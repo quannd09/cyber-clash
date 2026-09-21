@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CYBER CLASH: ZERO-G ARENA | 2D Local & Online Fighter</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=61">
+    <link rel="stylesheet" href="style.css?v=62">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -400,6 +400,50 @@
             </div>
         </div>
 
+        <!-- TOUCH CONTROLS (MOBILE VIRTUAL JOYSTICK & BUTTONS) -->
+        <div id="touch-controls" class="touch-controls hidden">
+            <!-- Left: Virtual Analog Joystick Zone -->
+            <div id="touch-joystick-zone" class="touch-joystick-zone">
+                <div id="touch-joystick-base" class="touch-joystick-base">
+                    <span class="dpad-arrow dpad-up">▲</span>
+                    <span class="dpad-arrow dpad-left">◀</span>
+                    <span class="dpad-arrow dpad-right">▶</span>
+                    <span class="dpad-arrow dpad-down">▼</span>
+                    <div id="touch-joystick-knob" class="touch-joystick-knob"></div>
+                </div>
+            </div>
+
+            <!-- Right: Action Combat Buttons Cluster -->
+            <div id="touch-actions-cluster" class="touch-actions-cluster">
+                <div class="touch-row touch-row-top">
+                    <button id="touch-btn-dash" class="touch-btn touch-btn-dash" data-action="strafe" aria-label="Dash">
+                        <span class="touch-icon">💨</span>
+                        <span class="touch-lbl">DASH</span>
+                    </button>
+                    <button id="touch-btn-ult" class="touch-btn touch-btn-ult" data-action="ultimate" aria-label="Ultimate">
+                        <span class="touch-icon">💥</span>
+                        <span class="touch-lbl">ULT</span>
+                    </button>
+                </div>
+                <div class="touch-row touch-row-bottom">
+                    <button id="touch-btn-skill" class="touch-btn touch-btn-skill" data-action="skill" aria-label="Skill">
+                        <span class="touch-icon">⚡</span>
+                        <span class="touch-lbl">SKILL</span>
+                    </button>
+                    <button id="touch-btn-shield" class="touch-btn touch-btn-shield" data-action="shield" aria-label="Shield">
+                        <span class="touch-icon">🛡️</span>
+                        <span class="touch-lbl">SHIELD</span>
+                    </button>
+                    <button id="touch-btn-atk" class="touch-btn touch-btn-atk" data-action="lightAttack" aria-label="Attack">
+                        <span class="touch-icon">⚔️</span>
+                        <span class="touch-lbl">ATK</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button id="touch-toggle-btn" class="help-toggle" style="right: 510px;" title="Toggle Virtual Touch Controls">📱 Touch</button>
+        <button id="fullscreen-toggle-btn" class="help-toggle" style="right: 360px;" title="Toggle Fullscreen Mode">⛶ Fullscreen</button>
         <button id="keybinds-toggle-btn" class="help-toggle" style="right: 210px;">⚙️ Keybinds</button>
         <button id="help-toggle-btn" class="help-toggle" onclick="document.getElementById('controls-modal').classList.toggle('hidden')">⌨️ Controls &amp; Tricks</button>
     </div>
@@ -415,6 +459,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=61"></script>
+    <script type="module" src="js/main.js?v=62"></script>
 </body>
 </html>

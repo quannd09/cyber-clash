@@ -16,7 +16,12 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 /* CRT Scanline Overlay - DISABLED FOR CLEAN LOOK */
@@ -26,15 +31,18 @@ body {
 
 #game-container {
     position: relative;
-    width: 1280px;
-    height: 720px;
-    max-width: 98vw;
-    max-height: 98vh;
+    width: 100vw;
+    height: 56.25vw;
+    max-width: min(1280px, calc(100vh * 16 / 9));
+    max-height: min(720px, 100vh);
+    aspect-ratio: 16 / 9;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
     border: 2px solid #334155;
     border-radius: 8px;
     overflow: hidden;
     background: #0f131c;
+    margin: auto;
+    touch-action: none;
 }
 
 canvas {
@@ -1007,5 +1015,347 @@ canvas {
 @keyframes pulseKey {
     from { opacity: 0.75; }
     to { opacity: 1; }
+}
+
+/* ============================================================
+   TOUCH CONTROLS (MOBILE VIRTUAL CONTROLLER) STYLES
+   ============================================================ */
+.touch-controls {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 45;
+    touch-action: none;
+}
+
+/* Left: Virtual Joystick Zone */
+.touch-joystick-zone {
+    position: absolute;
+    bottom: 22px;
+    left: 24px;
+    width: 136px;
+    height: 136px;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.touch-joystick-base {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.85) 100%);
+    border: 2px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.25), inset 0 0 14px rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+.dpad-arrow {
+    position: absolute;
+    color: rgba(56, 189, 248, 0.65);
+    font-size: 13px;
+    pointer-events: none;
+    font-weight: 900;
+}
+
+.dpad-up {
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dpad-down {
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dpad-left {
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.dpad-right {
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.touch-joystick-knob {
+    position: absolute;
+    top: calc(50% - 24px);
+    left: calc(50% - 24px);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #0284c7 70%, #0369a1 100%);
+    border: 2px solid #e0f2fe;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.8), 0 3px 6px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    transition: transform 0.04s linear;
+}
+
+/* Right: Combat Actions Cluster */
+.touch-actions-cluster {
+    position: absolute;
+    bottom: 20px;
+    right: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+    pointer-events: auto;
+    touch-action: none;
+}
+
+.touch-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.touch-btn {
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    border: 2px solid #ffffff;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
+    backdrop-filter: blur(4px);
+}
+
+.touch-btn:active,
+.touch-btn.touch-active {
+    transform: scale(0.91);
+    filter: brightness(1.35);
+}
+
+.touch-icon {
+    font-size: 18px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.touch-lbl {
+    font-size: 8.5px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+    margin-top: 1px;
+    pointer-events: none;
+}
+
+/* Attack Button (Largest, Red/Coral) */
+.touch-btn-atk {
+    width: 66px;
+    height: 66px;
+    background: radial-gradient(circle at 35% 35%, #f43f5e 0%, #be123c 80%, #881337 100%);
+    border-color: #fda4af;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.65), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.touch-btn-atk .touch-icon { font-size: 22px; }
+.touch-btn-atk .touch-lbl { font-size: 10px; }
+
+/* Shield Button (Cyan/Teal) */
+.touch-btn-shield {
+    width: 54px;
+    height: 54px;
+    background: radial-gradient(circle at 35% 35%, #06b6d4 0%, #0e7490 80%, #155e75 100%);
+    border-color: #67e8f9;
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.55), 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Skill Button (Amber/Gold) */
+.touch-btn-skill {
+    width: 54px;
+    height: 54px;
+    background: radial-gradient(circle at 35% 35%, #f59e0b 0%, #b45309 80%, #78350f 100%);
+    border-color: #fcd34d;
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.55), 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ultimate Button (Purple/Violet) */
+.touch-btn-ult {
+    width: 58px;
+    height: 58px;
+    background: radial-gradient(circle at 35% 35%, #a855f7 0%, #7e22ce 80%, #581c87 100%);
+    border-color: #d8b4fe;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.65), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Dash / Strafe Button (Emerald/Green) */
+.touch-btn-dash {
+    width: 48px;
+    height: 48px;
+    background: radial-gradient(circle at 35% 35%, #10b981 0%, #047857 80%, #064e3b 100%);
+    border-color: #6ee7b7;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.5), 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Fullscreen Active */
+:fullscreen #game-container,
+:-webkit-full-screen #game-container {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+}
+
+/* Responsive Scaling & Mobile Adaptations */
+@media (max-width: 768px), (max-height: 520px) {
+    .touch-joystick-zone {
+        bottom: 12px;
+        left: 14px;
+        width: 110px;
+        height: 110px;
+    }
+
+    .touch-joystick-knob {
+        width: 38px;
+        height: 38px;
+        top: calc(50% - 19px);
+        left: calc(50% - 19px);
+    }
+
+    .touch-actions-cluster {
+        bottom: 12px;
+        right: 14px;
+        gap: 6px;
+    }
+
+    .touch-row {
+        gap: 8px;
+    }
+
+    .touch-btn-atk {
+        width: 52px;
+        height: 52px;
+    }
+    .touch-btn-atk .touch-icon { font-size: 18px; }
+    .touch-btn-atk .touch-lbl { font-size: 8px; }
+
+    .touch-btn-shield,
+    .touch-btn-skill {
+        width: 44px;
+        height: 44px;
+    }
+    .touch-btn-shield .touch-icon,
+    .touch-btn-skill .touch-icon { font-size: 14px; }
+    .touch-btn-shield .touch-lbl,
+    .touch-btn-skill .touch-lbl { font-size: 7px; }
+
+    .touch-btn-ult {
+        width: 46px;
+        height: 46px;
+    }
+    .touch-btn-ult .touch-icon { font-size: 15px; }
+    .touch-btn-ult .touch-lbl { font-size: 7.5px; }
+
+    .touch-btn-dash {
+        width: 40px;
+        height: 40px;
+    }
+    .touch-btn-dash .touch-icon { font-size: 13px; }
+    .touch-btn-dash .touch-lbl { font-size: 6.5px; }
+
+    .help-toggle {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+        bottom: 6px !important;
+    }
+
+    #keybinds-toggle-btn { right: 135px !important; }
+    #help-toggle-btn { right: 8px !important; }
+    #fullscreen-toggle-btn { right: 235px !important; }
+    #touch-toggle-btn { right: 335px !important; }
+
+    .game-title {
+        font-size: 14px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .mode-tabs {
+        margin-bottom: 4px !important;
+        padding: 2px !important;
+    }
+
+    .mode-tab {
+        font-size: 9px !important;
+        padding: 3px 10px !important;
+    }
+
+    .bot-difficulty-panel {
+        padding: 2px 8px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .diff-title {
+        font-size: 9px !important;
+    }
+
+    .diff-btn {
+        font-size: 9px !important;
+        padding: 2px 6px !important;
+    }
+
+    .char-avatar {
+        width: 28px !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        min-height: 28px !important;
+        max-height: 28px !important;
+    }
+
+    .char-title {
+        font-size: 7.5px !important;
+    }
+
+    .char-type {
+        font-size: 6px !important;
+    }
+
+    .char-card {
+        padding: 2px 1px !important;
+    }
+
+    .player-box {
+        padding: 4px 6px !important;
+        gap: 3px !important;
+    }
+
+    .ready-btn {
+        font-size: 11px !important;
+        padding: 6px !important;
+    }
+
+    .skill-info-box {
+        min-height: 50px !important;
+        padding: 4px 6px !important;
+    }
+
+    .skill-row {
+        font-size: 9.5px !important;
+    }
 }
 

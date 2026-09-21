@@ -51,6 +51,27 @@ export class InputManager {
             lastMoveTime: 0
         };
 
+        // Mobile Touch Controls
+        this.touchEnabled = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        this.touchControlMode = 'auto'; // 'auto' | 'on' | 'off'
+        this.touchMove = { x: 0, y: 0 };
+        this.touchActions = {
+            lightAttack: false,
+            shield: false,
+            skill: false,
+            strafe: false,
+            ultimate: false
+        };
+        this.touchActionsJust = {
+            lightAttack: false,
+            shield: false,
+            skill: false,
+            strafe: false,
+            ultimate: false
+        };
+        this.joystickTouchId = null;
+        this.joystickCenter = { x: 0, y: 0, maxRadius: 42 };
+
         this.initListeners();
     }
 
@@ -181,6 +202,11 @@ export class InputManager {
         this.mouse.rightJustDown = false;
         this.mouse.prevLeftDown = this.mouse.leftDown;
         this.mouse.prevRightDown = this.mouse.rightDown;
+
+        // Reset single-frame touch triggers
+        for (const action in this.touchActionsJust) {
+            this.touchActionsJust[action] = false;
+        }
     }
 
     // Check keyboard key code
@@ -204,6 +230,12 @@ export class InputManager {
         // Check Keyboard
         let isDown = keyList.some(k => this.isKeyDown(k));
         let justDown = keyList.some(k => this.isKeyJustPressed(k));
+
+        // Player 1 Touch Controls Integration (Active for Player 1 / Solo / Online client)
+        if (playerIndex === 0) {
+            if (this.touchActions[action]) isDown = true;
+            if (this.touchActionsJust[action]) justDown = true;
+        }
 
         // Player 1 Mouse Integration (ONLY active in Single Player vs BOT or Online mode, DISABLED in Local 2-Player mode)
         if (this.mouseEnabled && playerIndex === 0 && this.mouse) {
@@ -280,6 +312,12 @@ export class InputManager {
         if (this.getActionState(playerIndex, 'up').isDown) y -= 1;
         if (this.getActionState(playerIndex, 'down').isDown) y += 1;
 
+        // Touch Virtual Joystick for Player 1 (or Solo/Online client)
+        if (playerIndex === 0 && (this.touchMove.x !== 0 || this.touchMove.y !== 0)) {
+            x = this.touchMove.x;
+            y = this.touchMove.y;
+        }
+
         // Gamepad analog input overrides if present
         const gp = this.gamepads[playerIndex];
         if (gp) {
@@ -300,6 +338,166 @@ export class InputManager {
         }
 
         return { x, y };
+    }
+
+    // --- MOBILE TOUCH CONTROLS METHODS ---
+    setTouchAction(action, isDown, justDown = false) {
+        if (this.touchActions.hasOwnProperty(action)) {
+            this.touchActions[action] = Boolean(isDown);
+            if (justDown) {
+                this.touchActionsJust[action] = true;
+            }
+        }
+    }
+
+    setTouchControlMode(mode) {
+        // mode: 'auto' | 'on' | 'off'
+        this.touchControlMode = mode;
+        if (mode === 'on') {
+            this.touchEnabled = true;
+        } else if (mode === 'off') {
+            this.touchEnabled = false;
+        } else {
+            this.touchEnabled = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        }
+        return this.touchControlMode;
+    }
+
+    cycleTouchControlMode() {
+        if (this.touchControlMode === 'auto') return this.setTouchControlMode('on');
+        if (this.touchControlMode === 'on') return this.setTouchControlMode('off');
+        return this.setTouchControlMode('auto');
+    }
+
+    initTouchControls(container) {
+        const touchOverlay = document.getElementById('touch-controls');
+        const joystickZone = document.getElementById('touch-joystick-zone');
+        const joystickBase = document.getElementById('touch-joystick-base');
+        const joystickKnob = document.getElementById('touch-joystick-knob');
+
+        if (!touchOverlay || !joystickZone || !joystickBase || !joystickKnob) return;
+
+        // 1. VIRTUAL JOYSTICK MULTI-TOUCH HANDLER
+        const handleJoystickStart = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (this.joystickTouchId !== null) return;
+            const touch = e.changedTouches ? e.changedTouches[0] : e;
+            this.joystickTouchId = (touch.identifier !== undefined) ? touch.identifier : 'mouse';
+            const rect = joystickBase.getBoundingClientRect();
+            this.joystickCenter = {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+                maxRadius: rect.width * 0.38
+            };
+            updateJoystick(touch.clientX, touch.clientY);
+        };
+
+        const updateJoystick = (clientX, clientY) => {
+            const dx = clientX - this.joystickCenter.x;
+            const dy = clientY - this.joystickCenter.y;
+            const dist = Math.hypot(dx, dy);
+            const maxR = this.joystickCenter.maxRadius || 42;
+            const angle = Math.atan2(dy, dx);
+            const clampedDist = Math.min(dist, maxR);
+
+            const knobX = Math.cos(angle) * clampedDist;
+            const knobY = Math.sin(angle) * clampedDist;
+            joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+
+            const force = Math.min(dist / maxR, 1.0);
+            if (force > 0.12) {
+                this.touchMove.x = Math.cos(angle) * force;
+                this.touchMove.y = Math.sin(angle) * force;
+            } else {
+                this.touchMove.x = 0;
+                this.touchMove.y = 0;
+            }
+        };
+
+        const handleJoystickMove = (e) => {
+            if (this.joystickTouchId === null) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.changedTouches) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    if (t.identifier === this.joystickTouchId) {
+                        updateJoystick(t.clientX, t.clientY);
+                        break;
+                    }
+                }
+            } else if (this.joystickTouchId === 'mouse') {
+                updateJoystick(e.clientX, e.clientY);
+            }
+        };
+
+        const handleJoystickEnd = (e) => {
+            if (this.joystickTouchId === null) return;
+            if (e.changedTouches) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === this.joystickTouchId) {
+                        this.joystickTouchId = null;
+                        this.touchMove.x = 0;
+                        this.touchMove.y = 0;
+                        joystickKnob.style.transform = 'translate(0px, 0px)';
+                        break;
+                    }
+                }
+            } else if (this.joystickTouchId === 'mouse') {
+                this.joystickTouchId = null;
+                this.touchMove.x = 0;
+                this.touchMove.y = 0;
+                joystickKnob.style.transform = 'translate(0px, 0px)';
+            }
+        };
+
+        joystickZone.addEventListener('touchstart', handleJoystickStart, { passive: false });
+        window.addEventListener('touchmove', handleJoystickMove, { passive: false });
+        window.addEventListener('touchend', handleJoystickEnd, { passive: false });
+        window.addEventListener('touchcancel', handleJoystickEnd, { passive: false });
+
+        // Desktop mouse fallback for testing
+        joystickZone.addEventListener('mousedown', (e) => {
+            if (e.button === 0) handleJoystickStart(e);
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (this.joystickTouchId === 'mouse') handleJoystickMove(e);
+        });
+        window.addEventListener('mouseup', (e) => {
+            if (this.joystickTouchId === 'mouse') handleJoystickEnd(e);
+        });
+
+        // 2. COMBAT ACTION BUTTONS MULTI-TOUCH HANDLER
+        const actionButtons = touchOverlay.querySelectorAll('.touch-btn');
+        actionButtons.forEach(btn => {
+            const action = btn.getAttribute('data-action');
+            if (!action) return;
+
+            const onBtnDown = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                btn.classList.add('touch-active');
+                const isInstant = (action === 'lightAttack' || action === 'skill' || action === 'ultimate');
+                this.setTouchAction(action, true, isInstant);
+            };
+
+            const onBtnUp = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                btn.classList.remove('touch-active');
+                this.setTouchAction(action, false, false);
+            };
+
+            btn.addEventListener('touchstart', onBtnDown, { passive: false });
+            btn.addEventListener('touchend', onBtnUp, { passive: false });
+            btn.addEventListener('touchcancel', onBtnUp, { passive: false });
+
+            // Desktop mouse fallback
+            btn.addEventListener('mousedown', onBtnDown);
+            btn.addEventListener('mouseup', onBtnUp);
+            btn.addEventListener('mouseleave', onBtnUp);
+        });
     }
 
     // --- CUSTOM KEYBINDINGS STORAGE & UTILITIES ---

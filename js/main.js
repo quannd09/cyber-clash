@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=61';
-import { input } from './input.js?v=61';
-import { fx } from './particles.js?v=61';
-import { combat, Projectile } from './combat.js?v=61';
-import { Cyborg } from './cyborg.js?v=61';
-import { GameRenderer } from './renderer.js?v=61';
-import { UIManager } from './ui.js?v=61';
-import { network } from './network.js?v=61';
-import { BotController } from './bot.js?v=61';
+import { sound } from './audio.js?v=62';
+import { input } from './input.js?v=62';
+import { fx } from './particles.js?v=62';
+import { combat, Projectile } from './combat.js?v=62';
+import { Cyborg } from './cyborg.js?v=62';
+import { GameRenderer } from './renderer.js?v=62';
+import { UIManager } from './ui.js?v=62';
+import { network } from './network.js?v=62';
+import { BotController } from './bot.js?v=62';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -61,6 +61,7 @@ class CyberClashGame {
         this.setGameMode('LOCAL');
         this.initResize();
         this.initAudioUnlock();
+        this.initMobileControls();
         this.initGameLoop();
     }
 
@@ -101,6 +102,64 @@ class CyberClashGame {
         };
         window.addEventListener('click', unlock);
         window.addEventListener('keydown', unlock);
+    }
+
+    initMobileControls() {
+        if (this.input && typeof this.input.initTouchControls === 'function') {
+            this.input.initTouchControls(document.getElementById('game-container'));
+        }
+
+        // Fullscreen Toggle Button
+        const fsBtn = document.getElementById('fullscreen-toggle-btn');
+        if (fsBtn) {
+            fsBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    const el = document.documentElement;
+                    if (el.requestFullscreen) {
+                        el.requestFullscreen().catch(err => console.warn(err));
+                    } else if (el.webkitRequestFullscreen) {
+                        el.webkitRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(err => console.warn(err));
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                }
+            });
+        }
+
+        // Touch Controls Toggle Button (AUTO / ON / OFF)
+        const touchBtn = document.getElementById('touch-toggle-btn');
+        if (touchBtn) {
+            const updateTouchBtnText = () => {
+                const mode = this.input.touchControlMode || 'auto';
+                touchBtn.textContent = `📱 Touch: ${mode.toUpperCase()}`;
+                this.updateTouchControlsVisibility();
+            };
+            updateTouchBtnText();
+            touchBtn.addEventListener('click', () => {
+                this.input.cycleTouchControlMode();
+                updateTouchBtnText();
+            });
+        }
+
+        this.updateTouchControlsVisibility();
+    }
+
+    updateTouchControlsVisibility() {
+        const touchOverlay = document.getElementById('touch-controls');
+        if (!touchOverlay) return;
+
+        const inFight = (this.state === STATE_FIGHT || this.state === STATE_COUNTDOWN || this.state === STATE_ROUND_OVER);
+        const shouldShow = inFight && Boolean(this.input.touchEnabled);
+
+        if (shouldShow) {
+            touchOverlay.classList.remove('hidden');
+        } else {
+            touchOverlay.classList.add('hidden');
+        }
     }
 
     startMatch(p1Char, p2Char) {
@@ -169,6 +228,7 @@ class CyberClashGame {
         this.latestClientInputs = null;
         this.latestSnapshot = null;
         this.ui.showLoadout();
+        this.updateTouchControlsVisibility();
     }
 
     startRound() {
@@ -183,6 +243,7 @@ class CyberClashGame {
         fx.clear();
 
         sound.playRoundStart();
+        this.updateTouchControlsVisibility();
     }
 
     initGameLoop() {
@@ -411,7 +472,7 @@ class CyberClashGame {
         const strafe = input.getActionState(index, 'strafe');
         player.setStrafing(strafe ? strafe.isDown : false);
 
-        // 2b. Mouse Aiming for Player 1 (Only in BOT or ONLINE mode, NEVER in LOCAL 2-player mode)
+        // 2b. Mouse & Touch Aiming for Player 1 (Only in BOT or ONLINE mode, NEVER in LOCAL 2-player mode)
         const isLocal2P = (this.gameMode === 'LOCAL');
         if (!isLocal2P && index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
             if (input.mouse && typeof input.mouse.x === 'number') {
@@ -420,6 +481,13 @@ class CyberClashGame {
                 if (Math.hypot(dx, dy) > 10) {
                     player.setAimAngle(Math.atan2(dy, dx));
                 }
+            }
+        } else if (index === 0 && opponent && input && input.touchEnabled && (!move || (move.x === 0 && move.y === 0))) {
+            // When playing on mobile with touch controls and not actively steering, auto-aim towards opponent
+            const dx = opponent.x - player.x;
+            const dy = opponent.y - player.y;
+            if (Math.hypot(dx, dy) > 10) {
+                player.setAimAngle(Math.atan2(dy, dx));
             }
         }
 
@@ -668,6 +736,7 @@ class CyberClashGame {
         if (this.state === STATE_VICTORY) {
             const winner = this.p1.roundsWon >= 2 ? this.p1 : this.p2;
             this.ui.showVictory(winner.name, winner.color);
+            this.updateTouchControlsVisibility();
         }
     }
 
@@ -690,6 +759,7 @@ class CyberClashGame {
         } else {
             this.roundMessage = 'DRAW ROUND!';
         }
+        this.updateTouchControlsVisibility();
     }
 
     resolveNextPhase() {
@@ -697,9 +767,11 @@ class CyberClashGame {
         if (this.p1.roundsWon >= 2) {
             this.state = STATE_VICTORY;
             this.ui.showVictory(this.p1.name, this.p1.color);
+            this.updateTouchControlsVisibility();
         } else if (this.p2.roundsWon >= 2) {
             this.state = STATE_VICTORY;
             this.ui.showVictory(this.p2.name, this.p2.color);
+            this.updateTouchControlsVisibility();
         } else {
             // Next round
             this.round++;
