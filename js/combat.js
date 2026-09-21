@@ -343,17 +343,21 @@ export class CombatResolver {
                 const ultDmgPerFrame = (normalDmg * 3.5) / 50;
 
                 if (user.characterId === 'yanagi') {
-                    // YANAGI: KAMEHAMEHA BEAM
+                    // YANAGI: PHÁO LÔI QUANG (LIGHTNING CANNON BEAM)
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const forwardDist = (target.x - user.x) * facingDir;
+                    const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1500;
-                    const beamAngle = user.aimAngle;
-                    const endX = user.x + Math.cos(beamAngle) * beamLen;
-                    const endY = user.y + Math.sin(beamAngle) * beamLen;
+                    const halfThickness = 28; // Khớp chính xác với bề rộng tia lôi quang hiển thị
 
-                    const dist = this.distToSegment(target.x, target.y, user.x, user.y, endX, endY);
-                    if (dist < target.radius + 80) {
+                    // Chỉ dính dame khi đối thủ thực sự nằm trong luồng tia lôi quang phía trước:
+                    // 1. Phải ở phía trước nòng pháo (từ 40px phía trước trở đi, không dính dame khi đứng sau lưng)
+                    // 2. Nằm trong chiều dài tia (<= 1500px)
+                    // 3. Khoảng cách vuông góc tới tia phải nhỏ hơn bán kính tia + bán kính nhân vật
+                    if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame);
                         target.applyStun(8);
-                        physics.applyKnockback(target, Math.cos(beamAngle), Math.sin(beamAngle), 1.5);
+                        physics.applyKnockback(target, facingDir, 0, 1.5);
                         fx.spawnHitSparks(target.x, target.y, user.color, 4);
                         triggerScreenShake(2, 4);
                     }
@@ -371,10 +375,12 @@ export class CombatResolver {
                     }
                 } else if (user.characterId === 'nicole') {
                     // NICOLE: GRAVITATIONAL SINGULARITY (HỐ ĐEN TRỌNG LỰC)
-                    const hX = user.x + Math.cos(user.aimAngle) * 320;
-                    const hY = user.y + Math.sin(user.aimAngle) * 320;
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const hX = user.x + facingDir * 320;
+                    const hY = user.y;
                     const dist = Math.hypot(target.x - hX, target.y - hY);
-                    if (dist < 300) {
+                    // Bán kính hút hố đen chuẩn xác theo vòng xoáy đĩa bồi tụ (120px)
+                    if (dist < target.radius + 95) {
                         // Sucking pull force towards black hole
                         const pullAngle = Math.atan2(hY - target.y, hX - target.x);
                         physics.applyKnockback(target, Math.cos(pullAngle), Math.sin(pullAngle), 2.2);
@@ -385,22 +391,22 @@ export class CombatResolver {
                     }
                 } else if (user.characterId === 'trigger') {
                     // TRIGGER: PIERCING SNIPER RAILGUN
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const forwardDist = (target.x - user.x) * facingDir;
+                    const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1600;
-                    const beamAngle = user.aimAngle;
-                    const endX = user.x + Math.cos(beamAngle) * beamLen;
-                    const endY = user.y + Math.sin(beamAngle) * beamLen;
+                    const halfThickness = 18; // Bán kính đường đạn xuyên phá chuẩn xác
 
-                    const dist = this.distToSegment(target.x, target.y, user.x, user.y, endX, endY);
-                    if (dist < target.radius + 60) {
+                    if (forwardDist >= 35 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame);
                         target.applyStun(12);
-                        physics.applyKnockback(target, Math.cos(beamAngle), Math.sin(beamAngle), 2.5);
+                        physics.applyKnockback(target, facingDir, 0, 2.5);
                         fx.spawnHitSparks(target.x, target.y, '#38bdf8', 5);
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'vivian') {
                     // VIVIAN: BANSHEE BLOOM (BÃO LÔNG VŨ ETHER) - Tăng phạm vi tác dụng lên 500px
-                    const stormRadius = 500;
+                    const stormRadius = 460;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + stormRadius) {
                         target.takeDamage(ultDmgPerFrame);
@@ -425,16 +431,17 @@ export class CombatResolver {
                     }
                 } else if (user.characterId === 'goku') {
                     // GOKU: SUPER SAIYAN KAMEHAMEHA!
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const forwardDist = (target.x - user.x) * facingDir;
+                    const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1500;
-                    const beamAngle = user.aimAngle;
-                    const endX = user.x + Math.cos(beamAngle) * beamLen;
-                    const endY = user.y + Math.sin(beamAngle) * beamLen;
+                    const halfThickness = 38; // Bán kính chuẩn cột sóng Kamehameha hoàng kim (bề rộng 76px)
 
-                    const dist = this.distToSegment(target.x, target.y, user.x, user.y, endX, endY);
-                    if (dist < target.radius + 90) { // Mega wide golden ki wave
+                    // Chỉ dính dame khi đối thủ thực sự nằm trong luồng sóng Kamehameha phía trước
+                    if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame);
                         target.applyStun(10);
-                        physics.applyKnockback(target, Math.cos(beamAngle), Math.sin(beamAngle), 2.0);
+                        physics.applyKnockback(target, facingDir, 0, 2.0);
                         fx.spawnHitSparks(target.x, target.y, '#fbbf24', 6);
                         triggerScreenShake(3, 6);
                     }
