@@ -32,24 +32,35 @@ body {
 #game-container {
     position: relative;
     width: 100vw;
-    height: 56.25vw;
-    max-width: min(1280px, calc(100vh * 16 / 9));
-    max-height: min(720px, 100vh);
-    aspect-ratio: 16 / 9;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
-    border: 2px solid #334155;
-    border-radius: 8px;
+    height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+    max-width: 100vw;
+    max-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
-    background: #0f131c;
-    margin: auto;
+    background: #090d16;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     touch-action: none;
 }
 
 canvas {
     width: 100%;
     height: 100%;
+    max-width: calc(100vh * 16 / 9);
+    max-height: calc(100vw * 9 / 16);
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
     display: block;
+    margin: auto;
     cursor: default;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.85);
 }
 
 /* OVERLAYS & MODALS */

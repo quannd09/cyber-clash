@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=62';
-import { input } from './input.js?v=62';
-import { fx } from './particles.js?v=62';
-import { combat, Projectile } from './combat.js?v=62';
-import { Cyborg } from './cyborg.js?v=62';
-import { GameRenderer } from './renderer.js?v=62';
-import { UIManager } from './ui.js?v=62';
-import { network } from './network.js?v=62';
-import { BotController } from './bot.js?v=62';
+import { sound } from './audio.js?v=63';
+import { input } from './input.js?v=63';
+import { fx } from './particles.js?v=63';
+import { combat, Projectile } from './combat.js?v=63';
+import { Cyborg } from './cyborg.js?v=63';
+import { GameRenderer } from './renderer.js?v=63';
+import { UIManager } from './ui.js?v=63';
+import { network } from './network.js?v=63';
+import { BotController } from './bot.js?v=63';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -145,7 +145,29 @@ class CyberClashGame {
             });
         }
 
+        // Auto-request fullscreen on tap/click when playing game
+        const triggerAutoFullscreen = () => {
+            if (this.state !== STATE_LOADOUT) {
+                this.requestFullscreen();
+            }
+        };
+        window.addEventListener('click', triggerAutoFullscreen, { passive: true });
+        window.addEventListener('touchend', triggerAutoFullscreen, { passive: true });
+
         this.updateTouchControlsVisibility();
+    }
+
+    requestFullscreen() {
+        try {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                const el = document.documentElement;
+                if (el.requestFullscreen) {
+                    el.requestFullscreen().catch(() => {});
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                }
+            }
+        } catch (e) {}
     }
 
     updateTouchControlsVisibility() {
@@ -163,6 +185,7 @@ class CyberClashGame {
     }
 
     startMatch(p1Char, p2Char) {
+        this.requestFullscreen();
         const charNames = {
             yanagi: 'TSUKISHIRO YANAGI',
             velina: 'VERINA AIRGID',

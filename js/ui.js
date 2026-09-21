@@ -1,6 +1,6 @@
-import { assets } from './assets.js?v=62';
-import { network } from './network.js?v=62';
-import { input } from './input.js?v=62';
+import { assets } from './assets.js?v=63';
+import { network } from './network.js?v=63';
+import { input } from './input.js?v=63';
 
 const SKILL_DATA = {
     yanagi: {
@@ -210,6 +210,7 @@ export class UIManager {
 
         if (p1ReadyBtn) {
             p1ReadyBtn.addEventListener('click', () => {
+                this.requestFullscreen();
                 if (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') return;
 
                 if (this.gameMode === 'BOT') {
@@ -238,6 +239,7 @@ export class UIManager {
 
         if (p2ReadyBtn) {
             p2ReadyBtn.addEventListener('click', () => {
+                this.requestFullscreen();
                 if (this.gameMode === 'BOT') return;
                 if (this.gameMode === 'ONLINE' && this.networkRole === 'HOST') return;
                 this.p2Ready = !this.p2Ready;
@@ -905,5 +907,18 @@ export class UIManager {
 
     hideVictory() {
         this.victoryScreen.classList.add('hidden');
+    }
+
+    requestFullscreen() {
+        try {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                const el = document.documentElement;
+                if (el.requestFullscreen) {
+                    el.requestFullscreen().catch(() => {});
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                }
+            }
+        } catch (err) {}
     }
 }
