@@ -1,5 +1,5 @@
-import { assets } from './assets.js?v=53';
-import { network } from './network.js?v=53';
+import { assets } from './assets.js?v=54';
+import { network } from './network.js?v=54';
 
 const SKILL_DATA = {
     yanagi: {
@@ -278,6 +278,8 @@ export class UIManager {
         const btnJoinRoom = document.getElementById('btn-join-room');
         const btnCopyCode = document.getElementById('btn-copy-code');
         const btnLeaveOnline = document.getElementById('btn-leave-online');
+        const btnCancelHost = document.getElementById('btn-cancel-host');
+        const btnCancelJoin = document.getElementById('btn-cancel-join');
         const inputRoomCode = document.getElementById('input-room-code');
         const hostCodeBox = document.getElementById('host-code-box');
         const displayRoomCode = document.getElementById('display-room-code');
@@ -300,6 +302,8 @@ export class UIManager {
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
             if (fightersContainer) fightersContainer.classList.remove('hidden');
+            if (hostCodeBox) hostCodeBox.classList.add('hidden');
+            if (clientWaitBox) clientWaitBox.classList.add('hidden');
 
             this.restoreLocalFighterPermissions();
             if (this.onNetworkModeChange) this.onNetworkModeChange('LOCAL');
@@ -318,6 +322,8 @@ export class UIManager {
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
             if (fightersContainer) fightersContainer.classList.remove('hidden');
+            if (hostCodeBox) hostCodeBox.classList.add('hidden');
+            if (clientWaitBox) clientWaitBox.classList.add('hidden');
 
             this.applyBotFighterPermissions();
             if (this.onNetworkModeChange) this.onNetworkModeChange('BOT');
@@ -361,11 +367,25 @@ export class UIManager {
         // CREATE ROOM (HOST)
         if (btnCreateRoom) {
             btnCreateRoom.addEventListener('click', () => {
+                if (clientWaitBox) clientWaitBox.classList.add('hidden');
+                if (inputRoomCode) inputRoomCode.value = '';
                 if (globalMsg) {
                     globalMsg.textContent = 'Initializing WebRTC peer room...';
                     globalMsg.classList.remove('error');
                 }
                 network.createRoom();
+            });
+        }
+
+        // CANCEL HOST ROOM
+        if (btnCancelHost) {
+            btnCancelHost.addEventListener('click', () => {
+                network.disconnect();
+                if (hostCodeBox) hostCodeBox.classList.add('hidden');
+                if (globalMsg) {
+                    globalMsg.textContent = 'Room cancelled. You can create a new room or join your opponent.';
+                    globalMsg.classList.remove('error');
+                }
             });
         }
 
@@ -380,9 +400,22 @@ export class UIManager {
                     }
                     return;
                 }
+                if (hostCodeBox) hostCodeBox.classList.add('hidden');
                 if (clientWaitBox) clientWaitBox.classList.remove('hidden');
                 if (clientWaitMsg) clientWaitMsg.textContent = `🔄 Connecting to [${code.toUpperCase()}]...`;
                 network.joinRoom(code);
+            });
+        }
+
+        // CANCEL JOIN
+        if (btnCancelJoin) {
+            btnCancelJoin.addEventListener('click', () => {
+                network.disconnect();
+                if (clientWaitBox) clientWaitBox.classList.add('hidden');
+                if (globalMsg) {
+                    globalMsg.textContent = 'Connection attempt cancelled.';
+                    globalMsg.classList.remove('error');
+                }
             });
         }
 

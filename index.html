@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=53">
+    <link rel="stylesheet" href="style.css?v=54">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -60,6 +60,7 @@
                                 <button id="btn-copy-code" class="copy-btn">📋 COPY</button>
                             </div>
                             <div class="lobby-pulse-msg">⏳ Waiting for opponent to join...</div>
+                            <button id="btn-cancel-host" class="leave-btn" style="margin-top: 10px; width: 100%; font-size: 13px;">❌ CANCEL ROOM</button>
                         </div>
                     </div>
 
@@ -77,11 +78,15 @@
 
                         <div id="client-wait-box" class="code-display-box hidden">
                             <div id="client-wait-msg" class="lobby-pulse-msg">🔄 Connecting to host...</div>
+                            <button id="btn-cancel-join" class="leave-btn" style="margin-top: 10px; width: 100%; font-size: 13px;">❌ CANCEL CONNECTION</button>
                         </div>
                     </div>
                 </div>
 
                 <div id="online-global-msg" class="lobby-status-msg"></div>
+                <p class="lobby-guide-note" style="text-align: center; color: #94a3b8; font-size: 13px; margin: 16px 0 0 0; line-height: 1.5;">
+                    💡 <strong>How to connect:</strong> Player 1 clicks <strong>⚡ CREATE ROOM</strong> and shares the code with Player 2. Player 2 enters the code and clicks <strong>🚀 JOIN</strong> (Do NOT both create rooms).
+                </p>
             </div>
 
             <div id="loadout-fighters-container" class="loadout-container">
@@ -335,6 +340,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=53"></script>
+    <script type="module" src="js/main.js?v=54"></script>
 </body>
 </html>
