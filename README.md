@@ -1,111 +1,85 @@
 # CYBER CLASH: ZERO-G ARENA ⚡
-> **Game đối kháng 2D phong cách Cyberpunk trong môi trường Không trọng lực (Zero-G Fighter)**  
-> *Hỗ trợ chơi 2 người chung máy (Local) & Đấu Online 2 máy qua mã phòng WebRTC P2P (Zero Backend).*
-
-![Cyber Clash Banner](assets/goku/avatar.png)
+> **Fast-Paced 2D Cyberpunk Fighter in Zero-Gravity**  
+> *Supports Local 2-Player on a single machine & Online 1v1 via WebRTC P2P (Zero Backend).*
 
 ---
 
-## 🌟 Tính Năng Nổi Bật
+## 🌟 Key Features
 
-- **Vật lý Không Trọng Lực (Zero-G Momentum):** Điều khiển phản lực 4 hướng, quán tính trôi dạt tự do, cơ chế **Bật tường gia tốc (Wall Bounce Boost)** để luồn lách phản công.
-- **8 Đấu Sĩ Độc Nhất (Anime & Cyberpunk Roster):**
-  1. **⚡ Tsukishiro Yanagi (500 HP):** Cận chiến sấm sét • Nguyệt Thương • Chớp Nhoáng • Pháo Lôi Quang.
-  2. **🌸 Verina Airgid (500 HP):** Tầm xa hồi phục • Sao Chổi • Quang Dưỡng • Bão Sinh Mệnh.
-  3. **💼 Nicole Demara (500 HP):** Tầm xa hỏa lực • Pháo Cặp Táp • Trượt Tiền Tài • Hố Đen Trọng Lực.
-  4. **🎯 Trigger (500 HP):** Bắn tỉa tinh nhuệ • Phát Bắn Thanh Trừng • Thế Bắn Tỉa • Hỏa Lực Đồng Bộ.
-  5. **🔮 Vivian Banshee (650 HP - Trâu bò & Nộ nhanh):** Tầm xa hắc thuật • Lông Vũ Dị Thường • Hộ Mệnh Nở Rộ • Bão Lông Vũ Điềm Báo Vĩnh Cửu.
-  6. **👊 Jotaro Kujo (500 HP):** Cận chiến vũ bão • ORA ORA ORA! • Star Finger • The World (Ngưng đọng thời gian 2.5s).
-  7. **🥋 Son Goku (500 HP):** Võ thuật siêu cấp • Long Quyền Ki • Dịch Chuyển Tức Thời • Siêu Kamehameha.
-  8. **🐞 Giorno Giovanna (500 HP):** Stand Hoàng Kim • MUDA MUDA MUDA! • Cây Cối Sinh Mệnh • Return To Zero.
-- **Cơ chế Chiến Đấu Chuyên Sâu:**
-  - **✨ Perfect Parry:** Đỡ đòn cận chiến làm choáng đối thủ 0.9s; đỡ đạn phản pháo ngược lại với tốc độ x1.3.
-  - **⚔️ Blade Clash:** Hai bên cùng ra đòn sẽ triệt tiêu lực và nổ sóng xung kích đẩy văng đối phương.
-  - **🛡️ Guard Break:** Giữ khiên quá lâu cạn năng lượng sẽ bị vỡ thế phòng thủ.
-  - **⚠️ Chống Spam Đòn Đánh:** Nhấn liên tiếp quá 6 đòn đánh trong vòng 3 giây sẽ bị phạt delay 1 giây.
-- **Chế Độ Chơi Đa Dạng:**
-  - **🎮 Đấu Chung Máy (Local):** 2 người chơi cùng bàn phím hoặc 2 tay cầm Gamepad.
-  - **🌐 Đấu Online (WebRTC P2P):** Ghép phòng qua mã 4 chữ số (ví dụ: `CLASH-8821`), không cần máy chủ trung gian, truyền tín hiệu P2P độ trễ siêu thấp.
-  - **⚡ Chống Đóng Băng Tab (Web Worker Ticker):** Máy chủ duy trì tính toán vật lý 60 FPS liên tục ngay cả khi chuyển tab hoặc ẩn cửa sổ.
+- **Zero-G Physics & Momentum:** Omni-directional thrusters, inertia drifting, and **Wall Bounce Boost** for high-speed counterattacks.
+- **8 Unique Fighters:**
+  1. **⚡ Tsukishiro Yanagi (500 HP • Melee):** Moon Spear • Flash Blink • Lightning Cannon.
+  2. **🌸 Verina Airgid (500 HP • Ranged):** Comet Blast • Photosynthesis • Life Blossom Storm.
+  3. **💼 Nicole Demara (500 HP • Ranged):** Briefcase Cannon • Vault Dash • Gravitational Black Hole.
+  4. **🎯 Trigger (500 HP • Ranged):** Purge Shot • Sniper Stance • Synchronized Firepower.
+  5. **🔮 Vivian Banshee (650 HP • Ranged):** Phantom Feathers • Blooming Ward • Feather Storm Harbinger.
+  6. **👊 Jotaro Kujo (500 HP • Melee):** ORA ORA ORA! • Star Finger • The World (Time Stop).
+  7. **🥋 Son Goku (500 HP • Melee):** Dragon Fist Ki • Instant Transmission • Super Kamehameha.
+  8. **🐞 Giorno Giovanna (500 HP • Melee):** MUDA MUDA MUDA! • Tree of Life • Return To Zero.
+- **Deep Combat Mechanics:**
+  - **Perfect Parry:** Block right before impact to stun melee foes or reflect plasma shots back at x1.3 speed.
+  - **Blade Clash:** Simultaneous melee strikes nullify damage and trigger a concussive shockwave.
+  - **Anti-Spam Penalty:** Excessive inputs (over 6 attacks within 3 seconds) trigger a brief 1-second cooldown.
+- **Game Modes:**
+  - **Local:** 2 players on a single keyboard or dual gamepads.
+  - **Online:** Direct WebRTC P2P connection via 4-character room codes (`CLASH-XXXX`). No external server required.
+  - **Background Ticker:** Powered by a Web Worker to maintain smooth 60 FPS physics calculation across background tabs.
 
 ---
 
-## 🕹️ Bảng Điều Khiển (Controls)
+## 🕹️ Controls
 
-### 1. Chế độ Chơi Chung Máy (Local 2-Player)
+### Local Mode (2 Players)
 
-| Thao tác | Player 1 (Bên Trái) | Player 2 (Bên Phải) | Gamepad |
+| Action | Player 1 (Cyan) | Player 2 (Magenta) | Gamepad |
 | :--- | :--- | :--- | :--- |
-| **Bay phản lực** | `W`, `A`, `S`, `D` | `↑`, `←`, `↓`, `→` | Cần Analog / D-Pad |
-| **Tấn công (Attack)** | `F` | `Num 1` hoặc `J` | Nút X / Vuông |
-| **Bật khiên (Shield)** | `H` | `Num 3` hoặc `L` | Nút B / Tròn |
-| **Kỹ năng (Skill)** | `R` | `Num 5` hoặc `I` | Nút A / X |
-| **Khóa hướng (Strafe)** | `Shift Trái` | `Num 0` hoặc `U` | Cò trái (LT / L1) |
-| **Chiêu cuối (Ultimate)**| `Space` | `Enter` hoặc `O` | Cò phải (RT / R1) |
+| **Thrust / Move** | `W`, `A`, `S`, `D` | `↑`, `←`, `↓`, `→` | Left Analog / D-Pad |
+| **Normal Attack** | `F` | `Num 1` or `J` | X / Square |
+| **Shield / Parry** | `H` | `Num 3` or `L` | B / Circle |
+| **Special Skill** | `R` | `Num 5` or `I` | A / Cross |
+| **Strafe Lock** | `Left Shift` | `Num 0` or `U` | Left Trigger (LT / L1) |
+| **Ultimate Ability** | `Space` | `Enter` or `O` | Right Trigger (RT / R1) |
 
-### 2. Chế độ Đấu Online (WebRTC)
-- **Chủ phòng (Host - Player 1):** Bấm `TẠO PHÒNG` $\rightarrow$ Copy mã phòng gửi cho bạn bè $\rightarrow$ Điều khiển bằng `WASD + F / H / R / Space`.
-- **Khách (Client - Player 2):** Nhập mã phòng $\rightarrow$ Bấm `VÀO PHÒNG` $\rightarrow$ Trên máy của mình có thể dùng tùy thích:
-  - Cụm `WASD` + `F` (đánh) + `H` (khiên) + `R` (skill) + `Space` (ulti).
-  - Hoặc cụm `Phím mũi tên` + `J` + `L` + `I` + `Enter`.
+### Online Mode (WebRTC)
+- **Host (Player 1):** Click `CREATE ROOM` $\rightarrow$ Share room code $\rightarrow$ Controls: `WASD + F / H / R / Space`.
+- **Client (Player 2):** Enter room code $\rightarrow$ Click `JOIN` $\rightarrow$ Controls: Can use either `WASD` or `Arrow Keys`.
 
 ---
 
-## 🚀 Cài Đặt & Chạy Cục Bộ (Local Run)
+## 🚀 Running Locally
 
-### Cách 1: Mở nhanh bằng file thực thi
-Nhấp đúp chuột vào file `open_game.bat`. Game sẽ tự động mở trên trình duyệt tại `http://localhost:8000`.
+### Option 1: Quick Launch (Windows)
+Double-click `open_game.bat`. The game will launch automatically at `http://localhost:8000`.
 
-### Cách 2: Chạy bằng Python HTTP Server
+### Option 2: Python HTTP Server
 ```bash
 py -m http.server 8000
 ```
-Sau đó truy cập trình duyệt: `http://localhost:8000`.
+Open `http://localhost:8000` in your web browser.
 
 ---
 
-## 🌐 Triển Khai Lên Vercel (Deploy to Vercel)
-
-Dự án được cấu hình sẵn 100% tệp tĩnh (Static Web App), sẵn sàng để deploy lên Vercel chỉ trong 1 phút:
-
-1. **Đẩy mã nguồn lên GitHub:**
-   - Sử dụng GitHub Desktop hoặc Git CLI để tạo repository và push code lên GitHub.
-2. **Kết nối Vercel:**
-   - Đăng nhập vào [Vercel](https://vercel.com).
-   - Chọn **"Add New..."** $\rightarrow$ **"Project"**.
-   - Chọn repository GitHub vừa tạo.
-   - Giữ nguyên cấu hình mặc định (Framework Preset: **Other**, Root Directory: `./`).
-   - Bấm **Deploy**.
-3. **Trải nghiệm:** Vercel sẽ cung cấp link truy cập dạng `https://your-project.vercel.app`. Bạn có thể gửi link này cho bất kỳ ai để cùng tạo phòng và solo trực tuyến!
-
----
-
-## 📁 Cấu Trúc Dự Án
+## 📁 Project Structure
 
 ```
 cyber-clash/
-├── assets/            # Ảnh nhân vật, avatar, sprite idle/sheet, âm thanh
+├── assets/            # Character sprites, avatars, and audio effects
 ├── js/
-│   ├── assets.js      # Nạp trước (Preload) hình ảnh & tài nguyên
-│   ├── audio.js       # Hệ thống âm thanh Web Audio API & Synth FX
-│   ├── combat.js      # Tính toán sát thương, đạn bay, hitbox con nhộng
-│   ├── cyborg.js      # Khởi tạo chỉ số nhân vật, kỹ năng, anti-spam
-│   ├── input.js       # Quản lý bàn phím anti-ghosting & Gamepad API
-│   ├── main.js        # Vòng lặp chính 60 FPS, Web Worker ticker ngầm
-│   ├── network.js     # WebRTC PeerJS quản lý kết nối P2P 1v1
-│   ├── particles.js   # Hiệu ứng nổ, tia lửa điện, lốc lông vũ
-│   ├── peerjs.min.js  # Thư viện PeerJS đóng gói cục bộ
-│   ├── physics.js     # Vật lý Zero-G, ma sát không gian, nảy tường
-│   ├── renderer.js    # Vẽ đấu trường Canvas, sàn lưới Neon, thanh HUD
-│   └── ui.js          # Giao diện chọn tướng, bảng skill, sảnh Online
-├── index.html         # Khung HTML chính & liên kết Google Fonts Orbitron
-├── style.css          # Giao diện Cyberpunk Neon Glassmorphism
-├── vercel.json        # Cấu hình tối ưu định tuyến và cache cho Vercel
-├── open_game.bat      # Script khởi chạy nhanh trên Windows
-└── README.md          # Tài liệu hướng dẫn trò chơi
+│   ├── assets.js      # Asset preloading
+│   ├── audio.js       # Web Audio API sound synthesizer
+│   ├── combat.js      # Damage calculation, projectiles & capsule hitboxes
+│   ├── cyborg.js      # Fighter stats, abilities & anti-spam logic
+│   ├── input.js       # Anti-ghosting keyboard & Gamepad API handler
+│   ├── main.js        # Main 60 FPS loop & Web Worker ticker
+│   ├── network.js     # WebRTC PeerJS P2P room networking
+│   ├── particles.js   # VFX particle systems
+│   ├── peerjs.min.js  # Bundled PeerJS library
+│   ├── physics.js     # Zero-G momentum, drag & wall bouncing
+│   ├── renderer.js    # Canvas rendering, neon arena grid & HUD
+│   └── ui.js          # Selection UI, moves display & online lobby
+├── index.html         # Main HTML document & font imports
+├── style.css          # Cyberpunk neon glassmorphism UI styles
+├── vercel.json        # Routing and cache configuration for static hosting
+├── open_game.bat      # Windows one-click local launcher
+└── README.md          # Game documentation
 ```
-
----
-
-## 📜 Giấy Phép & Bản Quyền
-Dự án được xây dựng cho mục đích học tập, giải trí và nghiên cứu phát triển game Web HTML5 / WebRTC P2P.

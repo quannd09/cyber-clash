@@ -4,114 +4,114 @@ import { network } from './network.js?v=48';
 
 const SKILL_DATA = {
     yanagi: {
-        title: '⚡ TSUKISHIRO YANAGI (CẬN CHIẾN • 500 HP)',
+        title: '⚡ TSUKISHIRO YANAGI (MELEE • 500 HP)',
         color: '#a78bfa',
         p1: [
-            { key: 'F (Cận chiến)', name: 'Nguyệt Thương', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Chớp Nhoáng', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Pháo Lôi Quang', desc: '' }
+            { key: 'F (Melee)', name: 'Moon Spear', desc: '' },
+            { key: 'R (Skill)', name: 'Flash Blink', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ],
         p2: [
-            { key: 'J (Cận chiến)', name: 'Nguyệt Thương', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Chớp Nhoáng', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Pháo Lôi Quang', desc: '' }
+            { key: 'J (Melee)', name: 'Moon Spear', desc: '' },
+            { key: 'I (Skill)', name: 'Flash Blink', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ]
     },
     velina: {
-        title: '🌸 VERINA AIRGID (TẦM XA • 500 HP)',
+        title: '🌸 VERINA AIRGID (RANGED • 500 HP)',
         color: '#34d399',
         p1: [
-            { key: 'F (Tầm xa)', name: 'Sao Chổi', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Quang Dưỡng', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Bão Sinh Mệnh', desc: '' }
+            { key: 'F (Ranged)', name: 'Comet Blast', desc: '' },
+            { key: 'R (Skill)', name: 'Photosynthesis', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ],
         p2: [
-            { key: 'J (Tầm xa)', name: 'Sao Chổi', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Quang Dưỡng', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Bão Sinh Mệnh', desc: '' }
+            { key: 'J (Ranged)', name: 'Comet Blast', desc: '' },
+            { key: 'I (Skill)', name: 'Photosynthesis', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ]
     },
     nicole: {
-        title: '💼 NICOLE DEMARA (TẦM XA • 500 HP)',
+        title: '💼 NICOLE DEMARA (RANGED • 500 HP)',
         color: '#f472b6',
         p1: [
-            { key: 'F (Tầm xa)', name: 'Pháo Cặp Táp', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Trượt Tiền Tài', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Hố Đen Trọng Lực', desc: '' }
+            { key: 'F (Ranged)', name: 'Briefcase Cannon', desc: '' },
+            { key: 'R (Skill)', name: 'Vault Dash', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ],
         p2: [
-            { key: 'J (Tầm xa)', name: 'Pháo Cặp Táp', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Trượt Tiền Tài', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Hố Đen Trọng Lực', desc: '' }
+            { key: 'J (Ranged)', name: 'Briefcase Cannon', desc: '' },
+            { key: 'I (Skill)', name: 'Vault Dash', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ]
     },
     trigger: {
-        title: '🎯 TRIGGER (TẦM XA • 500 HP)',
+        title: '🎯 TRIGGER (RANGED • 500 HP)',
         color: '#38bdf8',
         p1: [
-            { key: 'F (Tầm xa)', name: 'Phát Bắn Thanh Trừng', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Thế Bắn Tỉa', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Hỏa Lực Đồng Bộ', desc: '' }
+            { key: 'F (Ranged)', name: 'Purge Shot', desc: '' },
+            { key: 'R (Skill)', name: 'Sniper Stance', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ],
         p2: [
-            { key: 'J (Tầm xa)', name: 'Phát Bắn Thanh Trừng', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Thế Bắn Tỉa', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Hỏa Lực Đồng Bộ', desc: '' }
+            { key: 'J (Ranged)', name: 'Purge Shot', desc: '' },
+            { key: 'I (Skill)', name: 'Sniper Stance', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ]
     },
     vivian: {
-        title: '🔮 VIVIAN BANSHEE (TẦM XA • 650 HP)',
+        title: '🔮 VIVIAN BANSHEE (RANGED • 650 HP)',
         color: '#c084fc',
         p1: [
-            { key: 'F (Tầm xa)', name: 'Lông Vũ Dị Thường', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Hộ Mệnh Nở Rộ', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Điềm Báo Vĩnh Cửu', desc: '' }
+            { key: 'F (Ranged)', name: 'Phantom Feathers', desc: '' },
+            { key: 'R (Skill)', name: 'Blooming Ward', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ],
         p2: [
-            { key: 'J (Tầm xa)', name: 'Lông Vũ Dị Thường', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Hộ Mệnh Nở Rộ', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Điềm Báo Vĩnh Cửu', desc: '' }
+            { key: 'J (Ranged)', name: 'Phantom Feathers', desc: '' },
+            { key: 'I (Skill)', name: 'Blooming Ward', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ]
     },
     jotaro: {
-        title: '👊 JOTARO KUJO (CẬN CHIẾN • 500 HP)',
+        title: '👊 JOTARO KUJO (MELEE • 500 HP)',
         color: '#818cf8',
         p1: [
-            { key: 'F (Cận chiến)', name: 'ORA ORA ORA!', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Star Finger', desc: '' },
-            { key: 'Space (Ultimate)', name: 'The World: Ngưng Đọng Thời Gian', desc: '' }
+            { key: 'F (Melee)', name: 'ORA ORA ORA!', desc: '' },
+            { key: 'R (Skill)', name: 'Star Finger', desc: '' },
+            { key: 'Space (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ],
         p2: [
-            { key: 'J (Cận chiến)', name: 'ORA ORA ORA!', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Star Finger', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'The World: Ngưng Đọng Thời Gian', desc: '' }
+            { key: 'J (Melee)', name: 'ORA ORA ORA!', desc: '' },
+            { key: 'I (Skill)', name: 'Star Finger', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ]
     },
     goku: {
-        title: '🥋 SON GOKU (CẬN CHIẾN • 500 HP)',
+        title: '🥋 SON GOKU (MELEE • 500 HP)',
         color: '#fbbf24',
         p1: [
-            { key: 'F (Cận chiến)', name: 'Long Quyền Ki', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Dịch Chuyển Tức Thời', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Siêu Kamehameha', desc: '' }
+            { key: 'F (Melee)', name: 'Dragon Fist Ki', desc: '' },
+            { key: 'R (Skill)', name: 'Instant Transmission', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ],
         p2: [
-            { key: 'J (Cận chiến)', name: 'Long Quyền Ki', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Dịch Chuyển Tức Thời', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Siêu Kamehameha', desc: '' }
+            { key: 'J (Melee)', name: 'Dragon Fist Ki', desc: '' },
+            { key: 'I (Skill)', name: 'Instant Transmission', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ]
     },
     giorno: {
-        title: '🐞 GIORNO GIOVANNA (CẬN CHIẾN • 500 HP)',
+        title: '🐞 GIORNO GIOVANNA (MELEE • 500 HP)',
         color: '#facc15',
         p1: [
-            { key: 'F (Cận chiến)', name: 'MUDA MUDA MUDA!', desc: '' },
-            { key: 'R (Kỹ năng)', name: 'Cây Cối Sinh Mệnh', desc: '' },
+            { key: 'F (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
+            { key: 'R (Skill)', name: 'Tree of Life', desc: '' },
             { key: 'Space (Ultimate)', name: 'Return To Zero', desc: '' }
         ],
         p2: [
-            { key: 'J (Cận chiến)', name: 'MUDA MUDA MUDA!', desc: '' },
-            { key: 'I (Kỹ năng)', name: 'Cây Cối Sinh Mệnh', desc: '' },
+            { key: 'J (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
+            { key: 'I (Skill)', name: 'Tree of Life', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Return To Zero', desc: '' }
         ]
     }
@@ -309,7 +309,7 @@ export class UIManager {
         if (btnCreateRoom) {
             btnCreateRoom.addEventListener('click', () => {
                 if (globalMsg) {
-                    globalMsg.textContent = 'Đang khởi tạo máy chủ phòng qua WebRTC...';
+                    globalMsg.textContent = 'Initializing WebRTC peer room...';
                     globalMsg.classList.remove('error');
                 }
                 network.createRoom();
@@ -322,13 +322,13 @@ export class UIManager {
                 const code = inputRoomCode ? inputRoomCode.value.trim() : '';
                 if (!code) {
                     if (globalMsg) {
-                        globalMsg.textContent = 'Vui lòng nhập mã phòng trước khi bấm Vào Phòng!';
+                        globalMsg.textContent = 'Please enter a room code before joining!';
                         globalMsg.classList.add('error');
                     }
                     return;
                 }
                 if (clientWaitBox) clientWaitBox.classList.remove('hidden');
-                if (clientWaitMsg) clientWaitMsg.textContent = `🔄 Đang tìm và kết nối tới [${code.toUpperCase()}]...`;
+                if (clientWaitMsg) clientWaitMsg.textContent = `🔄 Connecting to [${code.toUpperCase()}]...`;
                 network.joinRoom(code);
             });
         }
@@ -347,7 +347,7 @@ export class UIManager {
             btnCopyCode.addEventListener('click', () => {
                 if (displayRoomCode && displayRoomCode.textContent) {
                     navigator.clipboard.writeText(displayRoomCode.textContent).then(() => {
-                        btnCopyCode.textContent = '✔️ ĐÃ COPY!';
+                        btnCopyCode.textContent = '✔️ COPIED!';
                         setTimeout(() => { btnCopyCode.textContent = '📋 COPY'; }, 2000);
                     });
                 }
@@ -373,7 +373,7 @@ export class UIManager {
             if (hostCodeBox) hostCodeBox.classList.remove('hidden');
             if (displayRoomCode) displayRoomCode.textContent = code;
             if (globalMsg) {
-                globalMsg.textContent = `Phòng [${code}] đã sẵn sàng! Gửi mã này cho bạn bè để cùng chơi.`;
+                globalMsg.textContent = `Room [${code}] ready! Share this code with your opponent.`;
                 globalMsg.classList.remove('error');
             }
         };
@@ -398,7 +398,7 @@ export class UIManager {
 
             if (bannerRoomCode) bannerRoomCode.textContent = code;
             if (bannerRoleText) {
-                bannerRoleText.textContent = role === 'HOST' ? 'VAI TRÒ: CHỦ PHÒNG (P1)' : 'VAI TRÒ: KHÁCH (P2)';
+                bannerRoleText.textContent = role === 'HOST' ? 'ROLE: HOST (P1)' : 'ROLE: CLIENT (P2)';
             }
 
             this.applyOnlinePermissions(role);
@@ -439,7 +439,7 @@ export class UIManager {
 
             // Client gets to use WASD OR Arrow keys on their own computer!
             const p2HeaderLabel = document.querySelector('.player-box.p2-border .section-label');
-            if (p2HeaderLabel) p2HeaderLabel.textContent = '[WASD / MŨI TÊN + F/J / H/L / R/I / SPACE/ENTER]';
+            if (p2HeaderLabel) p2HeaderLabel.textContent = '[WASD / ARROW KEYS + F/J / H/L / R/I / SPACE/ENTER]';
             if (p2Btn) p2Btn.textContent = 'READY (Press F / Space / J / Enter)';
             this.renderSkillInfo('p2', this.p2Char);
         }
@@ -455,7 +455,7 @@ export class UIManager {
         if (p2Btn) p2Btn.style.pointerEvents = 'auto';
 
         const p2HeaderLabel = document.querySelector('.player-box.p2-border .section-label');
-        if (p2HeaderLabel) p2HeaderLabel.textContent = '[MŨI TÊN + J / L / I / U / ENTER]';
+        if (p2HeaderLabel) p2HeaderLabel.textContent = '[ARROW KEYS + J / L / I / U / ENTER]';
         if (p2Btn) p2Btn.textContent = 'READY (Press J / Enter)';
     }
 
@@ -517,7 +517,7 @@ export class UIManager {
         let html = `
             <div class="skill-info-header">
                 <span class="skill-char-name" style="color: ${data.color};">${data.title}</span>
-                <span class="skill-badge">CHIÊU THỨC</span>
+                <span class="skill-badge">MOVES</span>
             </div>
         `;
 
@@ -577,7 +577,7 @@ export class UIManager {
         this.victoryScreen.classList.remove('hidden');
         const title = document.getElementById('winner-title');
         if (title) {
-            title.textContent = `${winnerName} CHIẾN THẮNG!`;
+            title.textContent = `${winnerName.toUpperCase()} WINS!`;
             title.style.color = winnerColor;
             title.style.textShadow = `0 0 25px ${winnerColor}`;
         }

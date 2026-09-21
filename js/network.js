@@ -43,11 +43,11 @@ export class NetworkManager {
         this.roomCode = this.generateRoomCode();
         const peerId = this.getPeerIdFromCode(this.roomCode);
 
-        this.notifyStatus(`Đang tạo phòng [${this.roomCode}]...`);
+        this.notifyStatus(`Creating room [${this.roomCode}]...`);
 
         try {
             if (typeof Peer === 'undefined') {
-                this.notifyStatus('Lỗi: Thư viện PeerJS chưa được tải!', true);
+                this.notifyStatus('Error: PeerJS library not loaded!', true);
                 return;
             }
 
@@ -56,7 +56,7 @@ export class NetworkManager {
             });
 
             this.peer.on('open', (id) => {
-                this.notifyStatus(`Phòng đã sẵn sàng! Đang đợi người chơi thứ 2...`);
+                this.notifyStatus(`Room ready! Waiting for opponent...`);
                 if (this.onRoomCreated) {
                     this.onRoomCreated(this.roomCode);
                 }
@@ -70,16 +70,16 @@ export class NetworkManager {
             this.peer.on('error', (err) => {
                 console.error('[Network Host Error]', err);
                 if (err.type === 'unavailable-id') {
-                    // Trùng mã phòng, tạo lại mã khác
+                    // Duplicate room code, regenerate
                     this.createRoom();
                 } else {
-                    this.notifyStatus(`Lỗi máy chủ mạng: ${err.type || err.message}`, true);
+                    this.notifyStatus(`Network error: ${err.type || err.message}`, true);
                 }
             });
 
         } catch (e) {
             console.error('[Create Room Exception]', e);
-            this.notifyStatus(`Không thể khởi tạo phòng: ${e.message}`, true);
+            this.notifyStatus(`Failed to initialize room: ${e.message}`, true);
         }
     }
 
@@ -87,7 +87,7 @@ export class NetworkManager {
         this.disconnect();
         const code = this.cleanCode(rawCode);
         if (!code || code === 'CLASH-') {
-            this.notifyStatus('Vui lòng nhập mã phòng hợp lệ!', true);
+            this.notifyStatus('Please enter a valid room code!', true);
             return;
         }
 
@@ -95,11 +95,11 @@ export class NetworkManager {
         this.roomCode = code;
         const hostPeerId = this.getPeerIdFromCode(code);
 
-        this.notifyStatus(`Đang tìm kiếm phòng [${code}]...`);
+        this.notifyStatus(`Searching for room [${code}]...`);
 
         try {
             if (typeof Peer === 'undefined') {
-                this.notifyStatus('Lỗi: Thư viện PeerJS chưa được tải!', true);
+                this.notifyStatus('Error: PeerJS library not loaded!', true);
                 return;
             }
 
@@ -108,7 +108,7 @@ export class NetworkManager {
             });
 
             this.peer.on('open', (myId) => {
-                this.notifyStatus(`Đang bắt tay với phòng [${code}]...`);
+                this.notifyStatus(`Connecting to room [${code}]...`);
                 const conn = this.peer.connect(hostPeerId, {
                     reliable: true
                 });
@@ -119,22 +119,22 @@ export class NetworkManager {
             this.peer.on('error', (err) => {
                 console.error('[Network Client Error]', err);
                 if (err.type === 'peer-unavailable') {
-                    this.notifyStatus(`Mã phòng [${code}] không tồn tại hoặc đã đóng!`, true);
+                    this.notifyStatus(`Room [${code}] does not exist or has expired!`, true);
                 } else {
-                    this.notifyStatus(`Lỗi kết nối: ${err.type || err.message}`, true);
+                    this.notifyStatus(`Connection error: ${err.type || err.message}`, true);
                 }
             });
 
         } catch (e) {
             console.error('[Join Room Exception]', e);
-            this.notifyStatus(`Không thể tham gia phòng: ${e.message}`, true);
+            this.notifyStatus(`Failed to join room: ${e.message}`, true);
         }
     }
 
     setupConnection(conn, isHost) {
         const handleOpen = () => {
             this.isConnected = true;
-            this.notifyStatus(`✅ Kết nối thành công! Đang vào sảnh đấu...`);
+            this.notifyStatus(`✅ Connected! Entering arena...`);
             if (this.onConnected) {
                 this.onConnected(this.role, this.roomCode);
             }
@@ -154,7 +154,7 @@ export class NetworkManager {
 
         conn.on('close', () => {
             this.isConnected = false;
-            this.notifyStatus(`⚠️ Kết nối với đối thủ đã bị gián đoạn!`, true);
+            this.notifyStatus(`⚠️ Connection to opponent lost!`, true);
             if (this.onDisconnected) {
                 this.onDisconnected();
             }
@@ -162,7 +162,7 @@ export class NetworkManager {
 
         conn.on('error', (err) => {
             console.error('[DataChannel Error]', err);
-            this.notifyStatus(`Lỗi đường truyền: ${err.message}`, true);
+            this.notifyStatus(`Network data error: ${err.message}`, true);
         });
     }
 
