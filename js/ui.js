@@ -7,7 +7,7 @@ const SKILL_DATA = {
         title: '⚡ TSUKISHIRO YANAGI (MELEE • 475 HP)',
         color: '#a78bfa',
         p1: [
-            { key: 'F (Melee)', name: 'Moon Spear', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Moon Spear', desc: '' },
             { key: 'R (Skill)', name: 'Flash Blink', desc: '' },
             { key: 'Space (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ],
@@ -21,7 +21,7 @@ const SKILL_DATA = {
         title: '🌸 VERINA AIRGID (RANGED • 480 HP)',
         color: '#34d399',
         p1: [
-            { key: 'F (Ranged)', name: 'Comet Blast', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Comet Blast', desc: '' },
             { key: 'R (Skill)', name: 'Photosynthesis', desc: '' },
             { key: 'Space (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ],
@@ -35,7 +35,7 @@ const SKILL_DATA = {
         title: '💼 NICOLE DEMARA (RANGED • 500 HP)',
         color: '#f472b6',
         p1: [
-            { key: 'F (Ranged)', name: 'Briefcase Cannon', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon', desc: '' },
             { key: 'R (Skill)', name: 'Vault Dash', desc: '' },
             { key: 'Space (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ],
@@ -49,7 +49,7 @@ const SKILL_DATA = {
         title: '🎯 TRIGGER (RANGED • 460 HP)',
         color: '#38bdf8',
         p1: [
-            { key: 'F (Ranged)', name: 'Purge Shot', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Purge Shot', desc: '' },
             { key: 'R (Skill)', name: 'Sniper Stance', desc: '' },
             { key: 'Space (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ],
@@ -63,7 +63,7 @@ const SKILL_DATA = {
         title: '🔮 VIVIAN BANSHEE (RANGED • 650 HP)',
         color: '#c084fc',
         p1: [
-            { key: 'F (Ranged)', name: 'Phantom Feathers', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Phantom Feathers', desc: '' },
             { key: 'R (Skill)', name: 'Blooming Ward', desc: '' },
             { key: 'Space (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ],
@@ -77,7 +77,7 @@ const SKILL_DATA = {
         title: '👊 JOTARO KUJO (MELEE • 550 HP)',
         color: '#818cf8',
         p1: [
-            { key: 'F (Melee)', name: 'ORA ORA ORA!', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'ORA ORA ORA!', desc: '' },
             { key: 'R (Skill)', name: 'Star Finger', desc: '' },
             { key: 'Space (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ],
@@ -91,7 +91,7 @@ const SKILL_DATA = {
         title: '🥋 SON GOKU (MELEE • 520 HP)',
         color: '#fbbf24',
         p1: [
-            { key: 'F (Melee)', name: 'Dragon Fist Ki', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dragon Fist Ki', desc: '' },
             { key: 'R (Skill)', name: 'Instant Transmission', desc: '' },
             { key: 'Space (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ],
@@ -105,7 +105,7 @@ const SKILL_DATA = {
         title: '🐞 GIORNO GIOVANNA (MELEE • 510 HP)',
         color: '#facc15',
         p1: [
-            { key: 'F (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
             { key: 'R (Skill)', name: 'Tree of Life', desc: '' },
             { key: 'Space (Ultimate)', name: 'Return To Zero', desc: '' }
         ],

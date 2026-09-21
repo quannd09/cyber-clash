@@ -5,9 +5,9 @@ import { fx } from './particles.js';
 import { combat, Projectile } from './combat.js';
 import { Cyborg } from './cyborg.js';
 import { GameRenderer } from './renderer.js';
-import { UIManager } from './ui.js?v=49';
-import { network } from './network.js?v=49';
-import { BotController } from './bot.js?v=49';
+import { UIManager } from './ui.js?v=50';
+import { network } from './network.js?v=50';
+import { BotController } from './bot.js?v=50';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -228,27 +228,27 @@ class CyberClashGame {
 
         if (this.state === STATE_LOADOUT) {
             if (this.gameMode === 'LOCAL') {
-                if (input.getActionState(0, 'lightAttack').justDown || input.getActionState(0, 'ultimate').justDown || input.isKeyJustPressed('Space')) {
+                if (input.isKeyJustPressed('KeyF') || input.isKeyJustPressed('Space')) {
                     const btn = document.getElementById('p1-ready-btn');
                     if (btn) btn.click();
                 }
-                if (input.getActionState(1, 'lightAttack').justDown || input.getActionState(1, 'ultimate').justDown || input.isKeyJustPressed('Enter')) {
+                if (input.isKeyJustPressed('Numpad1') || input.isKeyJustPressed('KeyJ') || input.isKeyJustPressed('Enter')) {
                     const btn = document.getElementById('p2-ready-btn');
                     if (btn) btn.click();
                 }
             } else if (this.gameMode === 'BOT') {
-                if (input.getActionState(0, 'lightAttack').justDown || input.getActionState(0, 'ultimate').justDown || input.isKeyJustPressed('Space')) {
+                if (input.isKeyJustPressed('KeyF') || input.isKeyJustPressed('Space')) {
                     const btn = document.getElementById('p1-ready-btn');
                     if (btn) btn.click();
                 }
             } else if (this.gameMode === 'ONLINE') {
                 if (this.isOnlineHost) {
-                    if (input.getActionState(0, 'lightAttack').justDown || input.getActionState(0, 'ultimate').justDown || input.isKeyJustPressed('Space')) {
+                    if (input.isKeyJustPressed('KeyF') || input.isKeyJustPressed('Space')) {
                         const btn = document.getElementById('p1-ready-btn');
                         if (btn) btn.click();
                     }
                 } else if (this.isOnlineClient) {
-                    if (input.getActionState(0, 'lightAttack').justDown || input.getActionState(0, 'ultimate').justDown || input.isKeyJustPressed('Space') || input.isKeyJustPressed('Enter')) {
+                    if (input.isKeyJustPressed('KeyF') || input.isKeyJustPressed('KeyJ') || input.isKeyJustPressed('Space') || input.isKeyJustPressed('Enter')) {
                         const btn = document.getElementById('p2-ready-btn');
                         if (btn) btn.click();
                     }
@@ -259,6 +259,13 @@ class CyberClashGame {
 
         // CLIENT IN ONLINE MODE:
         if (this.isOnlineClient) {
+            if (input.isMouseActive()) {
+                const dx = input.mouse.x - this.p2.x;
+                const dy = input.mouse.y - this.p2.y;
+                if (Math.hypot(dx, dy) > 10) {
+                    this.p2.setAimAngle(Math.atan2(dy, dx));
+                }
+            }
             this.sendClientInput();
             if (this.latestSnapshot) {
                 this.applySnapshot(this.latestSnapshot);
@@ -342,13 +349,22 @@ class CyberClashGame {
         const strafe = input.getActionState(index, 'strafe');
         player.setStrafing(strafe.isDown);
 
-        // 3. Attacks (F for P1, Num1/J for P2)
+        // 2b. Mouse Aiming for Player 1 (Solo vs Bot, Online Host, Local P1)
+        if (index === 0 && input.isMouseActive()) {
+            const dx = input.mouse.x - player.x;
+            const dy = input.mouse.y - player.y;
+            if (Math.hypot(dx, dy) > 10) {
+                player.setAimAngle(Math.atan2(dy, dx));
+            }
+        }
+
+        // 3. Attacks (Mouse Left Click or F for P1, Num1/J for P2)
         const attack = input.getActionState(index, 'lightAttack');
         if (attack.justDown) {
             player.attack();
         }
 
-        // 4. Shield / Parry
+        // 4. Shield / Parry (Mouse Right Click or H for P1, Num3/L for P2)
         const shield = input.getActionState(index, 'shield');
         if (shield.isDown) {
             player.activateShield();
@@ -374,9 +390,19 @@ class CyberClashGame {
         const p2AltMove = input.getMovementVector(1); // Arrows on client machine
         const move = (p2Move.x !== 0 || p2Move.y !== 0) ? p2Move : p2AltMove;
 
+        let aimAngle = null;
+        if (input.isMouseActive()) {
+            const dx = input.mouse.x - this.p2.x;
+            const dy = input.mouse.y - this.p2.y;
+            if (Math.hypot(dx, dy) > 10) {
+                aimAngle = Math.atan2(dy, dx);
+            }
+        }
+
         network.send({
             type: 'CLIENT_INPUT',
             move: move,
+            aimAngle: aimAngle,
             strafe: input.getActionState(0, 'strafe').isDown || input.getActionState(1, 'strafe').isDown,
             attack: input.getActionState(0, 'lightAttack').justDown || input.getActionState(1, 'lightAttack').justDown,
             shield: input.getActionState(0, 'shield').isDown || input.getActionState(1, 'shield').isDown,
@@ -393,6 +419,11 @@ class CyberClashGame {
         const my = inputs.move ? inputs.move.y : 0;
         if (mx !== 0 || my !== 0) {
             player.thrust(mx, my);
+        }
+
+        // 1b. Mouse Aim Angle from client
+        if (inputs.aimAngle !== null && inputs.aimAngle !== undefined) {
+            player.setAimAngle(inputs.aimAngle);
         }
 
         // 2. Strafe Lock

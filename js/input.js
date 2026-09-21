@@ -33,7 +33,40 @@ export class InputManager {
             ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo']
         };
 
+        // Mouse controls for Single Player / Online Client
+        this.mouse = {
+            x: 640,
+            y: 360,
+            leftDown: false,
+            leftJustDown: false,
+            prevLeftDown: false,
+            rightDown: false,
+            rightJustDown: false,
+            prevRightDown: false,
+            hasMoved: false,
+            lastMoveTime: 0
+        };
+
         this.initListeners();
+    }
+
+    updateMousePosition(e) {
+        const canvas = document.getElementById('gameCanvas');
+        if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                const scaleX = 1280 / rect.width;
+                const scaleY = 720 / rect.height;
+                this.mouse.x = (e.clientX - rect.left) * scaleX;
+                this.mouse.y = (e.clientY - rect.top) * scaleY;
+                this.mouse.hasMoved = true;
+                this.mouse.lastMoveTime = Date.now();
+            }
+        }
+    }
+
+    isMouseActive(timeoutMs = 4000) {
+        return this.mouse.hasMoved && (Date.now() - this.mouse.lastMoveTime < timeoutMs);
     }
 
     initListeners() {
@@ -59,8 +92,53 @@ export class InputManager {
             }
         });
 
+        // Mouse event listeners
+        window.addEventListener('mousemove', (e) => {
+            this.updateMousePosition(e);
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            this.updateMousePosition(e);
+
+            // Ignore clicks on UI cards, overlays, modals, buttons
+            if (e.target.closest('#loadout-screen, #controls-modal, #disconnect-modal, #victory-screen, button, input, select, .char-card, a')) {
+                return;
+            }
+
+            // Only register combat attacks when directly on the game canvas
+            if (e.target.id !== 'gameCanvas' && e.target.tagName !== 'CANVAS') {
+                return;
+            }
+
+            if (e.button === 0) {
+                this.mouse.leftDown = true;
+                this.mouse.leftJustDown = true;
+            } else if (e.button === 2) {
+                this.mouse.rightDown = true;
+                this.mouse.rightJustDown = true;
+            }
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (e.button === 0) {
+                this.mouse.leftDown = false;
+            } else if (e.button === 2) {
+                this.mouse.rightDown = false;
+            }
+        });
+
+        window.addEventListener('contextmenu', (e) => {
+            if (e.target.id === 'gameCanvas' || e.target.closest('#game-container')) {
+                e.preventDefault();
+            }
+        });
+
         window.addEventListener('blur', () => {
             this.keys = {};
+            this.mouse.leftDown = false;
+            this.mouse.rightDown = false;
+            this.mouse.leftJustDown = false;
+            this.mouse.rightJustDown = false;
         });
     }
 
@@ -77,6 +155,10 @@ export class InputManager {
 
     postUpdate() {
         this.prevKeys = { ...this.keys };
+        this.mouse.leftJustDown = false;
+        this.mouse.rightJustDown = false;
+        this.mouse.prevLeftDown = this.mouse.leftDown;
+        this.mouse.prevRightDown = this.mouse.rightDown;
     }
 
     // Check keyboard key code
@@ -100,6 +182,17 @@ export class InputManager {
         // Check Keyboard
         let isDown = keyList.some(k => this.isKeyDown(k));
         let justDown = keyList.some(k => this.isKeyJustPressed(k));
+
+        // Player 1 Mouse Integration (used for Single Player, Online Client & P1)
+        if (playerIndex === 0) {
+            if (action === 'lightAttack') {
+                if (this.mouse.leftDown) isDown = true;
+                if (this.mouse.leftJustDown) justDown = true;
+            } else if (action === 'shield') {
+                if (this.mouse.rightDown) isDown = true;
+                if (this.mouse.rightJustDown) justDown = true;
+            }
+        }
 
         // Check Gamepad
         const gp = this.gamepads[playerIndex];
