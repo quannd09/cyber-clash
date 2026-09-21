@@ -250,6 +250,11 @@ export class Cyborg {
         this.isStrafing = isStrafing;
     }
 
+    setAimAngle(angle) {
+        this.aimAngle = angle;
+        this.facingAngle = angle;
+    }
+
     attack() {
         if (this.isStunned || this.isShielding || this.isAttacking || this.attackCooldown > 0 || this.isUsingUltimate || this.spamDelayTimer > 0) return;
 

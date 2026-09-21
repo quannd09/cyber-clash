@@ -538,6 +538,90 @@ canvas {
     box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
 }
 
+/* AI Bot Difficulty Selector */
+.bot-difficulty-panel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    background: #0f172a;
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: 1px solid #334155;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.diff-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    color: #94a3b8;
+    letter-spacing: 1px;
+}
+
+.diff-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.diff-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 16px;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    background: #1e293b;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.diff-btn:hover {
+    color: #ffffff;
+    border-color: #64748b;
+    transform: translateY(-1px);
+}
+
+.diff-btn.active[data-diff="easy"] {
+    background: #10b981;
+    color: #ffffff;
+    border-color: #10b981;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.diff-btn.active[data-diff="normal"] {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.diff-btn.active[data-diff="master"] {
+    background: #8b5cf6;
+    color: #ffffff;
+    border-color: #a78bfa;
+    box-shadow: 0 0 14px rgba(139, 92, 246, 0.5);
+}
+
+.diff-btn.diff-impossible {
+    border-color: #ef4444;
+    color: #f87171;
+}
+
+.diff-btn.active.diff-impossible {
+    background: linear-gradient(135deg, #b91c1c, #ef4444);
+    color: #ffffff;
+    border-color: #ff0055;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+    animation: impossiblePulse 1.5s infinite alternate;
+}
+
+@keyframes impossiblePulse {
+    0% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
+    100% { box-shadow: 0 0 24px rgba(255, 0, 85, 0.9); }
+}
+
 /* Online Banner when in match/connected */
 .online-banner {
     display: flex;

@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="style.css?v=49">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -22,7 +22,19 @@
             <!-- GAME MODE SELECTION -->
             <div class="mode-tabs">
                 <button id="mode-local-tab" class="mode-tab active">LOCAL</button>
+                <button id="mode-bot-tab" class="mode-tab">VS BOT</button>
                 <button id="mode-online-tab" class="mode-tab">ONLINE</button>
+            </div>
+
+            <!-- BOT DIFFICULTY SELECTOR -->
+            <div id="bot-difficulty-panel" class="bot-difficulty-panel hidden">
+                <span class="diff-title">AI DIFFICULTY:</span>
+                <div class="diff-buttons">
+                    <button class="diff-btn" data-diff="easy">EASY</button>
+                    <button class="diff-btn active" data-diff="normal">NORMAL</button>
+                    <button class="diff-btn" data-diff="master">MASTER</button>
+                    <button class="diff-btn diff-impossible" data-diff="impossible">🔥 IMPOSSIBLE</button>
+                </div>
             </div>
 
             <!-- ONLINE MATCH BANNER -->
@@ -313,6 +325,6 @@
 
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=48"></script>
+    <script type="module" src="js/main.js?v=49"></script>
 </body>
 </html>

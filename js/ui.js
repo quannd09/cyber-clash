@@ -118,18 +118,20 @@ const SKILL_DATA = {
 };
 
 export class UIManager {
-    constructor(onStartMatch, onRematch, onNetworkModeChange, onNetworkConnected, onNetworkGameData) {
+    constructor(onStartMatch, onRematch, onNetworkModeChange, onNetworkConnected, onNetworkGameData, onBotDifficultyChange) {
         this.onStartMatch = onStartMatch;
         this.onRematch = onRematch;
         this.onNetworkModeChange = onNetworkModeChange;
         this.onNetworkConnected = onNetworkConnected;
         this.onNetworkGameData = onNetworkGameData;
+        this.onBotDifficultyChange = onBotDifficultyChange;
 
         this.loadoutScreen = document.getElementById('loadout-screen');
         this.victoryScreen = document.getElementById('victory-screen');
         this.controlsModal = document.getElementById('controls-modal');
 
-        this.gameMode = 'LOCAL'; // 'LOCAL' | 'ONLINE'
+        this.gameMode = 'LOCAL'; // 'LOCAL' | 'BOT' | 'ONLINE'
+        this.botDifficulty = 'normal'; // 'easy' | 'normal' | 'master' | 'impossible'
         this.networkRole = null; // 'HOST' | 'CLIENT' | null
         this.currentRoomCode = null;
 
@@ -153,6 +155,19 @@ export class UIManager {
         if (p1ReadyBtn) {
             p1ReadyBtn.addEventListener('click', () => {
                 if (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') return;
+
+                if (this.gameMode === 'BOT') {
+                    this.p1Ready = true;
+                    this.p2Ready = true;
+                    p1ReadyBtn.classList.add('ready');
+                    p1ReadyBtn.textContent = '✔️ READY!';
+                    setTimeout(() => {
+                        this.hideLoadout();
+                        this.onStartMatch(this.p1Char, this.p2Char);
+                    }, 300);
+                    return;
+                }
+
                 this.p1Ready = !this.p1Ready;
                 p1ReadyBtn.classList.toggle('ready', this.p1Ready);
                 p1ReadyBtn.textContent = this.p1Ready ? '✔️ P1 READY!' : 'READY (Press F / Space)';
@@ -166,6 +181,7 @@ export class UIManager {
 
         if (p2ReadyBtn) {
             p2ReadyBtn.addEventListener('click', () => {
+                if (this.gameMode === 'BOT') return;
                 if (this.gameMode === 'ONLINE' && this.networkRole === 'HOST') return;
                 this.p2Ready = !this.p2Ready;
                 p2ReadyBtn.classList.toggle('ready', this.p2Ready);
@@ -252,7 +268,9 @@ export class UIManager {
 
     setupOnlineUI() {
         const localTab = document.getElementById('mode-local-tab');
+        const botTab = document.getElementById('mode-bot-tab');
         const onlineTab = document.getElementById('mode-online-tab');
+        const botDiffPanel = document.getElementById('bot-difficulty-panel');
         const lobbyPanel = document.getElementById('online-lobby-panel');
         const fightersContainer = document.getElementById('loadout-fighters-container');
         const matchBanner = document.getElementById('online-match-banner');
@@ -276,7 +294,9 @@ export class UIManager {
             network.disconnect();
 
             if (localTab) localTab.classList.add('active');
+            if (botTab) botTab.classList.remove('active');
             if (onlineTab) onlineTab.classList.remove('active');
+            if (botDiffPanel) botDiffPanel.classList.add('hidden');
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
             if (fightersContainer) fightersContainer.classList.remove('hidden');
@@ -285,10 +305,31 @@ export class UIManager {
             if (this.onNetworkModeChange) this.onNetworkModeChange('LOCAL');
         };
 
+        const switchToBot = () => {
+            this.gameMode = 'BOT';
+            this.networkRole = null;
+            this.currentRoomCode = null;
+            network.disconnect();
+
+            if (localTab) localTab.classList.remove('active');
+            if (botTab) botTab.classList.add('active');
+            if (onlineTab) onlineTab.classList.remove('active');
+            if (botDiffPanel) botDiffPanel.classList.remove('hidden');
+            if (lobbyPanel) lobbyPanel.classList.add('hidden');
+            if (matchBanner) matchBanner.classList.add('hidden');
+            if (fightersContainer) fightersContainer.classList.remove('hidden');
+
+            this.applyBotFighterPermissions();
+            if (this.onNetworkModeChange) this.onNetworkModeChange('BOT');
+            if (this.onBotDifficultyChange) this.onBotDifficultyChange(this.botDifficulty);
+        };
+
         const switchToOnline = () => {
             this.gameMode = 'ONLINE';
             if (localTab) localTab.classList.remove('active');
+            if (botTab) botTab.classList.remove('active');
             if (onlineTab) onlineTab.classList.add('active');
+            if (botDiffPanel) botDiffPanel.classList.add('hidden');
 
             if (network.isConnected) {
                 if (lobbyPanel) lobbyPanel.classList.add('hidden');
@@ -303,7 +344,19 @@ export class UIManager {
         };
 
         if (localTab) localTab.addEventListener('click', switchToLocal);
+        if (botTab) botTab.addEventListener('click', switchToBot);
         if (onlineTab) onlineTab.addEventListener('click', switchToOnline);
+
+        // Difficulty Buttons
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.botDifficulty = btn.dataset.diff;
+                this.updateBotLabels();
+                if (this.onBotDifficultyChange) this.onBotDifficultyChange(this.botDifficulty);
+            });
+        });
 
         // CREATE ROOM (HOST)
         if (btnCreateRoom) {
@@ -445,18 +498,66 @@ export class UIManager {
         }
     }
 
+    updateBotLabels() {
+        const p2HeaderTitle = document.querySelector('.player-box.p2-border .player-header .p2-color');
+        const p2HeaderLabel = document.querySelector('.player-box.p2-border .player-header .section-label');
+        if (p2HeaderTitle) p2HeaderTitle.textContent = 'BOT (CPU)';
+        if (p2HeaderLabel) p2HeaderLabel.textContent = `[AI OPPONENT • ${this.botDifficulty.toUpperCase()}]`;
+    }
+
+    applyBotFighterPermissions() {
+        document.querySelectorAll('.char-card').forEach(card => card.classList.remove('card-disabled'));
+
+        const p1Title = document.querySelector('.player-box.p1-border .player-header .p1-color');
+        if (p1Title) p1Title.textContent = 'PLAYER 1 (YOU)';
+
+        this.updateBotLabels();
+
+        const p1Btn = document.getElementById('p1-ready-btn');
+        if (p1Btn) {
+            p1Btn.style.pointerEvents = 'auto';
+            p1Btn.textContent = 'READY (Press F / Space)';
+            p1Btn.classList.remove('ready');
+        }
+
+        const p2Btn = document.getElementById('p2-ready-btn');
+        if (p2Btn) {
+            p2Btn.style.pointerEvents = 'none';
+            p2Btn.textContent = '🤖 BOT READY';
+            p2Btn.classList.add('ready');
+        }
+        this.p1Ready = false;
+        this.p2Ready = true;
+    }
+
     restoreLocalFighterPermissions() {
         document.querySelectorAll('.char-card').forEach(card => card.classList.remove('card-disabled'));
 
+        const p1Title = document.querySelector('.player-box.p1-border .player-header .p1-color');
+        if (p1Title) p1Title.textContent = 'PLAYER 1';
+
+        const p2Title = document.querySelector('.player-box.p2-border .player-header .p2-color');
+        if (p2Title) p2Title.textContent = 'PLAYER 2';
+
         const p1Btn = document.getElementById('p1-ready-btn');
-        if (p1Btn) p1Btn.style.pointerEvents = 'auto';
+        if (p1Btn) {
+            p1Btn.style.pointerEvents = 'auto';
+            p1Btn.textContent = 'READY (Press F / Space)';
+            p1Btn.classList.remove('ready');
+        }
 
         const p2Btn = document.getElementById('p2-ready-btn');
-        if (p2Btn) p2Btn.style.pointerEvents = 'auto';
+        if (p2Btn) {
+            p2Btn.style.pointerEvents = 'auto';
+            p2Btn.textContent = 'READY (Press J / Enter)';
+            p2Btn.classList.remove('ready');
+        }
 
-        const p2HeaderLabel = document.querySelector('.player-box.p2-border .section-label');
+        const p2HeaderLabel = document.querySelector('.player-box.p2-border .player-header .section-label');
         if (p2HeaderLabel) p2HeaderLabel.textContent = '[ARROW KEYS + J / L / I / U / ENTER]';
-        if (p2Btn) p2Btn.textContent = 'READY (Press J / Enter)';
+
+        this.p1Ready = false;
+        this.p2Ready = false;
     }
 
     handleIncomingNetworkData(data) {
@@ -559,11 +660,19 @@ export class UIManager {
 
     showLoadout() {
         this.p1Ready = false;
-        this.p2Ready = false;
+        this.p2Ready = (this.gameMode === 'BOT');
         const p1Btn = document.getElementById('p1-ready-btn');
         const p2Btn = document.getElementById('p2-ready-btn');
         if (p1Btn) { p1Btn.classList.remove('ready'); p1Btn.textContent = 'READY (Press F / Space)'; }
-        if (p2Btn) { p2Btn.classList.remove('ready'); p2Btn.textContent = (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') ? 'READY (Press F / Space)' : 'READY (Press J / Enter)'; }
+        if (p2Btn) {
+            if (this.gameMode === 'BOT') {
+                p2Btn.classList.add('ready');
+                p2Btn.textContent = '🤖 BOT READY';
+            } else {
+                p2Btn.classList.remove('ready');
+                p2Btn.textContent = (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') ? 'READY (Press F / Space)' : 'READY (Press J / Enter)';
+            }
+        }
 
         this.loadoutScreen.classList.remove('hidden');
         this.victoryScreen.classList.add('hidden');

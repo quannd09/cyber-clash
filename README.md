@@ -13,17 +13,22 @@
   - **Blade Clash:** Simultaneous melee strikes nullify damage and trigger a concussive shockwave.
   - **Anti-Spam Penalty:** Excessive inputs (over 6 attacks within 3 seconds) trigger a brief 1-second cooldown.
 - **Game Modes:**
-  - **Local:** 2 players on a single keyboard or dual gamepads.
-  - **Online:** Direct WebRTC P2P connection via 4-character room codes (`CLASH-XXXX`). No external server required.
+  - **Single-Player (VS Bot):** Battle an intelligent AI with 4 distinct difficulty levels:
+    - `Easy`: Relaxed training bot with slower reflexes.
+    - `Normal`: Balanced fighter with basic kiting and defensive reactions.
+    - `Master`: Highly skilled opponent using predictive aim, spacing, wall-bounces, and combo chains.
+    - `🔥 Impossible (God AI)`: Unforgiving frame-perfect reflexes, 99.5% parry accuracy, zero-latency projectile reflection, optimal anti-spam attack pacing, and lethal combo execution.
+  - **Local 2-Player:** 2 players on a single keyboard or dual gamepads.
+  - **Online 1v1:** Direct WebRTC P2P connection via 4-character room codes (`CLASH-XXXX`). No external server required.
   - **Background Ticker:** Powered by a Web Worker to maintain smooth 60 FPS physics calculation across background tabs.
 
 ---
 
 ## 🕹️ Controls
 
-### Local Mode (2 Players)
+### Local Mode (2 Players) & VS Bot Mode
 
-| Action | Player 1 (Cyan) | Player 2 (Magenta) | Gamepad |
+| Action | Player 1 (Cyan / You) | Player 2 (Magenta / CPU) | Gamepad |
 | :--- | :--- | :--- | :--- |
 | **Thrust / Move** | `W`, `A`, `S`, `D` | `↑`, `←`, `↓`, `→` | Left Analog / D-Pad |
 | **Normal Attack** | `F` | `Num 1` or `J` | X / Square |
@@ -59,6 +64,7 @@ cyber-clash/
 ├── js/
 │   ├── assets.js      # Asset preloading
 │   ├── audio.js       # Web Audio API sound synthesizer
+│   ├── bot.js         # AI Bot Controller (Easy, Normal, Master, Impossible)
 │   ├── combat.js      # Damage calculation, projectiles & capsule hitboxes
 │   ├── cyborg.js      # Fighter stats, abilities & anti-spam logic
 │   ├── input.js       # Anti-ghosting keyboard & Gamepad API handler

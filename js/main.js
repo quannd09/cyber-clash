@@ -5,8 +5,9 @@ import { fx } from './particles.js';
 import { combat, Projectile } from './combat.js';
 import { Cyborg } from './cyborg.js';
 import { GameRenderer } from './renderer.js';
-import { UIManager } from './ui.js?v=48';
-import { network } from './network.js?v=48';
+import { UIManager } from './ui.js?v=49';
+import { network } from './network.js?v=49';
+import { BotController } from './bot.js?v=49';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -40,8 +41,9 @@ class CyberClashGame {
         this.roundOverTimer = 0;
         this.roundMessage = '';
 
-        // Network State
-        this.gameMode = 'LOCAL'; // 'LOCAL' | 'ONLINE'
+        // Game Modes & AI Bot
+        this.gameMode = 'LOCAL'; // 'LOCAL' | 'BOT' | 'ONLINE'
+        this.bot = new BotController('normal');
         this.networkRole = null; // 'HOST' | 'CLIENT' | null
         this.latestClientInputs = null;
         this.latestSnapshot = null;
@@ -51,7 +53,8 @@ class CyberClashGame {
             () => this.resetMatch(),
             (mode) => { this.gameMode = mode; },
             (role, code) => { this.networkRole = role; },
-            (data) => this.handleNetworkGameData(data)
+            (data) => this.handleNetworkGameData(data),
+            (diff) => { this.bot.setDifficulty(diff); }
         );
 
         this.initResize();
@@ -110,7 +113,10 @@ class CyberClashGame {
         };
 
         const p1Name = charNames[p1Char] || 'TSUKISHIRO YANAGI';
-        const p2Name = charNames[p2Char] || 'VERINA AIRGID';
+        let p2Name = charNames[p2Char] || 'VERINA AIRGID';
+        if (this.gameMode === 'BOT') {
+            p2Name = `[BOT] ${p2Name}`;
+        }
         const p1Color = charColors[p1Char] || '#a78bfa';
         const p2Color = charColors[p2Char] || '#34d399';
 
@@ -230,6 +236,11 @@ class CyberClashGame {
                     const btn = document.getElementById('p2-ready-btn');
                     if (btn) btn.click();
                 }
+            } else if (this.gameMode === 'BOT') {
+                if (input.getActionState(0, 'lightAttack').justDown || input.getActionState(0, 'ultimate').justDown || input.isKeyJustPressed('Space')) {
+                    const btn = document.getElementById('p1-ready-btn');
+                    if (btn) btn.click();
+                }
             } else if (this.gameMode === 'ONLINE') {
                 if (this.isOnlineHost) {
                     if (input.getActionState(0, 'lightAttack').justDown || input.getActionState(0, 'ultimate').justDown || input.isKeyJustPressed('Space')) {
@@ -276,6 +287,9 @@ class CyberClashGame {
             if (this.gameMode === 'LOCAL') {
                 this.processPlayerInputs(this.p1, 0, this.p2);
                 this.processPlayerInputs(this.p2, 1, this.p1);
+            } else if (this.gameMode === 'BOT') {
+                this.processPlayerInputs(this.p1, 0, this.p2);
+                this.bot.update(this.p2, this.p1, dt, this.bounds);
             } else if (this.isOnlineHost) {
                 this.processPlayerInputs(this.p1, 0, this.p2);
                 this.applyClientInputs(this.p2, this.latestClientInputs, this.p1);

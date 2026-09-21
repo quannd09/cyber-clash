@@ -1,0 +1,374 @@
+// AI Bot Controller for Cyber Clash: Zero-G Arena
+// Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
+import { WEAPONS, combat } from './combat.js';
+
+export class BotController {
+    constructor(difficulty = 'normal') {
+        this.difficulty = difficulty; // 'easy' | 'normal' | 'master' | 'impossible'
+        this.parryHoldTimer = 0;
+        this.recentAttacks = [];
+        this.decisionTimer = 0;
+        this.strafeDir = 1;
+        this.orbitTimer = 0;
+        this.feintTimer = 0;
+    }
+
+    setDifficulty(diff) {
+        this.difficulty = diff;
+    }
+
+    update(bot, opponent, dt, bounds) {
+        if (!bot || !opponent || bot.hp <= 0 || bot.isStunned || bot.isUsingUltimate) {
+            return;
+        }
+
+        const now = performance.now();
+        const dist = Math.hypot(opponent.x - bot.x, opponent.y - bot.y);
+        const isMelee = bot.combatStyle === 'melee';
+
+        // -------------------------------------------------------------
+        // 1. DEFENSE & REACTION SYSTEM (PARRY / REFLECT)
+        // -------------------------------------------------------------
+        let shouldShield = false;
+        let parryDuration = 6;
+
+        // A. Incoming Projectiles Detection
+        if (combat && combat.projectiles) {
+            for (let i = 0; i < combat.projectiles.length; i++) {
+                const p = combat.projectiles[i];
+                if (p.ownerIndex === bot.index) continue; // Ignore own projectiles
+
+                const dx = bot.x - p.x;
+                const dy = bot.y - p.y;
+                const pDist = Math.hypot(dx, dy);
+
+                // Relative velocity
+                const rvx = p.vx - bot.vx;
+                const rvy = p.vy - bot.vy;
+                const relSpeed = Math.hypot(rvx, rvy);
+                const dot = dx * rvx + dy * rvy;
+
+                // Moving towards bot
+                if (dot > 0 && relSpeed > 0.5) {
+                    const timeToImpact = pDist / relSpeed;
+                    // Closest approach distance
+                    const cross = Math.abs(dx * rvy - dy * rvx) / relSpeed;
+
+                    if (cross <= bot.radius + p.radius + 14) {
+                        if (this.difficulty === 'impossible') {
+                            // Frame-perfect 0-1 frame reflex, within 8 frames of impact
+                            if (timeToImpact <= 8) {
+                                shouldShield = true;
+                                parryDuration = 4;
+                                break;
+                            }
+                        } else if (this.difficulty === 'master') {
+                            // 85% reflex within 7 frames
+                            if (timeToImpact <= 7 && Math.random() < 0.85) {
+                                shouldShield = true;
+                                parryDuration = 5;
+                                break;
+                            }
+                        } else if (this.difficulty === 'normal') {
+                            // 50% reflex within 10 frames
+                            if (timeToImpact <= 10 && Math.random() < 0.50) {
+                                shouldShield = true;
+                                parryDuration = 9;
+                                break;
+                            }
+                        } else if (this.difficulty === 'easy') {
+                            // 15% reflex within 12 frames
+                            if (timeToImpact <= 12 && Math.random() < 0.15) {
+                                shouldShield = true;
+                                parryDuration = 18;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // B. Opponent Melee Slash Reaction
+        if (!shouldShield && opponent.isAttacking && !opponent.isShooting) {
+            const opponentReach = opponent.attackReach || 80;
+            if (dist <= opponentReach + bot.radius + 12) {
+                if (this.difficulty === 'impossible') {
+                    // Frame-perfect melee parry -> Stuns opponent for 0.9s!
+                    shouldShield = true;
+                    parryDuration = 4;
+                } else if (this.difficulty === 'master' && Math.random() < 0.80) {
+                    shouldShield = true;
+                    parryDuration = 5;
+                } else if (this.difficulty === 'normal' && Math.random() < 0.40) {
+                    shouldShield = true;
+                    parryDuration = 8;
+                } else if (this.difficulty === 'easy' && Math.random() < 0.10) {
+                    shouldShield = true;
+                    parryDuration = 15;
+                }
+            }
+        }
+
+        // Apply Shield / Release
+        if (shouldShield && bot.energy >= 15 && !bot.isAttacking) {
+            bot.activateShield();
+            this.parryHoldTimer = parryDuration;
+        } else if (this.parryHoldTimer > 0) {
+            this.parryHoldTimer -= dt;
+            if (this.parryHoldTimer <= 0) {
+                bot.releaseShield();
+            }
+        } else {
+            bot.releaseShield();
+        }
+
+        // -------------------------------------------------------------
+        // 2. PREDICTIVE AIMING SYSTEM
+        // -------------------------------------------------------------
+        let targetAimAngle = Math.atan2(opponent.y - bot.y, opponent.x - bot.x);
+
+        if (this.difficulty === 'impossible' || this.difficulty === 'master') {
+            // Ballistic lead aim calculation
+            const bulletSpeed = 14.5;
+            const travelTime = dist / bulletSpeed;
+            const predX = opponent.x + opponent.vx * travelTime;
+            const predY = opponent.y + opponent.vy * travelTime;
+            targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
+
+            if (this.difficulty === 'master') {
+                // Tiny human jitter (±2 degrees)
+                targetAimAngle += (Math.random() - 0.5) * 0.04;
+            }
+        } else if (this.difficulty === 'normal') {
+            // Slight jitter (±6 degrees)
+            targetAimAngle += (Math.random() - 0.5) * 0.12;
+        } else {
+            // Easy: moderate lag & jitter (±18 degrees)
+            targetAimAngle += (Math.random() - 0.5) * 0.32;
+        }
+
+        bot.setAimAngle(targetAimAngle);
+        bot.setStrafing(true); // Maintain aim towards opponent while maneuvering
+
+        // -------------------------------------------------------------
+        // 3. ZERO-G MOVEMENT & KITING BEHAVIOR
+        // -------------------------------------------------------------
+        this.orbitTimer += dt;
+        if (this.orbitTimer > 90) {
+            this.orbitTimer = 0;
+            if (Math.random() < 0.5) this.strafeDir *= -1;
+        }
+
+        let thrustX = 0;
+        let thrustY = 0;
+        const normDx = dist > 1 ? (opponent.x - bot.x) / dist : 1;
+        const normDy = dist > 1 ? (opponent.y - bot.y) / dist : 0;
+        const perpX = -normDy * this.strafeDir;
+        const perpY = normDx * this.strafeDir;
+
+        if (isMelee) {
+            // Melee Fighter: aggressively close distance
+            if (this.difficulty === 'impossible') {
+                if (dist > 65) {
+                    thrustX = normDx + perpX * 0.25;
+                    thrustY = normDy + perpY * 0.25;
+                } else {
+                    // Micro-spacing in face
+                    thrustX = perpX;
+                    thrustY = perpY;
+                }
+
+                // Intentional Wall-Bounce Boost if player is far and wall is nearby
+                if (dist > 350) {
+                    if (bot.x < bounds.minX + 90) thrustX = -1;
+                    else if (bot.x > bounds.maxX - 90) thrustX = 1;
+                    if (bot.y < bounds.minY + 90) thrustY = -1;
+                    else if (bot.y > bounds.maxY - 90) thrustY = 1;
+                }
+            } else if (this.difficulty === 'master') {
+                if (dist > 75) {
+                    thrustX = normDx + perpX * 0.3;
+                    thrustY = normDy + perpY * 0.3;
+                } else {
+                    thrustX = perpX;
+                    thrustY = perpY;
+                }
+            } else if (this.difficulty === 'normal') {
+                thrustX = normDx * 0.85;
+                thrustY = normDy * 0.85;
+            } else {
+                // Easy
+                thrustX = normDx * 0.55;
+                thrustY = normDy * 0.55;
+            }
+        } else {
+            // Ranged Fighter: Kiting & Spacing
+            const idealDist = this.difficulty === 'impossible' ? 400 : (this.difficulty === 'master' ? 380 : 340);
+
+            if (dist < idealDist - 60) {
+                // Backpedal + Orbit
+                thrustX = -normDx * 1.1 + perpX * 0.7;
+                thrustY = -normDy * 1.1 + perpY * 0.7;
+
+                // Wall avoid / Bounce Boost
+                if (this.difficulty === 'impossible') {
+                    if (bot.x < bounds.minX + 110) thrustX = -1; // Intentionally wall-bounce!
+                    else if (bot.x > bounds.maxX - 110) thrustX = 1;
+                    if (bot.y < bounds.minY + 110) thrustY = -1;
+                    else if (bot.y > bounds.maxY - 110) thrustY = 1;
+                }
+            } else if (dist > idealDist + 90) {
+                // Advance
+                thrustX = normDx * 0.8 + perpX * 0.4;
+                thrustY = normDy * 0.8 + perpY * 0.4;
+            } else {
+                // Sweet spot: Orbit around player to dodge straight line projectiles
+                thrustX = perpX * 0.95;
+                thrustY = perpY * 0.95;
+            }
+
+            if (this.difficulty === 'easy') {
+                thrustX *= 0.6;
+                thrustY *= 0.6;
+            }
+        }
+
+        // Apply thrust
+        if (Math.hypot(thrustX, thrustY) > 0.1) {
+            bot.thrust(thrustX, thrustY);
+        }
+
+        // -------------------------------------------------------------
+        // 4. COMBAT & ATTACK EXECUTION (ANTI-SPAM AWARE)
+        // -------------------------------------------------------------
+        // Clean attack history older than 3.1 seconds
+        this.recentAttacks = this.recentAttacks.filter(t => now - t <= 3100);
+
+        let canAttackAntiSpam = true;
+        if (this.difficulty === 'impossible') {
+            // IMPOSSIBLE BOT NEVER SUFFERS 1s DELAY:
+            // If already done 5 attacks in last 2.9s, holds back until the oldest drops out!
+            if (this.recentAttacks.length >= 5) {
+                canAttackAntiSpam = false;
+            }
+        } else if (this.difficulty === 'master') {
+            if (this.recentAttacks.length >= 5) {
+                canAttackAntiSpam = Math.random() < 0.3; // Sometimes holds back
+            }
+        }
+
+        // Attack range check
+        const weapon = WEAPONS[bot.characterId.toUpperCase()] || { attackRange: 80 };
+        const inAttackRange = isMelee ? (dist <= weapon.attackRange + 25) : (dist <= 650);
+
+        // Shield baiting: if player is shielding with high energy, avoid wasting melee strikes unless Impossible cracks guard
+        let shouldStrike = inAttackRange && canAttackAntiSpam && !bot.isShielding && bot.attackCooldown <= 0;
+
+        if (this.difficulty === 'impossible') {
+            if (opponent.isShielding) {
+                // If opponent shield is about to break, crack it!
+                if (opponent.energy < 22) {
+                    shouldStrike = true;
+                } else {
+                    // Don't waste hits into full shield; reposition!
+                    shouldStrike = false;
+                }
+            }
+        }
+
+        if (shouldStrike) {
+            if (this.difficulty === 'easy') {
+                if (Math.random() < 0.4) {
+                    bot.attack();
+                    this.recentAttacks.push(now);
+                }
+            } else if (this.difficulty === 'normal') {
+                if (Math.random() < 0.75) {
+                    bot.attack();
+                    this.recentAttacks.push(now);
+                }
+            } else {
+                bot.attack();
+                this.recentAttacks.push(now);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 5. SKILLS & LETHAL COMBO CHAINS
+        // -------------------------------------------------------------
+        if (bot.skillCooldownTimer <= 0 && !bot.isShielding) {
+            let fireSkill = false;
+            const charId = bot.characterId;
+
+            if (charId === 'goku') {
+                // Instant transmission: if opponent is far or bot wants to backstab
+                if (dist > 120) fireSkill = true;
+            } else if (charId === 'yanagi') {
+                // Phase blink: if in strike zone or closing gap
+                if (dist < 160 || (dist > 280 && dist < 450)) fireSkill = true;
+            } else if (charId === 'jotaro') {
+                // Star finger: medium range reach
+                if (dist < 250) fireSkill = true;
+            } else if (charId === 'vivian') {
+                // Abloom burst: massive 4-feather shotgun
+                if (dist < 420) fireSkill = true;
+            } else if (charId === 'trigger') {
+                // Sniper shot: long range piercing
+                if (dist > 220) fireSkill = true;
+            } else if (charId === 'nicole') {
+                // Sugar slide
+                if (dist < 360) fireSkill = true;
+            } else if (charId === 'velina') {
+                // EMP burst / Heal: if hurt or opponent close
+                if (bot.hp < bot.maxHp * 0.85 || dist < 220) fireSkill = true;
+            } else if (charId === 'giorno') {
+                // Tree of life
+                if (dist < 320) fireSkill = true;
+            }
+
+            if (fireSkill) {
+                if (this.difficulty === 'impossible' || this.difficulty === 'master') {
+                    bot.activateSkill(opponent);
+                } else if (this.difficulty === 'normal' && Math.random() < 0.7) {
+                    bot.activateSkill(opponent);
+                } else if (this.difficulty === 'easy' && Math.random() < 0.35) {
+                    bot.activateSkill(opponent);
+                }
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 6. ULTIMATE ABILITY (OVERDRIVE)
+        // -------------------------------------------------------------
+        if (bot.overdrive >= 100 && !bot.isShielding) {
+            if (this.difficulty === 'impossible') {
+                // Lethal execution: Fire Ultimate when opponent is stunned or guard broken
+                if (opponent.isStunned || dist < 380 || opponent.hp < 200) {
+                    bot.activateUltimate();
+                }
+            } else if (this.difficulty === 'master') {
+                if (opponent.isStunned || dist < 400 || Math.random() < 0.7) {
+                    bot.activateUltimate();
+                }
+            } else if (this.difficulty === 'normal') {
+                if (dist < 450 && Math.random() < 0.5) {
+                    bot.activateUltimate();
+                }
+            } else {
+                // Easy
+                if (Math.random() < 0.3) {
+                    bot.activateUltimate();
+                }
+            }
+        } else if (bot.overdrive < 100 && bot.energy >= 35) {
+            // Boost Dash (when overdrive not full)
+            if (this.difficulty === 'impossible' || this.difficulty === 'master') {
+                // Use boost dash if opponent is stunned to close distance instantly, or to escape corner
+                if (opponent.isStunned && dist > 140 && isMelee) {
+                    bot.activateUltimateOrDash();
+                }
+            }
+        }
+    }
+}
