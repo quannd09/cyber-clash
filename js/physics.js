@@ -3,8 +3,8 @@ export class PhysicsEngine {
     constructor() {
         this.friction = 0.92;       // Zero-G drift dampening
         this.maxSpeed = 9.0;        // Normal maximum cruising speed
-        this.boostMaxSpeed = 13.0;   // Maximum speed during Wall Bounce / Dash
-        this.wallElasticity = 0.70;  // Base restitution when hitting arena walls
+        this.boostMaxSpeed = 15.0;  // Maximum speed during Wall Bounce / Dash (boosted for 25% higher bounce)
+        this.wallElasticity = 0.875; // Restitution when hitting arena walls (+25% buffed from 0.70)
     }
 
     updateBody(body, dt = 1) {
@@ -80,15 +80,15 @@ export class PhysicsEngine {
             const dotProduct = body.vx * normalX + body.vy * normalY;
 
             if (dotProduct < -2.0) {
-                // Strong impact -> Can convert into Wall Bounce Boost!
-                const bounceForce = 7.0;
+                // Strong impact -> Can convert into Wall Bounce Boost! (+25% buffed bounce force)
+                const bounceForce = 8.75;
 
-                // Reflect velocity across the normal
+                // Reflect velocity across the normal (+25% stronger bounce reflection)
                 if (normalX !== 0) {
-                    body.vx = normalX * Math.abs(body.vx) * 0.7 + normalX * bounceForce * 0.4;
+                    body.vx = normalX * Math.abs(body.vx) * 0.875 + normalX * bounceForce * 0.4;
                 }
                 if (normalY !== 0) {
-                    body.vy = normalY * Math.abs(body.vy) * 0.7 + normalY * bounceForce * 0.4;
+                    body.vy = normalY * Math.abs(body.vy) * 0.875 + normalY * bounceForce * 0.4;
                 }
 
                 // Grant temporary boost status

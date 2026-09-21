@@ -1,8 +1,8 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=60';
-import { fx } from './particles.js?v=60';
-import { physics } from './physics.js?v=60';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=60';
+import { sound } from './audio.js?v=61';
+import { fx } from './particles.js?v=61';
+import { physics } from './physics.js?v=61';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=61';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -664,9 +664,10 @@ export class Cyborg {
 
     takeDamage(amount) {
         this.hp = Math.max(0, this.hp - amount);
-        // Hồi nộ chiêu cuối (Overdrive) khi bị đánh (Gojo/Sukuna nạp chậm hơn 1.75 lần)
+        // Giảm thêm thời gian hồi ulti khi chịu sát thương (tăng mạnh nộ Overdrive tích lũy khi bị đánh)
         if (!this.isUsingUltimate && this.overdrive < 100) {
-            this.overdrive = Math.min(100, this.overdrive + (amount * 0.22) * this.overdriveChargeRate);
+            const damageOdGain = (amount * 0.48 + 3.0) * this.overdriveChargeRate;
+            this.overdrive = Math.min(100, this.overdrive + damageOdGain);
         }
     }
 
