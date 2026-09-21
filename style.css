@@ -66,28 +66,51 @@ canvas {
 }
 
 /* LOADOUT SCREEN */
+#loadout-screen {
+    justify-content: flex-start !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px 0 24px 0;
+    scrollbar-width: thin;
+    scrollbar-color: #38bdf8 #0f172a;
+}
+
+#loadout-screen::-webkit-scrollbar {
+    width: 6px;
+}
+
+#loadout-screen::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+#loadout-screen::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 3px;
+}
+
 .game-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 42px;
+    font-size: 24px;
     font-weight: 900;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     margin-bottom: 6px;
     color: #f8fafc;
     text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 .subtitle {
-    font-size: 16px;
-    letter-spacing: 2px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
     color: #94a3b8;
-    margin-bottom: 24px;
+    margin-bottom: 12px;
     font-weight: 500;
 }
 
 .loadout-container {
     display: flex;
-    gap: 32px;
-    width: 90%;
+    gap: 16px;
+    width: 95%;
+    max-width: 1220px;
     justify-content: center;
 }
 
@@ -95,11 +118,11 @@ canvas {
     flex: 1;
     background: #1e293b;
     border-radius: 8px;
-    padding: 22px;
+    padding: 10px 14px;
     border: 2px solid #334155;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
@@ -113,13 +136,13 @@ canvas {
 
 .player-header {
     font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 700;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #334155;
-    padding-bottom: 10px;
+    padding-bottom: 4px;
 }
 
 .p1-color { color: #a78bfa; }
@@ -183,15 +206,15 @@ canvas {
 /* READY BUTTONS */
 .ready-btn {
     font-family: 'Orbitron', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    padding: 13px;
+    padding: 10px;
     border: 1px solid #475569;
     background: #0f172a;
     color: #f8fafc;
     border-radius: 6px;
     cursor: pointer;
-    margin-top: 6px;
+    margin-top: 4px;
     transition: all 0.2s;
     letter-spacing: 1px;
 }
@@ -339,15 +362,15 @@ canvas {
 .char-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    margin: 4px 0;
+    gap: 4px;
+    margin: 2px 0;
 }
 
 .char-card {
     background: #0f172a;
     border: 2px solid #334155;
     border-radius: 8px;
-    padding: 6px 3px;
+    padding: 4px 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -384,18 +407,18 @@ canvas {
 .char-card.selected-sukuna { border-color: #f43f5e !important; background: #38121d !important; box-shadow: 0 0 14px rgba(244, 63, 94, 0.5); }
 
 .char-avatar {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
     border-radius: 50%;
     object-fit: cover;
     object-position: center;
     background: #090d16;
     border: 2px solid #475569;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     transition: transform 0.2s ease;
 }
 
@@ -405,7 +428,7 @@ canvas {
 
 .char-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 700;
     color: #f8fafc;
     margin-bottom: 2px;
@@ -416,9 +439,9 @@ canvas {
 }
 
 .char-type {
-    font-size: 7.5px;
+    font-size: 7px;
     font-weight: 600;
-    padding: 1px 4px;
+    padding: 1px 3px;
     border-radius: 6px;
     letter-spacing: 0.3px;
     white-space: nowrap;
@@ -442,12 +465,12 @@ canvas {
     background: #090d16;
     border: 1px solid #334155;
     border-radius: 8px;
-    padding: 10px 12px;
+    padding: 6px 10px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    margin-top: 4px;
-    min-height: 110px;
+    gap: 3px;
+    margin-top: 2px;
+    min-height: 75px;
 }
 
 .skill-info-header {
@@ -515,19 +538,19 @@ canvas {
    ============================================================ */
 .mode-tabs {
     display: flex;
-    gap: 12px;
-    margin-bottom: 18px;
+    gap: 10px;
+    margin-bottom: 8px;
     background: #0f172a;
-    padding: 6px;
+    padding: 4px;
     border-radius: 30px;
     border: 1px solid #334155;
 }
 
 .mode-tab {
     font-family: 'Orbitron', sans-serif;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    padding: 8px 22px;
+    padding: 5px 16px;
     border: none;
     border-radius: 20px;
     background: transparent;
@@ -551,10 +574,10 @@ canvas {
 .bot-difficulty-panel {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 10px;
+    margin-bottom: 8px;
     background: #0f172a;
-    padding: 6px 18px;
+    padding: 4px 14px;
     border-radius: 20px;
     border: 1px solid #334155;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
