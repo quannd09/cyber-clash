@@ -70,7 +70,7 @@ canvas {
     justify-content: flex-start !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding: 10px 0 24px 0;
+    padding: 8px 0 20px 0;
     scrollbar-width: thin;
     scrollbar-color: #38bdf8 #0f172a;
 }
@@ -90,26 +90,27 @@ canvas {
 
 .game-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 900;
     letter-spacing: 2px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     color: #f8fafc;
     text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    line-height: 1.1;
 }
 
 .subtitle {
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 1.5px;
     color: #94a3b8;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-weight: 500;
 }
 
 .loadout-container {
     display: flex;
-    gap: 16px;
-    width: 95%;
+    gap: 14px;
+    width: 96%;
     max-width: 1220px;
     justify-content: center;
 }
@@ -118,11 +119,11 @@ canvas {
     flex: 1;
     background: #1e293b;
     border-radius: 8px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 2px solid #334155;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
@@ -136,13 +137,13 @@ canvas {
 
 .player-header {
     font-family: 'Orbitron', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #334155;
-    padding-bottom: 4px;
+    padding-bottom: 3px;
 }
 
 .p1-color { color: #a78bfa; }
