@@ -1,8 +1,8 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=54';
-import { fx } from './particles.js?v=54';
-import { physics } from './physics.js?v=54';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=54';
+import { sound } from './audio.js?v=60';
+import { fx } from './particles.js?v=60';
+import { physics } from './physics.js?v=60';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=60';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -586,7 +586,7 @@ export class Cyborg {
                 Math.sin(this.aimAngle) * 16,
                 skillDmg,
                 '#a855f7',
-                18,
+                22,
                 'hollow_purple'
             );
             combat.addProjectile(proj);
