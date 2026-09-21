@@ -1,0 +1,469 @@
+// Weapons, Skills, Projectiles & Combat Resolution Engine
+import { sound } from './audio.js';
+import { fx } from './particles.js';
+import { physics } from './physics.js';
+
+export const WEAPONS = {
+    YANAGI: {
+        id: 'YANAGI',
+        name: 'Naginata Điện',
+        attackDmg: 35, 
+        attackRange: 80,
+        attackDuration: 20,
+        attackCooldown: 25,
+        isRanged: false,
+        icon: '⚔️'
+    },
+    VELINA: {
+        id: 'VELINA',
+        name: 'Thực Vật Quang Học',
+        attackDmg: 24,
+        attackRange: 600,
+        attackDuration: 25,
+        attackCooldown: 30,
+        isRanged: true,
+        icon: '🌿'
+    },
+    NICOLE: {
+        id: 'NICOLE',
+        name: 'Pháo Cặp Táp',
+        attackDmg: 26,
+        attackRange: 550,
+        attackDuration: 24,
+        attackCooldown: 28,
+        isRanged: true,
+        icon: '💼'
+    },
+    TRIGGER: {
+        id: 'TRIGGER',
+        name: 'Súng Bắn Tỉa Điện Từ',
+        attackDmg: 36,
+        attackRange: 750,
+        attackDuration: 28,
+        attackCooldown: 40,
+        isRanged: true,
+        icon: '🎯'
+    },
+    VIVIAN: {
+        id: 'VIVIAN',
+        name: 'Lông Vũ Ether',
+        attackDmg: 25,
+        attackRange: 520,
+        attackDuration: 22,
+        attackCooldown: 24,
+        isRanged: true,
+        icon: '🔮'
+    },
+    JOTARO: {
+        id: 'JOTARO',
+        name: 'Star Platinum ORA',
+        attackDmg: 34,
+        attackRange: 85,
+        attackDuration: 20,
+        attackCooldown: 22,
+        isRanged: false,
+        icon: '👊'
+    },
+    GOKU: {
+        id: 'GOKU',
+        name: 'Long Quyền Ki',
+        attackDmg: 28,
+        attackRange: 80,
+        attackDuration: 22,
+        attackCooldown: 24,
+        isRanged: false,
+        icon: '🥋'
+    },
+    GIORNO: {
+        id: 'GIORNO',
+        name: 'Gold Experience MUDA',
+        attackDmg: 33,
+        attackRange: 80,
+        attackDuration: 20,
+        attackCooldown: 22,
+        isRanged: false,
+        icon: '🐞'
+    }
+};
+
+export const SKILLS = {
+    YANAGI_SKILL: { id: 'PHASE_BLINK', name: 'Lôi Điện Chớp Nhoáng', cooldown: 180, icon: '⚡' },
+    VERINA_SKILL: { id: 'EMP_BLAST', name: 'Hạt Giống Sinh Mệnh', cooldown: 220, icon: '🌸' },
+    NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Trượt Tiền Tài', cooldown: 200, icon: '💼' },
+    TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Thế Bắn Tỉa', cooldown: 220, icon: '🎯' },
+    VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Hộ Mệnh Nở Rộ', cooldown: 140, icon: '🔮' },
+    JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 210, icon: '👊' },
+    GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Dịch Chuyển Tức Thời', cooldown: 230, icon: '🥋' },
+    GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Cây Cối Sinh Mệnh', cooldown: 220, icon: '🐞' }
+};
+
+export class Projectile {
+    constructor(ownerIndex, x, y, vx, vy, damage, color, radius = 8) {
+        this.ownerIndex = ownerIndex;
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.damage = damage;
+        this.color = color;
+        this.radius = radius;
+        this.life = 160;
+        this.isReflected = false;
+    }
+
+    update(dt = 1) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.life -= dt;
+
+        // Spark tail
+        if (Math.random() < 0.4) {
+            fx.spawnHitSparks(this.x, this.y, this.color, 1);
+        }
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 15;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Projectile direction beam tail
+        const angle = Math.atan2(this.vy, this.vx);
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x - Math.cos(angle) * 22, this.y - Math.sin(angle) * 22);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+}
+
+export class CombatResolver {
+    constructor() {
+        this.projectiles = [];
+    }
+
+    reset() {
+        this.projectiles = [];
+    }
+
+    addProjectile(p) {
+        this.projectiles.push(p);
+    }
+
+    updateProjectiles(dt = 1, arenaBounds) {
+        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+            const p = this.projectiles[i];
+            p.update(dt);
+
+            // Bounds check
+            if (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
+                p.y < arenaBounds.minY || p.y > arenaBounds.maxY || p.life <= 0) {
+                fx.spawnHitSparks(p.x, p.y, p.color, 8);
+                this.projectiles.splice(i, 1);
+            }
+        }
+    }
+
+    drawProjectiles(ctx) {
+        this.projectiles.forEach(p => p.draw(ctx));
+    }
+
+    // --- RESOLVE COMBAT TRICKS & INTERACTIONS ---
+
+    resolve(p1, p2, triggerScreenShake) {
+        // 1. Check Blade Clash (Both attacking with melee active)
+        if (p1.isAttacking && p2.isAttacking && !p1.hasClashed && !p2.hasClashed) {
+            const p1Weapon = WEAPONS[p1.characterId.toUpperCase()];
+            const p2Weapon = WEAPONS[p2.characterId.toUpperCase()];
+
+            // If neither is in projectile mode
+            if (!p1Weapon.isRanged && !p2Weapon.isRanged) {
+
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                const dist = Math.hypot(dx, dy);
+                const clashReach = (p1.attackReach + p2.attackReach) * 0.75;
+
+                if (dist < clashReach) {
+                    // TRICK #4: BLADE CLASH TRIGGERED!
+                    p1.hasClashed = true;
+                    p2.hasClashed = true;
+                    p1.isAttacking = false;
+                    p2.isAttacking = false;
+
+                    const midX = (p1.x + p2.x) / 2;
+                    const midY = (p1.y + p2.y) / 2;
+
+                    // Push both players backwards with massive recoil
+                    physics.applyKnockback(p1, -dx, -dy, 14);
+                    physics.applyKnockback(p2, dx, dy, 14);
+
+                    sound.playClash();
+                    fx.spawnClashShockwave(midX, midY);
+                    fx.addText(midX, midY - 30, '⚡ BLADE CLASH! ⚡', '#ffff00', 26);
+                    triggerScreenShake(12, 16);
+                    return;
+                }
+            }
+        }
+
+        // 2. Check P1 Melee Attack hitting P2
+        this.resolveMeleeAttack(p1, p2, triggerScreenShake);
+
+        // 3. Check P2 Melee Attack hitting P1
+        this.resolveMeleeAttack(p2, p1, triggerScreenShake);
+
+        // 4. Check Projectiles hitting Players
+        this.resolveProjectilesAgainstPlayers(p1, p2, triggerScreenShake);
+
+        // 5. Check Ultimate Overdrive Beams
+        this.resolveUltimates(p1, p2, triggerScreenShake);
+    }
+
+    resolveMeleeAttack(attacker, defender, triggerScreenShake) {
+        if (!attacker.isAttacking || attacker.attackHitRegistered) return;
+        if (attacker.isShooting) return; // Projectiles handled separately
+
+        const reach = attacker.attackReach;
+        // Calculate attack point in facing / aim direction
+        const aimAngle = attacker.aimAngle;
+        const attackX = attacker.x + Math.cos(aimAngle) * (reach * 0.7);
+        const attackY = attacker.y + Math.sin(aimAngle) * (reach * 0.7);
+
+        const dist = Math.hypot(defender.x - attackX, defender.y - attackY);
+
+        if (dist < defender.radius + reach * 0.5) {
+            attacker.attackHitRegistered = true;
+            const baseDmg = attacker.currentAttackDamage;
+
+            // Check Defender Shield / Parry
+            if (defender.isShielding) {
+                // TRICK #1: PERFECT PARRY WINDOW (first 10 frames = ~0.16s of shield activation)
+                if (defender.shieldTimer <= 10) {
+                    // PERFECT PARRY SUCCESS!
+                    defender.overdrive = Math.min(100, defender.overdrive + 25);
+                    attacker.applyStun(55); // 0.9s Stun on attacker!
+                    physics.applyKnockback(attacker, -Math.cos(aimAngle), -Math.sin(aimAngle), 11);
+
+                    sound.playParry();
+                    fx.spawnParryBurst(defender.x, defender.y, defender.color);
+                    fx.addText(defender.x, defender.y - 40, '✨ PERFECT PARRY! ✨', '#00ffcc', 28);
+                    triggerScreenShake(8, 14);
+                    return;
+                } else {
+                    // Regular block (Chip damage only, no stun)
+                    defender.takeDamage(baseDmg * 0.18);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 4);
+                    sound.playHit(false);
+                    fx.spawnHitSparks(defender.x, defender.y, '#ffffff', 6);
+                    fx.addText(defender.x, defender.y - 25, 'BLOCKED', '#00ffff', 18);
+                    return;
+                }
+            }
+
+            // Direct unshielded hit!
+            defender.takeDamage(baseDmg);
+            attacker.overdrive = Math.min(100, attacker.overdrive + 14);
+            defender.applyStun(20);
+            physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 10);
+
+            sound.playHit(true);
+            fx.spawnHitSparks(defender.x, defender.y, attacker.color, 18);
+            triggerScreenShake(8, 12);
+        }
+    }
+
+    resolveProjectilesAgainstPlayers(p1, p2, triggerScreenShake) {
+        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+            const proj = this.projectiles[i];
+            const defender = proj.ownerIndex === 0 ? p2 : p1;
+            const attacker = proj.ownerIndex === 0 ? p1 : p2;
+
+            // Hitbox dạng hình con nhộng (Capsule) bao phủ toàn bộ cơ thể nhân vật từ đầu tới chân
+            const targetY = Math.max(defender.y - 55, Math.min(defender.y + 30, proj.y));
+            const dist = Math.hypot(defender.x - proj.x, targetY - proj.y);
+
+            if (dist < defender.radius + proj.radius) {
+                // Check if defender parries projectile!
+                if (defender.isShielding) {
+                    if (defender.shieldTimer <= 10 && !proj.isReflected) {
+                        // TRICK #1: REFLECTED VIA PERFECT PARRY!
+                        proj.isReflected = true;
+                        proj.ownerIndex = defender.index;
+                        proj.color = defender.color;
+                        proj.vx = -proj.vx * 1.35;
+                        proj.vy = -proj.vy * 1.35;
+                        proj.damage *= 1.3;
+                        defender.overdrive = Math.min(100, defender.overdrive + 20);
+
+                        sound.playParry();
+                        fx.spawnParryBurst(proj.x, proj.y, defender.color);
+                        fx.addText(defender.x, defender.y - 35, '⚡ REFLECTED! ⚡', '#00ffcc', 24);
+                        triggerScreenShake(6, 10);
+                        continue;
+                    } else {
+                        // Absorbed by shield
+                        defender.takeDamage(proj.damage * 0.15);
+                        fx.spawnHitSparks(proj.x, proj.y, '#ffffff', 8);
+                        sound.playHit(false);
+                        this.projectiles.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                // Direct hit!
+                defender.takeDamage(proj.damage);
+                attacker.overdrive = Math.min(100, attacker.overdrive + 12);
+                defender.applyStun(16);
+                physics.applyKnockback(defender, proj.vx * 0.3, proj.vy * 0.3, 6);
+
+                sound.playHit(true);
+                fx.spawnHitSparks(proj.x, proj.y, proj.color, 18);
+                fx.addText(defender.x, targetY - 20, `-${Math.round(proj.damage)}`, attacker.color, 20);
+                triggerScreenShake(7, 10);
+                this.projectiles.splice(i, 1);
+            }
+        }
+    }
+
+    resolveUltimates(p1, p2, triggerScreenShake) {
+        [ { user: p1, target: p2 }, { user: p2, target: p1 } ].forEach(({ user, target }) => {
+            if (user.isUsingUltimate && user.ultimateTimer > 15 && user.ultimateTimer < 65) {
+                const userWeapon = WEAPONS[user.characterId.toUpperCase()];
+                const normalDmg = userWeapon ? userWeapon.attackDmg : 30;
+                // Dame ulti = 3.5x dame 1 đòn đánh thường (chia đều qua 50 frame hoạt động)
+                const ultDmgPerFrame = (normalDmg * 3.5) / 50;
+
+                if (user.characterId === 'yanagi') {
+                    // YANAGI: KAMEHAMEHA BEAM
+                    const beamLen = 1500;
+                    const beamAngle = user.aimAngle;
+                    const endX = user.x + Math.cos(beamAngle) * beamLen;
+                    const endY = user.y + Math.sin(beamAngle) * beamLen;
+
+                    const dist = this.distToSegment(target.x, target.y, user.x, user.y, endX, endY);
+                    if (dist < target.radius + 80) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(8);
+                        physics.applyKnockback(target, Math.cos(beamAngle), Math.sin(beamAngle), 1.5);
+                        fx.spawnHitSparks(target.x, target.y, user.color, 4);
+                        triggerScreenShake(2, 4);
+                    }
+                } else if (user.characterId === 'velina') {
+                    // VELINA: TORNADO / RADIAL BLAST
+                    const stormRadius = 80 + user.ultimateTimer * 5;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + stormRadius) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(8);
+                        const angleToTarget = Math.atan2(target.y - user.y, target.x - user.x);
+                        physics.applyKnockback(target, Math.cos(angleToTarget), Math.sin(angleToTarget), 1.5);
+                        fx.spawnHitSparks(target.x, target.y, user.color, 4);
+                        triggerScreenShake(3, 5);
+                    }
+                } else if (user.characterId === 'nicole') {
+                    // NICOLE: GRAVITATIONAL SINGULARITY (HỐ ĐEN TRỌNG LỰC)
+                    const hX = user.x + Math.cos(user.aimAngle) * 320;
+                    const hY = user.y + Math.sin(user.aimAngle) * 320;
+                    const dist = Math.hypot(target.x - hX, target.y - hY);
+                    if (dist < 300) {
+                        // Sucking pull force towards black hole
+                        const pullAngle = Math.atan2(hY - target.y, hX - target.x);
+                        physics.applyKnockback(target, Math.cos(pullAngle), Math.sin(pullAngle), 2.2);
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(10);
+                        fx.spawnHitSparks(target.x, target.y, '#ec4899', 3);
+                        triggerScreenShake(2, 4);
+                    }
+                } else if (user.characterId === 'trigger') {
+                    // TRIGGER: PIERCING SNIPER RAILGUN
+                    const beamLen = 1600;
+                    const beamAngle = user.aimAngle;
+                    const endX = user.x + Math.cos(beamAngle) * beamLen;
+                    const endY = user.y + Math.sin(beamAngle) * beamLen;
+
+                    const dist = this.distToSegment(target.x, target.y, user.x, user.y, endX, endY);
+                    if (dist < target.radius + 60) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(12);
+                        physics.applyKnockback(target, Math.cos(beamAngle), Math.sin(beamAngle), 2.5);
+                        fx.spawnHitSparks(target.x, target.y, '#38bdf8', 5);
+                        triggerScreenShake(3, 6);
+                    }
+                } else if (user.characterId === 'vivian') {
+                    // VIVIAN: BANSHEE BLOOM (BÃO LÔNG VŨ ETHER) - Tăng phạm vi tác dụng lên 500px
+                    const stormRadius = 500;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + stormRadius) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(8);
+                        target.vx *= 0.7; // Ether slow
+                        target.vy *= 0.7;
+                        fx.spawnHitSparks(target.x, target.y, '#c084fc', 4);
+                        triggerScreenShake(2, 4);
+                    }
+                } else if (user.characterId === 'jotaro') {
+                    // JOTARO: THE WORLD TIME STOP + ORA ORA RUSH!
+                    target.applyStun(20);
+                    target.vx = 0;
+                    target.vy = 0;
+                    // Rush close to target if within range
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < 220) {
+                        target.takeDamage(ultDmgPerFrame);
+                        physics.applyKnockback(target, Math.cos(user.aimAngle), Math.sin(user.aimAngle), 1.8);
+                        fx.spawnHitSparks(target.x, target.y, '#6366f1', 6);
+                        triggerScreenShake(4, 7);
+                    }
+                } else if (user.characterId === 'goku') {
+                    // GOKU: SUPER SAIYAN KAMEHAMEHA!
+                    const beamLen = 1500;
+                    const beamAngle = user.aimAngle;
+                    const endX = user.x + Math.cos(beamAngle) * beamLen;
+                    const endY = user.y + Math.sin(beamAngle) * beamLen;
+
+                    const dist = this.distToSegment(target.x, target.y, user.x, user.y, endX, endY);
+                    if (dist < target.radius + 90) { // Mega wide golden ki wave
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(10);
+                        physics.applyKnockback(target, Math.cos(beamAngle), Math.sin(beamAngle), 2.0);
+                        fx.spawnHitSparks(target.x, target.y, '#fbbf24', 6);
+                        triggerScreenShake(3, 6);
+                    }
+                } else if (user.characterId === 'giorno') {
+                    // GIORNO: RETURN TO ZERO (GER) + 7-PAGE MUDA!
+                    target.applyStun(25);
+                    target.vx *= 0.2;
+                    target.vy *= 0.2;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < 240) {
+                        target.takeDamage(ultDmgPerFrame);
+                        const angle = Math.atan2(target.y - user.y, target.x - user.x);
+                        physics.applyKnockback(target, Math.cos(angle), Math.sin(angle), 1.6);
+                        fx.spawnHitSparks(target.x, target.y, '#eab308', 5);
+                        triggerScreenShake(3, 6);
+                    }
+                }
+            }
+        });
+    }
+
+    distToSegment(px, py, x1, y1, x2, y2) {
+        const l2 = Math.hypot(x2 - x1, y2 - y1) ** 2;
+        if (l2 === 0) return Math.hypot(px - x1, py - y1);
+        let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return Math.hypot(px - (x1 + t * (x2 - x1)), py - (y1 + t * (y2 - y1)));
+    }
+}
+
+export const combat = new CombatResolver();

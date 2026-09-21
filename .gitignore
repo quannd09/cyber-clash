@@ -1,0 +1,11 @@
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.tmp
+.vscode/
+.idea/
+
+# Node / Scratch / Temporary scripts
+node_modules/
+*.py
+!assets/

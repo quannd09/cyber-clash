@@ -1,0 +1,589 @@
+// Character Selection, Overlay & Cheat Sheet UI Controller
+import { assets } from './assets.js?v=48';
+import { network } from './network.js?v=48';
+
+const SKILL_DATA = {
+    yanagi: {
+        title: '⚡ TSUKISHIRO YANAGI (CẬN CHIẾN • 500 HP)',
+        color: '#a78bfa',
+        p1: [
+            { key: 'F (Cận chiến)', name: 'Nguyệt Thương', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Chớp Nhoáng', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Pháo Lôi Quang', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Cận chiến)', name: 'Nguyệt Thương', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Chớp Nhoáng', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Pháo Lôi Quang', desc: '' }
+        ]
+    },
+    velina: {
+        title: '🌸 VERINA AIRGID (TẦM XA • 500 HP)',
+        color: '#34d399',
+        p1: [
+            { key: 'F (Tầm xa)', name: 'Sao Chổi', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Quang Dưỡng', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Bão Sinh Mệnh', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Tầm xa)', name: 'Sao Chổi', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Quang Dưỡng', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Bão Sinh Mệnh', desc: '' }
+        ]
+    },
+    nicole: {
+        title: '💼 NICOLE DEMARA (TẦM XA • 500 HP)',
+        color: '#f472b6',
+        p1: [
+            { key: 'F (Tầm xa)', name: 'Pháo Cặp Táp', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Trượt Tiền Tài', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Hố Đen Trọng Lực', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Tầm xa)', name: 'Pháo Cặp Táp', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Trượt Tiền Tài', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Hố Đen Trọng Lực', desc: '' }
+        ]
+    },
+    trigger: {
+        title: '🎯 TRIGGER (TẦM XA • 500 HP)',
+        color: '#38bdf8',
+        p1: [
+            { key: 'F (Tầm xa)', name: 'Phát Bắn Thanh Trừng', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Thế Bắn Tỉa', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Hỏa Lực Đồng Bộ', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Tầm xa)', name: 'Phát Bắn Thanh Trừng', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Thế Bắn Tỉa', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Hỏa Lực Đồng Bộ', desc: '' }
+        ]
+    },
+    vivian: {
+        title: '🔮 VIVIAN BANSHEE (TẦM XA • 650 HP)',
+        color: '#c084fc',
+        p1: [
+            { key: 'F (Tầm xa)', name: 'Lông Vũ Dị Thường', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Hộ Mệnh Nở Rộ', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Điềm Báo Vĩnh Cửu', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Tầm xa)', name: 'Lông Vũ Dị Thường', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Hộ Mệnh Nở Rộ', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Điềm Báo Vĩnh Cửu', desc: '' }
+        ]
+    },
+    jotaro: {
+        title: '👊 JOTARO KUJO (CẬN CHIẾN • 500 HP)',
+        color: '#818cf8',
+        p1: [
+            { key: 'F (Cận chiến)', name: 'ORA ORA ORA!', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Star Finger', desc: '' },
+            { key: 'Space (Ultimate)', name: 'The World: Ngưng Đọng Thời Gian', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Cận chiến)', name: 'ORA ORA ORA!', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Star Finger', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'The World: Ngưng Đọng Thời Gian', desc: '' }
+        ]
+    },
+    goku: {
+        title: '🥋 SON GOKU (CẬN CHIẾN • 500 HP)',
+        color: '#fbbf24',
+        p1: [
+            { key: 'F (Cận chiến)', name: 'Long Quyền Ki', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Dịch Chuyển Tức Thời', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Siêu Kamehameha', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Cận chiến)', name: 'Long Quyền Ki', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Dịch Chuyển Tức Thời', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Siêu Kamehameha', desc: '' }
+        ]
+    },
+    giorno: {
+        title: '🐞 GIORNO GIOVANNA (CẬN CHIẾN • 500 HP)',
+        color: '#facc15',
+        p1: [
+            { key: 'F (Cận chiến)', name: 'MUDA MUDA MUDA!', desc: '' },
+            { key: 'R (Kỹ năng)', name: 'Cây Cối Sinh Mệnh', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Return To Zero', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Cận chiến)', name: 'MUDA MUDA MUDA!', desc: '' },
+            { key: 'I (Kỹ năng)', name: 'Cây Cối Sinh Mệnh', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Return To Zero', desc: '' }
+        ]
+    }
+};
+
+export class UIManager {
+    constructor(onStartMatch, onRematch, onNetworkModeChange, onNetworkConnected, onNetworkGameData) {
+        this.onStartMatch = onStartMatch;
+        this.onRematch = onRematch;
+        this.onNetworkModeChange = onNetworkModeChange;
+        this.onNetworkConnected = onNetworkConnected;
+        this.onNetworkGameData = onNetworkGameData;
+
+        this.loadoutScreen = document.getElementById('loadout-screen');
+        this.victoryScreen = document.getElementById('victory-screen');
+        this.controlsModal = document.getElementById('controls-modal');
+
+        this.gameMode = 'LOCAL'; // 'LOCAL' | 'ONLINE'
+        this.networkRole = null; // 'HOST' | 'CLIENT' | null
+        this.currentRoomCode = null;
+
+        this.p1Ready = false;
+        this.p2Ready = false;
+
+        this.p1Char = 'yanagi';
+        this.p2Char = 'velina';
+
+        this.initUI();
+    }
+
+    initUI() {
+        this.setupCharacterSelection();
+        this.setupOnlineUI();
+
+        // Ready Buttons
+        const p1ReadyBtn = document.getElementById('p1-ready-btn');
+        const p2ReadyBtn = document.getElementById('p2-ready-btn');
+
+        if (p1ReadyBtn) {
+            p1ReadyBtn.addEventListener('click', () => {
+                if (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') return;
+                this.p1Ready = !this.p1Ready;
+                p1ReadyBtn.classList.toggle('ready', this.p1Ready);
+                p1ReadyBtn.textContent = this.p1Ready ? '✔️ P1 READY!' : 'READY (Press F / Space)';
+
+                if (this.gameMode === 'ONLINE') {
+                    network.send({ type: 'READY_STATE', player: 'p1', ready: this.p1Ready });
+                }
+                this.checkBothReady();
+            });
+        }
+
+        if (p2ReadyBtn) {
+            p2ReadyBtn.addEventListener('click', () => {
+                if (this.gameMode === 'ONLINE' && this.networkRole === 'HOST') return;
+                this.p2Ready = !this.p2Ready;
+                p2ReadyBtn.classList.toggle('ready', this.p2Ready);
+                p2ReadyBtn.textContent = this.p2Ready ? '✔️ P2 READY!' : (this.gameMode === 'ONLINE' ? 'READY (Press F / Space)' : 'READY (Press J / Enter)');
+
+                if (this.gameMode === 'ONLINE') {
+                    network.send({ type: 'READY_STATE', player: 'p2', ready: this.p2Ready });
+                }
+                this.checkBothReady();
+            });
+        }
+
+        // Rematch Button
+        const rematchBtn = document.getElementById('rematch-btn');
+        if (rematchBtn) {
+            rematchBtn.addEventListener('click', () => {
+                this.hideVictory();
+                this.showLoadout();
+            });
+        }
+
+        // Help Modal Toggle & Close Handlers
+        const closeModal = () => {
+            const modal = document.getElementById('controls-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        const openModal = () => {
+            const modal = document.getElementById('controls-modal');
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        const helpBtn = document.getElementById('help-toggle-btn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', openModal);
+        }
+
+        const closeHelpBtn = document.getElementById('close-help-btn');
+        if (closeHelpBtn) {
+            closeHelpBtn.addEventListener('click', closeModal);
+        }
+
+        const modalCloseX = document.querySelector('.modal-close-btn');
+        if (modalCloseX) {
+            modalCloseX.addEventListener('click', closeModal);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    }
+
+    setupCharacterSelection() {
+        // Player 1 click handlers
+        document.querySelectorAll('.char-card[data-player="p1"]').forEach(card => {
+            card.addEventListener('click', () => {
+                if (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') return;
+                const charId = card.dataset.char;
+                this.p1Char = charId;
+                this.updateCardSelection('p1', charId);
+                this.renderSkillInfo('p1', charId);
+
+                if (this.gameMode === 'ONLINE') {
+                    network.send({ type: 'CHAR_SELECT', player: 'p1', charId });
+                }
+            });
+        });
+
+        // Player 2 click handlers
+        document.querySelectorAll('.char-card[data-player="p2"]').forEach(card => {
+            card.addEventListener('click', () => {
+                if (this.gameMode === 'ONLINE' && this.networkRole === 'HOST') return;
+                const charId = card.dataset.char;
+                this.p2Char = charId;
+                this.updateCardSelection('p2', charId);
+                this.renderSkillInfo('p2', charId);
+
+                if (this.gameMode === 'ONLINE') {
+                    network.send({ type: 'CHAR_SELECT', player: 'p2', charId });
+                }
+            });
+        });
+    }
+
+    setupOnlineUI() {
+        const localTab = document.getElementById('mode-local-tab');
+        const onlineTab = document.getElementById('mode-online-tab');
+        const lobbyPanel = document.getElementById('online-lobby-panel');
+        const fightersContainer = document.getElementById('loadout-fighters-container');
+        const matchBanner = document.getElementById('online-match-banner');
+        const btnCreateRoom = document.getElementById('btn-create-room');
+        const btnJoinRoom = document.getElementById('btn-join-room');
+        const btnCopyCode = document.getElementById('btn-copy-code');
+        const btnLeaveOnline = document.getElementById('btn-leave-online');
+        const inputRoomCode = document.getElementById('input-room-code');
+        const hostCodeBox = document.getElementById('host-code-box');
+        const displayRoomCode = document.getElementById('display-room-code');
+        const clientWaitBox = document.getElementById('client-wait-box');
+        const clientWaitMsg = document.getElementById('client-wait-msg');
+        const globalMsg = document.getElementById('online-global-msg');
+        const bannerRoomCode = document.getElementById('banner-room-code');
+        const bannerRoleText = document.getElementById('banner-role-text');
+
+        const switchToLocal = () => {
+            this.gameMode = 'LOCAL';
+            this.networkRole = null;
+            this.currentRoomCode = null;
+            network.disconnect();
+
+            if (localTab) localTab.classList.add('active');
+            if (onlineTab) onlineTab.classList.remove('active');
+            if (lobbyPanel) lobbyPanel.classList.add('hidden');
+            if (matchBanner) matchBanner.classList.add('hidden');
+            if (fightersContainer) fightersContainer.classList.remove('hidden');
+
+            this.restoreLocalFighterPermissions();
+            if (this.onNetworkModeChange) this.onNetworkModeChange('LOCAL');
+        };
+
+        const switchToOnline = () => {
+            this.gameMode = 'ONLINE';
+            if (localTab) localTab.classList.remove('active');
+            if (onlineTab) onlineTab.classList.add('active');
+
+            if (network.isConnected) {
+                if (lobbyPanel) lobbyPanel.classList.add('hidden');
+                if (matchBanner) matchBanner.classList.remove('hidden');
+                if (fightersContainer) fightersContainer.classList.remove('hidden');
+            } else {
+                if (lobbyPanel) lobbyPanel.classList.remove('hidden');
+                if (matchBanner) matchBanner.classList.add('hidden');
+                if (fightersContainer) fightersContainer.classList.add('hidden');
+            }
+            if (this.onNetworkModeChange) this.onNetworkModeChange('ONLINE');
+        };
+
+        if (localTab) localTab.addEventListener('click', switchToLocal);
+        if (onlineTab) onlineTab.addEventListener('click', switchToOnline);
+
+        // CREATE ROOM (HOST)
+        if (btnCreateRoom) {
+            btnCreateRoom.addEventListener('click', () => {
+                if (globalMsg) {
+                    globalMsg.textContent = 'Đang khởi tạo máy chủ phòng qua WebRTC...';
+                    globalMsg.classList.remove('error');
+                }
+                network.createRoom();
+            });
+        }
+
+        // JOIN ROOM (CLIENT)
+        if (btnJoinRoom) {
+            btnJoinRoom.addEventListener('click', () => {
+                const code = inputRoomCode ? inputRoomCode.value.trim() : '';
+                if (!code) {
+                    if (globalMsg) {
+                        globalMsg.textContent = 'Vui lòng nhập mã phòng trước khi bấm Vào Phòng!';
+                        globalMsg.classList.add('error');
+                    }
+                    return;
+                }
+                if (clientWaitBox) clientWaitBox.classList.remove('hidden');
+                if (clientWaitMsg) clientWaitMsg.textContent = `🔄 Đang tìm và kết nối tới [${code.toUpperCase()}]...`;
+                network.joinRoom(code);
+            });
+        }
+
+        // Enter key in input box
+        if (inputRoomCode) {
+            inputRoomCode.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && btnJoinRoom) {
+                    btnJoinRoom.click();
+                }
+            });
+        }
+
+        // COPY CODE
+        if (btnCopyCode) {
+            btnCopyCode.addEventListener('click', () => {
+                if (displayRoomCode && displayRoomCode.textContent) {
+                    navigator.clipboard.writeText(displayRoomCode.textContent).then(() => {
+                        btnCopyCode.textContent = '✔️ ĐÃ COPY!';
+                        setTimeout(() => { btnCopyCode.textContent = '📋 COPY'; }, 2000);
+                    });
+                }
+            });
+        }
+
+        // LEAVE ONLINE
+        if (btnLeaveOnline) {
+            btnLeaveOnline.addEventListener('click', switchToLocal);
+        }
+
+        const btnDisconnectOk = document.getElementById('btn-disconnect-ok');
+        if (btnDisconnectOk) {
+            btnDisconnectOk.addEventListener('click', () => {
+                const modal = document.getElementById('disconnect-modal');
+                if (modal) modal.classList.add('hidden');
+                switchToLocal();
+            });
+        }
+
+        // Network Callbacks
+        network.onRoomCreated = (code) => {
+            if (hostCodeBox) hostCodeBox.classList.remove('hidden');
+            if (displayRoomCode) displayRoomCode.textContent = code;
+            if (globalMsg) {
+                globalMsg.textContent = `Phòng [${code}] đã sẵn sàng! Gửi mã này cho bạn bè để cùng chơi.`;
+                globalMsg.classList.remove('error');
+            }
+        };
+
+        network.onStatusChange = (msg, isError) => {
+            if (globalMsg) {
+                globalMsg.textContent = msg;
+                globalMsg.classList.toggle('error', !!isError);
+            }
+            if (clientWaitMsg) {
+                clientWaitMsg.textContent = msg;
+            }
+        };
+
+        network.onConnected = (role, code) => {
+            this.networkRole = role;
+            this.currentRoomCode = code;
+
+            if (lobbyPanel) lobbyPanel.classList.add('hidden');
+            if (matchBanner) matchBanner.classList.remove('hidden');
+            if (fightersContainer) fightersContainer.classList.remove('hidden');
+
+            if (bannerRoomCode) bannerRoomCode.textContent = code;
+            if (bannerRoleText) {
+                bannerRoleText.textContent = role === 'HOST' ? 'VAI TRÒ: CHỦ PHÒNG (P1)' : 'VAI TRÒ: KHÁCH (P2)';
+            }
+
+            this.applyOnlinePermissions(role);
+            if (this.onNetworkConnected) {
+                this.onNetworkConnected(role, code);
+            }
+        };
+
+        network.onDisconnected = () => {
+            const modal = document.getElementById('disconnect-modal');
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        network.onData = (data) => {
+            this.handleIncomingNetworkData(data);
+        };
+    }
+
+    applyOnlinePermissions(role) {
+        if (role === 'HOST') {
+            document.querySelectorAll('.char-card[data-player="p2"]').forEach(card => card.classList.add('card-disabled'));
+            document.querySelectorAll('.char-card[data-player="p1"]').forEach(card => card.classList.remove('card-disabled'));
+
+            const p2Btn = document.getElementById('p2-ready-btn');
+            if (p2Btn) p2Btn.style.pointerEvents = 'none';
+
+            const p1Btn = document.getElementById('p1-ready-btn');
+            if (p1Btn) p1Btn.style.pointerEvents = 'auto';
+        } else if (role === 'CLIENT') {
+            document.querySelectorAll('.char-card[data-player="p1"]').forEach(card => card.classList.add('card-disabled'));
+            document.querySelectorAll('.char-card[data-player="p2"]').forEach(card => card.classList.remove('card-disabled'));
+
+            const p1Btn = document.getElementById('p1-ready-btn');
+            if (p1Btn) p1Btn.style.pointerEvents = 'none';
+
+            const p2Btn = document.getElementById('p2-ready-btn');
+            if (p2Btn) p2Btn.style.pointerEvents = 'auto';
+
+            // Client gets to use WASD OR Arrow keys on their own computer!
+            const p2HeaderLabel = document.querySelector('.player-box.p2-border .section-label');
+            if (p2HeaderLabel) p2HeaderLabel.textContent = '[WASD / MŨI TÊN + F/J / H/L / R/I / SPACE/ENTER]';
+            if (p2Btn) p2Btn.textContent = 'READY (Press F / Space / J / Enter)';
+            this.renderSkillInfo('p2', this.p2Char);
+        }
+    }
+
+    restoreLocalFighterPermissions() {
+        document.querySelectorAll('.char-card').forEach(card => card.classList.remove('card-disabled'));
+
+        const p1Btn = document.getElementById('p1-ready-btn');
+        if (p1Btn) p1Btn.style.pointerEvents = 'auto';
+
+        const p2Btn = document.getElementById('p2-ready-btn');
+        if (p2Btn) p2Btn.style.pointerEvents = 'auto';
+
+        const p2HeaderLabel = document.querySelector('.player-box.p2-border .section-label');
+        if (p2HeaderLabel) p2HeaderLabel.textContent = '[MŨI TÊN + J / L / I / U / ENTER]';
+        if (p2Btn) p2Btn.textContent = 'READY (Press J / Enter)';
+    }
+
+    handleIncomingNetworkData(data) {
+        if (!data) return;
+
+        if (data.type === 'CHAR_SELECT') {
+            if (data.player === 'p1') {
+                this.p1Char = data.charId;
+                this.updateCardSelection('p1', data.charId);
+                this.renderSkillInfo('p1', data.charId);
+            } else if (data.player === 'p2') {
+                this.p2Char = data.charId;
+                this.updateCardSelection('p2', data.charId);
+                this.renderSkillInfo('p2', data.charId);
+            }
+        } else if (data.type === 'READY_STATE') {
+            if (data.player === 'p1') {
+                this.p1Ready = data.ready;
+                const p1Btn = document.getElementById('p1-ready-btn');
+                if (p1Btn) {
+                    p1Btn.classList.toggle('ready', data.ready);
+                    p1Btn.textContent = data.ready ? '✔️ P1 READY!' : 'READY (Press F / Space)';
+                }
+            } else if (data.player === 'p2') {
+                this.p2Ready = data.ready;
+                const p2Btn = document.getElementById('p2-ready-btn');
+                if (p2Btn) {
+                    p2Btn.classList.toggle('ready', data.ready);
+                    p2Btn.textContent = data.ready ? '✔️ P2 READY!' : 'READY (Press J / Enter)';
+                }
+            }
+            this.checkBothReady();
+        } else if (data.type === 'MATCH_START') {
+            this.hideLoadout();
+            this.onStartMatch(data.p1Char, data.p2Char);
+        } else if (this.onNetworkGameData) {
+            this.onNetworkGameData(data);
+        }
+    }
+
+    updateCardSelection(player, charId) {
+        document.querySelectorAll(`.char-card[data-player="${player}"]`).forEach(card => {
+            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno');
+            if (card.dataset.char === charId) {
+                card.classList.add('selected', `selected-${charId}`);
+            }
+        });
+    }
+
+    renderSkillInfo(player, charId) {
+        const box = document.getElementById(`${player}-skill-info`);
+        if (!box) return;
+
+        const data = SKILL_DATA[charId];
+        const moves = data[player];
+        const isOnlineClient = (this.gameMode === 'ONLINE' && (this.networkRole === 'CLIENT' || network.role === 'CLIENT') && player === 'p2');
+
+        let html = `
+            <div class="skill-info-header">
+                <span class="skill-char-name" style="color: ${data.color};">${data.title}</span>
+                <span class="skill-badge">CHIÊU THỨC</span>
+            </div>
+        `;
+
+        moves.forEach(m => {
+            let keyDisplay = m.key;
+            if (isOnlineClient) {
+                keyDisplay = keyDisplay.replace('J (', 'F / J (').replace('I (', 'R / I (').replace('Enter (', 'Space / Enter (');
+            }
+            html += `
+                <div class="skill-row">
+                    <span class="skill-key">${keyDisplay}</span>
+                    <span class="skill-name">${m.name}</span>
+                    <span class="skill-desc">${m.desc}</span>
+                </div>
+            `;
+        });
+
+        box.innerHTML = html;
+    }
+
+    checkBothReady() {
+        if (this.p1Ready && this.p2Ready) {
+            if (this.gameMode === 'ONLINE') {
+                if (this.networkRole === 'HOST' || network.role === 'HOST') {
+                    network.send({ type: 'MATCH_START', p1Char: this.p1Char, p2Char: this.p2Char });
+                    setTimeout(() => {
+                        this.hideLoadout();
+                        this.onStartMatch(this.p1Char, this.p2Char);
+                    }, 300);
+                }
+            } else {
+                setTimeout(() => {
+                    this.hideLoadout();
+                    this.onStartMatch(this.p1Char, this.p2Char);
+                }, 300);
+            }
+        }
+    }
+
+    showLoadout() {
+        this.p1Ready = false;
+        this.p2Ready = false;
+        const p1Btn = document.getElementById('p1-ready-btn');
+        const p2Btn = document.getElementById('p2-ready-btn');
+        if (p1Btn) { p1Btn.classList.remove('ready'); p1Btn.textContent = 'READY (Press F / Space)'; }
+        if (p2Btn) { p2Btn.classList.remove('ready'); p2Btn.textContent = (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') ? 'READY (Press F / Space)' : 'READY (Press J / Enter)'; }
+
+        this.loadoutScreen.classList.remove('hidden');
+        this.victoryScreen.classList.add('hidden');
+    }
+
+    hideLoadout() {
+        this.loadoutScreen.classList.add('hidden');
+    }
+
+    showVictory(winnerName, winnerColor) {
+        this.victoryScreen.classList.remove('hidden');
+        const title = document.getElementById('winner-title');
+        if (title) {
+            title.textContent = `${winnerName} CHIẾN THẮNG!`;
+            title.style.color = winnerColor;
+            title.style.textShadow = `0 0 25px ${winnerColor}`;
+        }
+    }
+
+    hideVictory() {
+        this.victoryScreen.classList.add('hidden');
+    }
+}

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER CLASH: ZERO-G ARENA | 2D Local 2-Player Fighter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=48">
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- LOADOUT SELECTION SCREEN -->
+        <div id="loadout-screen" class="overlay">
+            <h1 class="game-title">CYBER CLASH: ZERO-G ARENA</h1>
+            
+            <!-- CHỌN CHẾ ĐỘ CHƠI -->
+            <div class="mode-tabs">
+                <button id="mode-local-tab" class="mode-tab active">🎮 ĐẤU CHUNG MÁY (LOCAL)</button>
+                <button id="mode-online-tab" class="mode-tab">🌐 ĐẤU ONLINE (MÃ PHÒNG WEBRTC)</button>
+            </div>
+
+            <!-- THANH THÔNG BÁO KHI ĐÃ KẾT NỐI ONLINE -->
+            <div id="online-match-banner" class="online-banner hidden">
+                <span class="online-indicator">🟢 ONLINE P2P</span>
+                <span class="room-pill">PHÒNG: <strong id="banner-room-code">CLASH-XXXX</strong></span>
+                <span class="role-pill" id="banner-role-text">VAI TRÒ: CHỦ PHÒNG (P1)</span>
+                <button id="btn-leave-online" class="leave-btn">❌ THOÁT PHÒNG</button>
+            </div>
+
+            <!-- SẢNH CHỜ GHÉP PHÒNG ONLINE (WEBRTC PEERJS) -->
+            <div id="online-lobby-panel" class="online-lobby hidden">
+                <div class="lobby-columns">
+                    <!-- TẠO PHÒNG (HOST) -->
+                    <div class="lobby-col host-col">
+                        <div class="lobby-col-badge host-badge">MÁY 1 • CHỦ PHÒNG</div>
+                        <h2 class="lobby-col-title">TẠO PHÒNG MỚI</h2>
+                        <p class="lobby-col-desc">Nhận mã phòng ngẫu nhiên và gửi cho bạn bè để bắt đầu trận đấu đối kháng qua WebRTC P2P.</p>
+                        
+                        <button id="btn-create-room" class="lobby-btn host-action-btn">⚡ TẠO PHÒNG (HOST)</button>
+
+                        <div id="host-code-box" class="code-display-box hidden">
+                            <div class="code-title">MÃ PHÒNG CỦA BẠN:</div>
+                            <div class="code-row">
+                                <span id="display-room-code" class="code-digits">CLASH-XXXX</span>
+                                <button id="btn-copy-code" class="copy-btn">📋 COPY</button>
+                            </div>
+                            <div class="lobby-pulse-msg">⏳ Đang đợi đối thủ nhập mã vào phòng...</div>
+                        </div>
+                    </div>
+
+                    <div class="lobby-divider">
+                        <span>HOẶC</span>
+                    </div>
+
+                    <!-- VÀO PHÒNG (CLIENT) -->
+                    <div class="lobby-col client-col">
+                        <div class="lobby-col-badge client-badge">MÁY 2 • KHÁCH</div>
+                        <h2 class="lobby-col-title">VÀO PHÒNG CÓ SẴN</h2>
+                        <p class="lobby-col-desc">Nhập mã phòng do chủ phòng cung cấp (Ví dụ: <code>CLASH-8821</code> hoặc chỉ gõ <code>8821</code>).</p>
+                        
+                        <div class="join-input-row">
+                            <input type="text" id="input-room-code" class="room-input" placeholder="Nhập mã phòng..." maxlength="12" autocomplete="off" spellcheck="false">
+                            <button id="btn-join-room" class="lobby-btn client-action-btn">🚀 VÀO PHÒNG</button>
+                        </div>
+
+                        <div id="client-wait-box" class="code-display-box hidden">
+                            <div id="client-wait-msg" class="lobby-pulse-msg">🔄 Đang kết nối tới chủ phòng...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="online-global-msg" class="lobby-status-msg"></div>
+            </div>
+
+            <div id="loadout-fighters-container" class="loadout-container">
+                <!-- PLAYER 1 LOADOUT -->
+                <div class="player-box p1-border">
+                    <div class="player-header">
+                        <span class="p1-color">PLAYER 1</span>
+                        <span class="section-label">[WASD + F / H / R / SHIFT / SPACE]</span>
+                    </div>
+
+                    <span class="section-label">CHỌN NHÂN VẬT:</span>
+                    <div class="char-grid" id="p1-char-grid">
+                        <div class="char-card selected-yanagi" data-player="p1" data-char="yanagi">
+                            <img src="assets/yanagi/avatar.png?v=45" class="char-avatar" alt="Yanagi">
+                            <div class="char-title">Yanagi</div>
+                            <span class="char-type type-yanagi">⚔️ CẬN CHIẾN</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="velina">
+                            <img src="assets/velina/avatar.png?v=45" class="char-avatar" alt="Verina">
+                            <div class="char-title">Verina</div>
+                            <span class="char-type type-velina">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="nicole">
+                            <img src="assets/nicole/avatar.png?v=45" class="char-avatar" alt="Nicole">
+                            <div class="char-title">Nicole</div>
+                            <span class="char-type type-nicole">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="trigger">
+                            <img src="assets/trigger/avatar.png?v=45" class="char-avatar" alt="Trigger">
+                            <div class="char-title">Trigger</div>
+                            <span class="char-type type-trigger">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="vivian">
+                            <img src="assets/vivian/avatar.png?v=45" class="char-avatar" alt="Vivian">
+                            <div class="char-title">Vivian</div>
+                            <span class="char-type type-vivian">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="jotaro">
+                            <img src="assets/jotaro/avatar.png?v=45" class="char-avatar" alt="Jotaro">
+                            <div class="char-title">Jotaro</div>
+                            <span class="char-type type-jotaro">⚔️ CẬN CHIẾN</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="goku">
+                            <img src="assets/goku/avatar.png?v=45" class="char-avatar" alt="Goku">
+                            <div class="char-title">Goku</div>
+                            <span class="char-type type-goku">⚔️ CẬN CHIẾN</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="giorno">
+                            <img src="assets/giorno/avatar.png?v=45" class="char-avatar" alt="Giorno">
+                            <div class="char-title">Giorno</div>
+                            <span class="char-type type-giorno">⚔️ CẬN CHIẾN</span>
+                        </div>
+                    </div>
+
+                    <!-- POP-UP GIỚI THIỆU CHIÊU THỨC P1 -->
+                    <div class="skill-info-box" id="p1-skill-info">
+                        <div class="skill-info-header">
+                            <span class="skill-char-name" style="color: #a78bfa;">⚡ TSUKISHIRO YANAGI (CẬN CHIẾN • 500 HP)</span>
+                            <span class="skill-badge">CHIÊU THỨC</span>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-key">F (Cận chiến)</span>
+                            <span class="skill-name">Nguyệt Thương</span>
+                            <span class="skill-desc"></span>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-key">R (Kỹ năng)</span>
+                            <span class="skill-name">Chớp Nhoáng</span>
+                            <span class="skill-desc"></span>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-key">Space (Ultimate)</span>
+                            <span class="skill-name">Pháo Lôi Quang</span>
+                            <span class="skill-desc"></span>
+                        </div>
+                    </div>
+
+                    <button id="p1-ready-btn" class="ready-btn">READY (Press F / Space)</button>
+                </div>
+
+                <!-- PLAYER 2 LOADOUT -->
+                <div class="player-box p2-border">
+                    <div class="player-header">
+                        <span class="p2-color">PLAYER 2</span>
+                        <span class="section-label">[MŨI TÊN + J / L / I / U / ENTER]</span>
+                    </div>
+
+                    <span class="section-label">CHỌN NHÂN VẬT:</span>
+                    <div class="char-grid" id="p2-char-grid">
+                        <div class="char-card" data-player="p2" data-char="yanagi">
+                            <img src="assets/yanagi/avatar.png?v=45" class="char-avatar" alt="Yanagi">
+                            <div class="char-title">Yanagi</div>
+                            <span class="char-type type-yanagi">⚔️ CẬN CHIẾN</span>
+                        </div>
+                        <div class="char-card selected-velina" data-player="p2" data-char="velina">
+                            <img src="assets/velina/avatar.png?v=45" class="char-avatar" alt="Verina">
+                            <div class="char-title">Verina</div>
+                            <span class="char-type type-velina">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="nicole">
+                            <img src="assets/nicole/avatar.png?v=45" class="char-avatar" alt="Nicole">
+                            <div class="char-title">Nicole</div>
+                            <span class="char-type type-nicole">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="trigger">
+                            <img src="assets/trigger/avatar.png?v=45" class="char-avatar" alt="Trigger">
+                            <div class="char-title">Trigger</div>
+                            <span class="char-type type-trigger">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="vivian">
+                            <img src="assets/vivian/avatar.png?v=45" class="char-avatar" alt="Vivian">
+                            <div class="char-title">Vivian</div>
+                            <span class="char-type type-vivian">🏹 TẦM XA</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="jotaro">
+                            <img src="assets/jotaro/avatar.png?v=45" class="char-avatar" alt="Jotaro">
+                            <div class="char-title">Jotaro</div>
+                            <span class="char-type type-jotaro">⚔️ CẬN CHIẾN</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="goku">
+                            <img src="assets/goku/avatar.png?v=45" class="char-avatar" alt="Goku">
+                            <div class="char-title">Goku</div>
+                            <span class="char-type type-goku">⚔️ CẬN CHIẾN</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="giorno">
+                            <img src="assets/giorno/avatar.png?v=45" class="char-avatar" alt="Giorno">
+                            <div class="char-title">Giorno</div>
+                            <span class="char-type type-giorno">⚔️ CẬN CHIẾN</span>
+                        </div>
+                    </div>
+
+                    <!-- POP-UP GIỚI THIỆU CHIÊU THỨC P2 -->
+                    <div class="skill-info-box" id="p2-skill-info">
+                        <div class="skill-info-header">
+                            <span class="skill-char-name" style="color: #34d399;">🌸 VERINA AIRGID (TẦM XA • 500 HP)</span>
+                            <span class="skill-badge">CHIÊU THỨC</span>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-key">J (Tầm xa)</span>
+                            <span class="skill-name">Sao Chổi</span>
+                            <span class="skill-desc"></span>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-key">I (Kỹ năng)</span>
+                            <span class="skill-name">Quang Dưỡng</span>
+                            <span class="skill-desc"></span>
+                        </div>
+                        <div class="skill-row">
+                            <span class="skill-key">Enter (Ultimate)</span>
+                            <span class="skill-name">Bão Sinh Mệnh</span>
+                            <span class="skill-desc"></span>
+                        </div>
+                    </div>
+
+                    <button id="p2-ready-btn" class="ready-btn">READY (Press J / Enter)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VICTORY SCREEN -->
+        <div id="victory-screen" class="overlay hidden">
+            <h1 id="winner-title" class="victory-title">PLAYER 1 DOMINATES!</h1>
+            <button id="rematch-btn" class="rematch-btn">REMATCH (TÁI ĐẤU)</button>
+        </div>
+
+        <!-- CONTROLS & TRICKS MODAL -->
+        <div id="controls-modal" class="overlay hidden" onclick="if(event.target === this) this.classList.add('hidden')">
+            <div class="controls-content">
+                <button class="modal-close-btn" onclick="document.getElementById('controls-modal').classList.add('hidden')" title="Đóng">✕</button>
+                <h2 style="font-family: 'Orbitron', sans-serif; color: #00f0ff; margin-bottom: 10px;">BẢNG HƯỚNG DẪN ĐIỀU KHIỂN &amp; COMBAT TRICKS</h2>
+                <table class="controls-table">
+                    <thead>
+                        <tr>
+                            <th>Hành động</th>
+                            <th style="color: #00f0ff;">Player 1 (Cyan)</th>
+                            <th style="color: #ff007f;">Player 2 (Magenta)</th>
+                            <th style="color: #ffaa00;">Gamepad (Cả 2)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Bay 4 hướng</strong> (Phản lực Zero-G)</td>
+                            <td><code>W</code>, <code>A</code>, <code>S</code>, <code>D</code></td>
+                            <td><code>↑</code>, <code>←</code>, <code>↓</code>, <code>→</code></td>
+                            <td>Cần gạt trái / D-Pad</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Đánh thường</strong></td>
+                            <td><code>F</code></td>
+                            <td><code>Num 1</code> hoặc <code>J</code></td>
+                            <td>Nút X (Square) / Y (Triangle)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Khiên từ trường / Parry</strong></td>
+                            <td><code>H</code></td>
+                            <td><code>Num 3</code> hoặc <code>L</code></td>
+                            <td>Nút B (Circle)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kỹ năng phụ</strong> (Skill)</td>
+                            <td><code>R</code></td>
+                            <td><code>Num 5</code> hoặc <code>I</code></td>
+                            <td>Nút A (Cross)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Khóa hướng ngắm</strong> (Strafe Lock)</td>
+                            <td><code>Shift Trái</code></td>
+                            <td><code>Num 0</code> hoặc <code>U</code></td>
+                            <td>Cò trái (LT / L1)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chiêu cuối</strong> (Ultimate)</td>
+                            <td><code>Space</code></td>
+                            <td><code>Enter</code> hoặc <code>O</code></td>
+                            <td>Cò phải (RT / R1)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tricks-list">
+                    <p>🛡️ <strong>TRICK 1: Perfect Parry</strong> - Bật khiên đúng 0.16s trước khi đòn đánh tới để làm CHOÁNG đối thủ cận chiến hoặc DỘI NGƯỢC đòn Plasma bay về kẻ bắn!</p>
+                    <p>🔥 <strong>TRICK 2: Wall Bounce Boost</strong> - Bay va chạm mạnh vào vách phòng thí nghiệm để kích hoạt lực đẩy phản lực siêu tốc luồn ra sau lưng đối thủ!</p>
+                    <p>⚔️ <strong>TRICK 4: Blade Clash</strong> - Khi cả 2 người cùng chém kiếm trúng nhau cùng lúc, đòn đánh sẽ triệt tiêu nhau, tạo vụ nổ đẩy văng cả 2 ra xa!</p>
+                </div>
+
+                <button id="close-help-btn" class="ready-btn" onclick="document.getElementById('controls-modal').classList.add('hidden')" style="margin-top: 20px; width: 100%; cursor: pointer;">ĐÃ HIỂU (ĐÓNG)</button>
+            </div>
+        </div>
+
+        <!-- DISCONNECT MODAL -->
+        <div id="disconnect-modal" class="overlay hidden">
+            <div class="modal-box p1-border" style="max-width: 480px; text-align: center;">
+                <h2 style="font-family: 'Orbitron', sans-serif; color: #ef4444; font-size: 26px; margin-bottom: 12px;">⚠️ MẤT KẾT NỐI!</h2>
+                <p id="disconnect-msg" style="color: #cbd5e1; font-size: 16px; margin-bottom: 24px;">Đối thủ đã ngắt kết nối hoặc rời phòng.</p>
+                <button id="btn-disconnect-ok" class="ready-btn" style="width: 100%; cursor: pointer;">QUAY VỀ SẢNH ĐẤU</button>
+            </div>
+        </div>
+
+        <button id="help-toggle-btn" class="help-toggle" onclick="document.getElementById('controls-modal').classList.toggle('hidden')">⌨️ Phím tắt &amp; Tricks</button>
+    </div>
+
+    <!-- WebRTC PeerJS Library -->
+    <script src="js/peerjs.min.js"></script>
+    <script type="module" src="js/main.js?v=48"></script>
+</body>
+</html>
