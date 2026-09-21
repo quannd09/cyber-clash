@@ -1,3 +1,29 @@
+export const DEFAULT_P1_BINDINGS = {
+    up: ['KeyW', 'keyw'],
+    left: ['KeyA', 'keya'],
+    down: ['KeyS', 'keys'],
+    right: ['KeyD', 'keyd'],
+    lightAttack: ['KeyF', 'keyf'],
+    heavyAttack: [],
+    shield: ['KeyH', 'keyh'],
+    skill: ['KeyR', 'keyr'],
+    strafe: ['ShiftLeft'],
+    ultimate: ['Space', ' ', 'Spacebar']
+};
+
+export const DEFAULT_P2_BINDINGS = {
+    up: ['ArrowUp'],
+    left: ['ArrowLeft'],
+    down: ['ArrowDown'],
+    right: ['ArrowRight'],
+    lightAttack: ['Numpad1', 'KeyJ', 'keyj'],
+    heavyAttack: [],
+    shield: ['Numpad3', 'KeyL', 'keyl'],
+    skill: ['Numpad5', 'KeyI', 'keyi'],
+    strafe: ['Numpad0', 'KeyU', 'keyu', 'ControlRight'],
+    ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo']
+};
+
 // Multi-player Input Manager with anti-ghosting Keyboard & Gamepad API support
 export class InputManager {
     constructor() {
@@ -5,33 +31,10 @@ export class InputManager {
         this.prevKeys = {};
         this.gamepads = [];
 
-        // Player 1 bindings
-        this.p1Bindings = {
-            up: ['KeyW', 'keyw'],
-            left: ['KeyA', 'keya'],
-            down: ['KeyS', 'keys'],
-            right: ['KeyD', 'keyd'],
-            lightAttack: ['KeyF', 'keyf'],
-            heavyAttack: [],
-            shield: ['KeyH', 'keyh'],
-            skill: ['KeyR', 'keyr'],
-            strafe: ['ShiftLeft'],
-            ultimate: ['Space', ' ', 'Spacebar']
-        };
-
-        // Player 2 bindings (Supports both Numpad & Home row J/L/I/U/O for compact laptops)
-        this.p2Bindings = {
-            up: ['ArrowUp'],
-            left: ['ArrowLeft'],
-            down: ['ArrowDown'],
-            right: ['ArrowRight'],
-            lightAttack: ['Numpad1', 'KeyJ', 'keyj'],
-            heavyAttack: [],
-            shield: ['Numpad3', 'KeyL', 'keyl'],
-            skill: ['Numpad5', 'KeyI', 'keyi'],
-            strafe: ['Numpad0', 'KeyU', 'keyu', 'ControlRight'],
-            ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo']
-        };
+        // Player bindings loaded from defaults or localStorage
+        this.p1Bindings = JSON.parse(JSON.stringify(DEFAULT_P1_BINDINGS));
+        this.p2Bindings = JSON.parse(JSON.stringify(DEFAULT_P2_BINDINGS));
+        this.loadBindings();
 
         // Mouse controls for Single Player / Online Client (Disabled in Local 2-Player)
         this.mouseEnabled = false;
@@ -298,6 +301,84 @@ export class InputManager {
 
         return { x, y };
     }
+
+    // --- CUSTOM KEYBINDINGS STORAGE & UTILITIES ---
+    loadBindings() {
+        try {
+            const s1 = localStorage.getItem('cyber_clash_p1_bindings');
+            const s2 = localStorage.getItem('cyber_clash_p2_bindings');
+            if (s1) {
+                const parsed1 = JSON.parse(s1);
+                this.p1Bindings = { ...this.p1Bindings, ...parsed1 };
+            }
+            if (s2) {
+                const parsed2 = JSON.parse(s2);
+                this.p2Bindings = { ...this.p2Bindings, ...parsed2 };
+            }
+        } catch (err) {
+            console.warn('[InputManager] Could not load saved bindings:', err);
+        }
+    }
+
+    saveBindings() {
+        try {
+            localStorage.setItem('cyber_clash_p1_bindings', JSON.stringify(this.p1Bindings));
+            localStorage.setItem('cyber_clash_p2_bindings', JSON.stringify(this.p2Bindings));
+        } catch (err) {
+            console.warn('[InputManager] Could not save bindings:', err);
+        }
+    }
+
+    rebindAction(playerIndex, action, keyCode, keyChar) {
+        const bindings = playerIndex === 0 ? this.p1Bindings : this.p2Bindings;
+        const keysArr = [keyCode];
+        if (keyChar && keyChar !== keyCode) {
+            keysArr.push(keyChar);
+            if (typeof keyChar === 'string') {
+                keysArr.push(keyChar.toLowerCase());
+                keysArr.push(keyChar.toUpperCase());
+            }
+        }
+        bindings[action] = [...new Set(keysArr)];
+        this.saveBindings();
+    }
+
+    resetDefaults() {
+        this.p1Bindings = JSON.parse(JSON.stringify(DEFAULT_P1_BINDINGS));
+        this.p2Bindings = JSON.parse(JSON.stringify(DEFAULT_P2_BINDINGS));
+        this.saveBindings();
+    }
+
+    getBindingDisplay(playerIndex, action) {
+        const bindings = playerIndex === 0 ? this.p1Bindings : this.p2Bindings;
+        const list = bindings[action] || [];
+        if (list.length === 0) return 'NONE';
+
+        // Select the most user-friendly code in the list
+        const primary = list[0];
+        return this.formatKeyName(primary);
+    }
+
+    formatKeyName(code) {
+        if (!code) return 'NONE';
+        if (code.startsWith('Key')) return code.replace('Key', '');
+        if (code.startsWith('Digit')) return code.replace('Digit', '');
+        if (code.startsWith('Numpad')) return 'Num ' + code.replace('Numpad', '');
+        if (code === 'Space' || code === ' ') return 'Space';
+        if (code === 'Enter' || code === 'NumpadEnter') return 'Enter';
+        if (code === 'ArrowUp') return '↑';
+        if (code === 'ArrowDown') return '↓';
+        if (code === 'ArrowLeft') return '←';
+        if (code === 'ArrowRight') return '→';
+        if (code === 'ShiftLeft') return 'L-Shift';
+        if (code === 'ShiftRight') return 'R-Shift';
+        if (code === 'ControlLeft') return 'L-Ctrl';
+        if (code === 'ControlRight') return 'R-Ctrl';
+        if (code === 'AltLeft') return 'L-Alt';
+        if (code === 'AltRight') return 'R-Alt';
+        return code.toUpperCase();
+    }
 }
 
 export const input = new InputManager();
+

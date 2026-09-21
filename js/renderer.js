@@ -214,6 +214,33 @@ export class GameRenderer {
 
             // Vẽ ảnh gốc tại toạ độ đã được transform
             ctx.drawImage(customSprite, -targetW / 2, -targetH, targetW, targetH);
+
+            // 24 FPS Celluloid Projection Frame Effect (Hiệu ứng đóng băng khung hình 24 FPS)
+            if (c.frameFrozenTimer > 0) {
+                ctx.save();
+                ctx.strokeStyle = '#a3e635';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = '#a3e635';
+                ctx.shadowBlur = 15;
+                const fw = targetW + 22;
+                const fh = targetH + 16;
+                const fx = -fw / 2;
+                const fy = -targetH - 8;
+                // Film border
+                ctx.strokeRect(fx, fy, fw, fh);
+                // Film perforations (sprocket holes)
+                ctx.fillStyle = '#0f172a';
+                for (let py = fy + 6; py < fy + fh - 10; py += 16) {
+                    ctx.fillRect(fx + 2, py, 5, 8);
+                    ctx.fillRect(fx + fw - 7, py, 5, 8);
+                }
+                // Text label
+                ctx.fillStyle = '#a3e635';
+                ctx.font = 'bold 9px Orbitron, sans-serif';
+                ctx.fillText('24 FPS', fx + 10, fy + 14);
+                ctx.restore();
+            }
+
             ctx.restore();
         } else {
             // PROCEDURAL ANIME WARRIOR (Fallback)
@@ -281,7 +308,56 @@ export class GameRenderer {
             ctx.save();
             const isYanagi = c.characterId === 'yanagi';
 
-            if (isYanagi) {
+            if (c.characterId === 'naoya') {
+                // Naoya: 24 FPS High-Speed Lime Green Projection Slashes
+                ctx.strokeStyle = '#a3e635';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach, startAngle - 0.8, startAngle + 0.8);
+                ctx.stroke();
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach * 0.85, startAngle - 0.5, startAngle + 0.5);
+                ctx.stroke();
+            } else if (c.characterId === 'luffy') {
+                // Luffy: Rubber Stretched Red Haki Fist Shockwave
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 7;
+                ctx.beginPath();
+                ctx.arc(25, 0, c.attackReach, startAngle - 0.6, startAngle + 0.6);
+                ctx.stroke();
+                ctx.fillStyle = '#1e1b4b';
+                ctx.beginPath();
+                ctx.arc(15 + Math.cos(startAngle) * (c.attackReach * 0.9), Math.sin(startAngle) * (c.attackReach * 0.9), 12, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ef4444';
+                ctx.stroke();
+            } else if (c.characterId === 'gojo') {
+                // Gojo: Black Flash Spatial Cursed Punch Burst
+                ctx.strokeStyle = '#0284c7';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach, startAngle - 0.7, startAngle + 0.7);
+                ctx.stroke();
+                ctx.strokeStyle = '#dc2626';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach * 0.9, startAngle - 0.4, startAngle + 0.4);
+                ctx.stroke();
+            } else if (c.characterId === 'sukuna') {
+                // Sukuna: Dismantle Sharp Crimson Slashing Grid
+                ctx.strokeStyle = '#f43f5e';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach, startAngle - 0.9, startAngle + 0.9);
+                ctx.stroke();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(20, -10, c.attackReach * 0.95, startAngle - 0.7, startAngle + 0.3);
+                ctx.stroke();
+            } else if (isYanagi) {
                 // Sharp Electric Purple / Blue Crescent Slash
                 ctx.strokeStyle = swingProgress < 0.5 ? '#38bdf8' : '#a855f7';
                 ctx.lineWidth = c.attackType === 'heavy' ? 8 : 4;
@@ -638,6 +714,239 @@ export class GameRenderer {
                     ctx.fill();
                     ctx.restore();
                 }
+            } else if (c.characterId === 'naoya') {
+                // NAOYA: MACH 3 PROJECTION SORCERY MULTI-DASH BARRAGE
+                const zoneR = 340;
+                ctx.save();
+                ctx.strokeStyle = 'rgba(163, 230, 53, 0.45)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([12, 8]);
+                ctx.beginPath();
+                ctx.arc(0, 0, zoneR, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Mach 3 Supersonic Zigzag Dash Lines
+                ctx.strokeStyle = '#a3e635';
+                ctx.shadowColor = '#bef264';
+                ctx.shadowBlur = 25;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                for (let i = 0; i < 8; i++) {
+                    const a1 = (c.ultimateTimer * 0.4 + i * (Math.PI / 4)) % (Math.PI * 2);
+                    const r1 = 80 + (i % 3) * 80;
+                    const x1 = Math.cos(a1) * r1;
+                    const y1 = Math.sin(a1) * r1;
+                    const a2 = a1 + 2.2;
+                    const x2 = Math.cos(a2) * (r1 + 50);
+                    const y2 = Math.sin(a2) * (r1 + 50);
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                }
+                ctx.stroke();
+
+                // Celluloid film frame afterimages scattered across zone
+                for (let i = 0; i < 4; i++) {
+                    const fa = c.ultimateTimer * 0.2 + i * 1.57;
+                    const fx = Math.cos(fa) * 160;
+                    const fy = Math.sin(fa) * 110;
+                    ctx.strokeStyle = 'rgba(163, 230, 53, 0.7)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(fx - 20, fy - 25, 40, 50);
+                    ctx.fillStyle = '#a3e635';
+                    ctx.font = '7px Orbitron, sans-serif';
+                    ctx.fillText('24 FPS', fx - 16, fy - 14);
+                }
+                ctx.restore();
+
+            } else if (c.characterId === 'luffy') {
+                // LUFFY: GOMU GOMU NO BAJRANG GUN (COLOSSAL HAKI FIST DESCENDING FROM STORM CLOUDS)
+                ctx.save();
+                const forwardOffset = 180;
+                ctx.translate(forwardOffset, 0);
+
+                // 1. Dark Thunderclouds Gathering Above
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+                ctx.beginPath();
+                ctx.ellipse(0, -220, 260, 70, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(30, 41, 59, 0.85)';
+                ctx.beginPath();
+                ctx.ellipse(0, -200, 210, 55, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 2. Black & Crimson Conqueror's Haki Lightning Bolts Crackling Down
+                for (let i = 0; i < 6; i++) {
+                    ctx.strokeStyle = i % 2 === 0 ? '#ef4444' : '#000000';
+                    ctx.lineWidth = i % 2 === 0 ? 3 : 5;
+                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowBlur = 20;
+                    ctx.beginPath();
+                    let lx = -140 + i * 55 + Math.sin(c.ultimateTimer + i) * 20;
+                    let ly = -210;
+                    ctx.moveTo(lx, ly);
+                    for (let seg = 0; ly < 60; seg++) {
+                        lx += (Math.random() - 0.5) * 35;
+                        ly += 30 + Math.random() * 20;
+                        ctx.lineTo(lx, ly);
+                    }
+                    ctx.stroke();
+                }
+
+                // 3. Colossal Armament Haki Fist Descending
+                const slamProgress = Math.min(1, (c.ultimateTimer - 15) / 20);
+                const fistY = -180 + slamProgress * 180;
+                const fistRadius = 110 + pulse * 2;
+
+                // Impact Shockwave Rings on ground
+                if (slamProgress > 0.4) {
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 40, 180 + pulse * 10, 45 + pulse * 4, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 40, 120 + pulse * 6, 30 + pulse * 2, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // The Colossal Black Fist Body
+                ctx.shadowColor = '#ef4444';
+                ctx.shadowBlur = 35;
+                ctx.fillStyle = '#0a0a0f'; // Jet black armament Haki
+                ctx.strokeStyle = '#dc2626';
+                ctx.lineWidth = 5;
+
+                ctx.beginPath();
+                ctx.arc(0, fistY, fistRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Knuckle contours on the giant fist
+                for (let k = -2; k <= 2; k++) {
+                    ctx.fillStyle = '#1e1b4b';
+                    ctx.strokeStyle = '#f87171';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.ellipse(k * 36, fistY + fistRadius * 0.45, 18, 26, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                // Metallic specular sheen on Haki
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(-25, fistY - 30, fistRadius * 0.55, -Math.PI * 0.8, -Math.PI * 0.2);
+                ctx.stroke();
+
+                ctx.restore();
+
+            } else if (c.characterId === 'gojo') {
+                // GOJO: DOMAIN EXPANSION - UNLIMITED VOID (VÔ LƯỢNG KHÔNG XỨ)
+                ctx.save();
+                const domainRadius = 450;
+
+                // Deep Space Void Background Ring
+                ctx.shadowColor = '#0284c7';
+                ctx.shadowBlur = 45;
+                ctx.fillStyle = 'rgba(3, 7, 18, 0.6)';
+                ctx.beginPath();
+                ctx.arc(0, 0, domainRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cosmic Swirling Nebulae
+                for (let i = 0; i < 4; i++) {
+                    ctx.save();
+                    ctx.rotate(c.ultimateTimer * 0.05 + (i * Math.PI / 2));
+                    ctx.strokeStyle = i % 2 === 0 ? 'rgba(56, 189, 248, 0.4)' : 'rgba(168, 85, 247, 0.35)';
+                    ctx.lineWidth = 20 + pulse;
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 320, 120, 0.3, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Glowing Infinity Cosmic Eye Circles
+                for (let r = 50; r <= 380; r += 70) {
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r + pulse, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Core Infinite Cyan Singularity at Gojo's location
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 50;
+                ctx.beginPath();
+                ctx.arc(0, 0, 35 + pulse * 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+
+            } else if (c.characterId === 'sukuna') {
+                // SUKUNA: DOMAIN EXPANSION - MALEVOLENT SHRINE (PHỤC MA NGỰ KHẢM TỬ)
+                ctx.save();
+                const shrineRadius = 420;
+
+                // Blood-Red Domain Realm Atmosphere
+                ctx.fillStyle = 'rgba(69, 10, 10, 0.45)';
+                ctx.beginPath();
+                ctx.arc(0, 0, shrineRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#dc2626';
+                ctx.lineWidth = 4;
+                ctx.shadowColor = '#ef4444';
+                ctx.shadowBlur = 30;
+                ctx.beginPath();
+                ctx.arc(0, 0, shrineRadius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Sinister Demonic Torii Shrine Silhouette
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.strokeStyle = '#991b1b';
+                ctx.lineWidth = 4;
+                // Roof curve
+                ctx.beginPath();
+                ctx.moveTo(-160, -90);
+                ctx.quadraticCurveTo(0, -135, 160, -90);
+                ctx.lineTo(130, -75);
+                ctx.quadraticCurveTo(0, -115, -130, -75);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                // Pillars
+                ctx.fillRect(-90, -75, 24, 110);
+                ctx.strokeRect(-90, -75, 24, 110);
+                ctx.fillRect(66, -75, 24, 110);
+                ctx.strokeRect(66, -75, 24, 110);
+
+                // Relentless Cleave & Dismantle Slashes Grid
+                ctx.lineWidth = 2.5;
+                for (let i = 0; i < 8; i++) {
+                    const sx1 = -320 + Math.random() * 640;
+                    const sy1 = -240 + Math.random() * 480;
+                    const len = 90 + Math.random() * 110;
+                    const sAngle = (i * 0.7 + c.ultimateTimer * 0.4);
+                    const sx2 = sx1 + Math.cos(sAngle) * len;
+                    const sy2 = sy1 + Math.sin(sAngle) * len;
+
+                    ctx.strokeStyle = i % 2 === 0 ? '#ffffff' : '#f43f5e';
+                    ctx.shadowColor = '#f43f5e';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath();
+                    ctx.moveTo(sx1, sy1);
+                    ctx.lineTo(sx2, sy2);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
             }
 
             ctx.restore();

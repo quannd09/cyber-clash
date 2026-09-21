@@ -18,7 +18,11 @@ export class Cyborg {
             vivian: '#c084fc',
             jotaro: '#818cf8',
             goku: '#fbbf24',
-            giorno: '#facc15'
+            giorno: '#facc15',
+            naoya: '#a3e635',
+            luffy: '#ef4444',
+            gojo: '#0284c7',
+            sukuna: '#f43f5e'
         };
         const charStyles = {
             yanagi: 'melee',
@@ -28,7 +32,11 @@ export class Cyborg {
             vivian: 'ranged',
             jotaro: 'melee',
             goku: 'melee',
-            giorno: 'melee'
+            giorno: 'melee',
+            naoya: 'melee',
+            luffy: 'melee',
+            gojo: 'melee',
+            sukuna: 'melee'
         };
         this.color = charColors[characterId] || color || '#a78bfa';
         this.combatStyle = charStyles[characterId] || 'melee';
@@ -49,15 +57,23 @@ export class Cyborg {
         this.isBoosted = false;
         this.boostTimer = 0;
 
+        // Naoya 24-FPS Projection & Frame Freeze mechanism
+        this.naoyaHitCount = 0;
+        this.frameFrozenTimer = 0;
+
         // Core Vitals (Balanced across archetypes)
         const charHp = {
-            vivian: 650,
+            vivian: 600, // Nerfed from 650 down to 600
             jotaro: 550,
+            luffy: 540,
+            sukuna: 530,
             goku: 520,
             giorno: 510,
             nicole: 500,
+            gojo: 500,
             velina: 480,
             yanagi: 475,
+            naoya: 465,
             trigger: 460
         };
         this.maxHp = charHp[characterId] || 500;
@@ -130,6 +146,8 @@ export class Cyborg {
         this.hasClashed = false;
         this.recentAttackTimes = [];
         this.spamDelayTimer = 0;
+        this.naoyaHitCount = 0;
+        this.frameFrozenTimer = 0;
     }
 
     update(dt = 1, arenaBounds) {
@@ -162,6 +180,11 @@ export class Cyborg {
             if (this.stunTimer <= 0) {
                 this.isStunned = false;
             }
+        }
+
+        // Handle 24 FPS Frame Freeze
+        if (this.frameFrozenTimer > 0) {
+            this.frameFrozenTimer -= dt;
         }
 
         // Handle Skill Cooldown & Active Skill Pose Duration
@@ -481,6 +504,70 @@ export class Cyborg {
             opponent.vy = -12; // Launch into air
             physics.applyKnockback(opponent, (Math.random() - 0.5) * 2, -1, 10);
             sound.playHit(true);
+        } else if (skill.id === 'PROJECTION_DASH') {
+            // NAOYA: Lướt xuyên qua đối thủ và đóng băng 24 FPS (choáng)
+            sound.playWallBounce();
+            fx.spawnParryBurst(this.x, this.y, '#a3e635');
+            const dashDist = 240;
+            this.x += Math.cos(this.aimAngle) * dashDist;
+            this.y += Math.sin(this.aimAngle) * dashDist;
+            fx.spawnParryBurst(this.x, this.y, '#a3e635');
+            fx.addText(this.x, this.y - 35, '🎞️ LƯỚT 24 FPS!', '#a3e635', 24);
+
+            const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
+            if (dist < 230) {
+                opponent.takeDamage(skillDmg);
+                opponent.applyFrameFreeze(50);
+                physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 11);
+                sound.playHit(true);
+                fx.spawnHitSparks(opponent.x, opponent.y, '#a3e635', 20);
+            }
+        } else if (skill.id === 'GIGANT_STOMP') {
+            // LUFFY: Dậm cao su khổng lồ
+            sound.playHit(true);
+            physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 10);
+            fx.spawnClashShockwave(this.x, this.y);
+            fx.addText(this.x, this.y - 35, '🍖 GIGANT STOMP!', '#ef4444', 24);
+            const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
+            if (dist < 210) {
+                opponent.takeDamage(skillDmg);
+                opponent.applyStun(35);
+                physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 13);
+                fx.spawnHitSparks(opponent.x, opponent.y, '#ef4444', 22);
+                sound.playHit(true);
+            }
+        } else if (skill.id === 'HOLLOW_PURPLE') {
+            // GOJO: Tử Phần (Hollow Purple 🟣)
+            sound.playLaser();
+            fx.addText(this.x, this.y - 35, '🟣 TỬ PHẦN (HOLLOW PURPLE)!', '#a855f7', 24);
+            const proj = new Projectile(
+                this.index,
+                this.x + Math.cos(this.aimAngle) * 35,
+                this.y + Math.sin(this.aimAngle) * 35,
+                Math.cos(this.aimAngle) * 18,
+                Math.sin(this.aimAngle) * 18,
+                skillDmg,
+                '#9333ea',
+                14
+            );
+            combat.addProjectile(proj);
+            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
+        } else if (skill.id === 'KAMINO_FIRE_ARROW') {
+            // SUKUNA: Hỏa Tiễn Kamino (Fuga 🔥)
+            sound.playLaser();
+            fx.addText(this.x, this.y - 35, '🔥 FUGA (HỎA TIỄN)!', '#f97316', 24);
+            const proj = new Projectile(
+                this.index,
+                this.x + Math.cos(this.aimAngle) * 35,
+                this.y + Math.sin(this.aimAngle) * 35,
+                Math.cos(this.aimAngle) * 20,
+                Math.sin(this.aimAngle) * 20,
+                skillDmg,
+                '#ea580c',
+                13
+            );
+            combat.addProjectile(proj);
+            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 8);
         }
     }
 
@@ -525,7 +612,11 @@ export class Cyborg {
             vivian: '🔮 ĐIỀM BÁO VĨNH CỬU! 🔮',
             jotaro: '⏳ THE WORLD: ORA ORA ORA! ⏳',
             goku: '💥 SIÊU KAMEHAMEHA! 💥',
-            giorno: '♾️ RETURN TO ZERO! ♾️'
+            giorno: '♾️ RETURN TO ZERO! ♾️',
+            naoya: '⚡ PHÓNG CHIẾU: TỐC ĐỘ MACH 3! ⚡',
+            luffy: '🍖 GOMU GOMU NO BAJRANG GUN! 🍖',
+            gojo: '🌌 BẢNH CHƯỚNG LÃNH ĐỊA: VÔ LƯỢNG KHÔNG XỨ! 🌌',
+            sukuna: '⛩️ PHỤC MA NGỰ KHẢM TỬ: TRẢM PHÁ! ⛩️'
         };
         const shout = ultShouts[this.characterId] || '🔥 OVERDRIVE ULTIMATE! 🔥';
         fx.addText(this.x, this.y - 45, shout, this.color, 28, 60);
@@ -544,5 +635,12 @@ export class Cyborg {
         this.stunTimer = frames;
         this.isAttacking = false;
         this.isShielding = false;
+    }
+
+    applyFrameFreeze(frames = 45) {
+        this.applyStun(frames);
+        this.frameFrozenTimer = frames;
+        fx.addText(this.x, this.y - 45, '🎞️ 24 FPS ĐÓNG BĂNG FRAME! 🎞️', '#a3e635', 24, 50);
+        sound.playHit(true);
     }
 }

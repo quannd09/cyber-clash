@@ -240,36 +240,33 @@ export class BotController {
         }
 
         // -------------------------------------------------------------
-        // 4. COMBAT & ATTACK EXECUTION (ANTI-SPAM AWARE)
+        // 4. COMBAT & ATTACK EXECUTION (GLOBAL BOT NERF: MAX 6 SHOTS IN 4.5S -> 1.5S OVERHEAT LOCKOUT)
         // -------------------------------------------------------------
-        // Clean attack history older than 3.1 seconds
-        this.recentAttacks = this.recentAttacks.filter(t => now - t <= 3100);
+        // Clean attack history older than 4.5 seconds (4500ms)
+        this.shotTimestamps = (this.shotTimestamps || []).filter(t => now - t <= 4500);
 
-        let canAttackAntiSpam = true;
-        if (this.difficulty === 'impossible') {
-            // IMPOSSIBLE BOT NEVER SUFFERS 1s DELAY:
-            // If already done 5 attacks in last 2.9s, holds back until the oldest drops out!
-            if (this.recentAttacks.length >= 5) {
-                canAttackAntiSpam = false;
-            }
-        } else if (this.difficulty === 'master') {
-            if (this.recentAttacks.length >= 5) {
-                canAttackAntiSpam = Math.random() < 0.3; // Sometimes holds back
-            }
-        }
+        // Check if currently overheated (cannot shoot/strike for 1.5s)
+        this.overheatEndTime = this.overheatEndTime || 0;
+        const isOverheated = now < this.overheatEndTime;
 
         // Attack range check
         const weapon = WEAPONS[bot.characterId.toUpperCase()] || { attackRange: 80 };
         const inAttackRange = isMelee ? (dist <= weapon.attackRange + 25) : (dist <= 650);
 
-        // Shield baiting: if player is shielding with high energy, avoid wasting melee strikes unless Impossible cracks guard
-        let shouldStrike = inAttackRange && canAttackAntiSpam && !bot.isShielding && bot.attackCooldown <= 0;
+        // Shield baiting: if player is shielding with high energy, avoid wasting strikes
+        let shouldStrike = inAttackRange && !isOverheated && !bot.isShielding && bot.attackCooldown <= 0;
+
+        // NERF ENFORCEMENT: Max 6 shots in 4.5s. If reached, trigger 1.5s lockout
+        if (shouldStrike && this.shotTimestamps.length >= 6) {
+            this.overheatEndTime = now + 1500;
+            shouldStrike = false;
+        }
 
         if (this.difficulty === 'impossible') {
             if (opponent.isShielding) {
                 // If opponent shield is about to break, crack it!
                 if (opponent.energy < 22) {
-                    shouldStrike = true;
+                    shouldStrike = !isOverheated && inAttackRange;
                 } else {
                     // Don't waste hits into full shield; reposition!
                     shouldStrike = false;
@@ -278,19 +275,18 @@ export class BotController {
         }
 
         if (shouldStrike) {
+            let willAttack = false;
             if (this.difficulty === 'easy') {
-                if (Math.random() < 0.4) {
-                    bot.attack();
-                    this.recentAttacks.push(now);
-                }
+                willAttack = Math.random() < 0.4;
             } else if (this.difficulty === 'normal') {
-                if (Math.random() < 0.75) {
-                    bot.attack();
-                    this.recentAttacks.push(now);
-                }
+                willAttack = Math.random() < 0.75;
             } else {
+                willAttack = true;
+            }
+
+            if (willAttack) {
                 bot.attack();
-                this.recentAttacks.push(now);
+                this.shotTimestamps.push(now);
             }
         }
 
@@ -325,6 +321,18 @@ export class BotController {
             } else if (charId === 'giorno') {
                 // Tree of life
                 if (dist < 320) fireSkill = true;
+            } else if (charId === 'naoya') {
+                // Projection dash: dash through opponent
+                if (dist > 80 && dist < 260) fireSkill = true;
+            } else if (charId === 'luffy') {
+                // Gigant stomp: close to mid range
+                if (dist < 230) fireSkill = true;
+            } else if (charId === 'gojo') {
+                // Hollow purple: mid to long range
+                if (dist > 160) fireSkill = true;
+            } else if (charId === 'sukuna') {
+                // Kamino fire arrow: mid to long range
+                if (dist > 140) fireSkill = true;
             }
 
             if (fireSkill) {

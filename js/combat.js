@@ -82,6 +82,46 @@ export const WEAPONS = {
         attackCooldown: 21,
         isRanged: false,
         icon: '🐞'
+    },
+    NAOYA: {
+        id: 'NAOYA',
+        name: '24 FPS Projection Fists',
+        attackDmg: 28,
+        attackRange: 82,
+        attackDuration: 16,
+        attackCooldown: 18,
+        isRanged: false,
+        icon: '🎞️'
+    },
+    LUFFY: {
+        id: 'LUFFY',
+        name: 'Gomu Gomu no Pistol',
+        attackDmg: 30,
+        attackRange: 110,
+        attackDuration: 20,
+        attackCooldown: 22,
+        isRanged: false,
+        icon: '🍖'
+    },
+    GOJO: {
+        id: 'GOJO',
+        name: 'Black Flash Infinity',
+        attackDmg: 33,
+        attackRange: 85,
+        attackDuration: 18,
+        attackCooldown: 21,
+        isRanged: false,
+        icon: '♾️'
+    },
+    SUKUNA: {
+        id: 'SUKUNA',
+        name: 'Dismantle Slashes',
+        attackDmg: 34,
+        attackRange: 92,
+        attackDuration: 18,
+        attackCooldown: 21,
+        isRanged: false,
+        icon: '⛩️'
     }
 };
 
@@ -93,7 +133,11 @@ export const SKILLS = {
     VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Abloom Burst', cooldown: 150, icon: '🔮' },
     JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 200, icon: '👊' },
     GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Instant Transmission', cooldown: 210, icon: '🥋' },
-    GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Tree of Life', cooldown: 200, icon: '🐞' }
+    GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Tree of Life', cooldown: 200, icon: '🐞' },
+    NAOYA_SKILL: { id: 'PROJECTION_DASH', name: 'Projection Dash', cooldown: 200, icon: '🎞️' },
+    LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
+    GOJO_SKILL: { id: 'HOLLOW_PURPLE', name: 'Hollow Purple', cooldown: 220, icon: '🟣' },
+    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino Fire Arrow', cooldown: 210, icon: '🔥' }
 };
 
 export class Projectile {
@@ -274,6 +318,17 @@ export class CombatResolver {
             attacker.overdrive = Math.min(100, attacker.overdrive + 14);
             defender.applyStun(20);
             physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 10);
+
+            // Check Naoya 3-hit frame freeze passive
+            if (attacker.characterId === 'naoya') {
+                attacker.naoyaHitCount = (attacker.naoyaHitCount || 0) + 1;
+                if (attacker.naoyaHitCount >= 3) {
+                    defender.applyFrameFreeze(50);
+                    attacker.naoyaHitCount = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🎞️ FRAME [${attacker.naoyaHitCount}/3]`, '#a3e635', 18);
+                }
+            }
 
             sound.playHit(true);
             fx.spawnHitSparks(defender.x, defender.y, attacker.color, 18);
@@ -457,6 +512,55 @@ export class CombatResolver {
                         physics.applyKnockback(target, Math.cos(angle), Math.sin(angle), 1.6);
                         fx.spawnHitSparks(target.x, target.y, '#eab308', 5);
                         triggerScreenShake(3, 6);
+                    }
+                } else if (user.characterId === 'naoya') {
+                    // NAOYA: TỐC ĐỘ MACH 3 LIÊN HOÀN TRẢM (PROJECTION SORCERY 24 FPS)
+                    const barrageRadius = 340;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + barrageRadius) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyFrameFreeze(12);
+                        const dashAngle = user.ultimateTimer * 0.8;
+                        physics.applyKnockback(target, Math.cos(dashAngle), Math.sin(dashAngle), 2.2);
+                        fx.spawnHitSparks(target.x, target.y, '#a3e635', 5);
+                        triggerScreenShake(3, 5);
+                    }
+                } else if (user.characterId === 'luffy') {
+                    // LUFFY: GOMU GOMU NO BAJRANG GUN (NẮM ĐẤM HAKI HÓA THẦN NIKA KHỔNG LỒ)
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const strikeX = user.x + facingDir * 180;
+                    const strikeY = user.y;
+                    const dist = Math.hypot(target.x - strikeX, target.y - strikeY);
+                    if (dist < target.radius + 320) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(14);
+                        physics.applyKnockback(target, facingDir * 0.8, 1.2, 3.0); // Downward & forward slam
+                        fx.spawnHitSparks(target.x, target.y, '#ef4444', 6);
+                        triggerScreenShake(5, 8);
+                    }
+                } else if (user.characterId === 'gojo') {
+                    // GOJO: BÀNH TRƯỚNG LÃNH ĐỊA - VÔ LƯỢNG KHÔNG XỨ (UNLIMITED VOID)
+                    const domainRadius = 450;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + domainRadius) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(22);
+                        target.vx *= 0.1;
+                        target.vy *= 0.1;
+                        fx.spawnHitSparks(target.x, target.y, '#0284c7', 5);
+                        triggerScreenShake(3, 6);
+                    }
+                } else if (user.characterId === 'sukuna') {
+                    // SUKUNA: BÀNH TRƯỚNG LÃNH ĐỊA - PHỤC MA NGỰ KHẢM TỬ (MALEVOLENT SHRINE)
+                    const shrineRadius = 420;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + shrineRadius) {
+                        target.takeDamage(ultDmgPerFrame);
+                        target.applyStun(10);
+                        const sliceAngle = (user.ultimateTimer * 0.7) % (Math.PI * 2);
+                        physics.applyKnockback(target, Math.cos(sliceAngle), Math.sin(sliceAngle), 1.8);
+                        fx.spawnHitSparks(target.x, target.y, '#f43f5e', 6);
+                        triggerScreenShake(4, 7);
                     }
                 }
             }

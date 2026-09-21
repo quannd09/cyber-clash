@@ -1,5 +1,6 @@
 import { assets } from './assets.js?v=54';
 import { network } from './network.js?v=54';
+import { input } from './input.js?v=54';
 
 const SKILL_DATA = {
     yanagi: {
@@ -59,7 +60,7 @@ const SKILL_DATA = {
         ]
     },
     vivian: {
-        title: '🔮 VIVIAN BANSHEE (RANGED • 650 HP)',
+        title: '🔮 VIVIAN BANSHEE (RANGED • 600 HP)',
         color: '#c084fc',
         p1: [
             { key: 'Left Click / F (Ranged)', name: 'Phantom Feathers', desc: '' },
@@ -112,6 +113,62 @@ const SKILL_DATA = {
             { key: 'J (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
             { key: 'I (Skill)', name: 'Tree of Life', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Return To Zero', desc: '' }
+        ]
+    },
+    naoya: {
+        title: '🎞️ NAOYA ZEN\'IN (MELEE • 465 HP)',
+        color: '#a3e635',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: '24 FPS Projection Fists', desc: 'Đánh trúng 3 đòn liên tiếp đóng băng đối thủ vào khung ảnh' },
+            { key: 'R (Skill)', name: 'Projection Dash', desc: 'Lướt xuyên qua đối thủ và đóng băng 24 FPS (choáng)' },
+            { key: 'Space (Ultimate)', name: 'Mach 3 Barrage', desc: 'Liên hoàn trảm tốc độ Mach 3 bao trùm toàn bộ khu vực' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: '24 FPS Projection Fists', desc: 'Đánh trúng 3 đòn liên tiếp đóng băng đối thủ vào khung ảnh' },
+            { key: 'I (Skill)', name: 'Projection Dash', desc: 'Lướt xuyên qua đối thủ và đóng băng 24 FPS (choáng)' },
+            { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage', desc: 'Liên hoàn trảm tốc độ Mach 3 bao trùm toàn bộ khu vực' }
+        ]
+    },
+    luffy: {
+        title: '🍖 MONKEY D. LUFFY (MELEE • 540 HP)',
+        color: '#ef4444',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol', desc: 'Cú đấm cao su sải tay dài uy lực' },
+            { key: 'R (Skill)', name: 'Gigant Stomp', desc: 'Bật nhảy cao su dậm Haki diện rộng làm choáng' },
+            { key: 'Space (Ultimate)', name: 'Bajrang Gun', desc: 'Nắm đấm Haki thần Nika khổng lồ giáng từ tầng mây sấm sét' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Gomu Gomu Pistol', desc: 'Cú đấm cao su sải tay dài uy lực' },
+            { key: 'I (Skill)', name: 'Gigant Stomp', desc: 'Bật nhảy cao su dậm Haki diện rộng làm choáng' },
+            { key: 'Enter (Ultimate)', name: 'Bajrang Gun', desc: 'Nắm đấm Haki thần Nika khổng lồ giáng từ tầng mây sấm sét' }
+        ]
+    },
+    gojo: {
+        title: '♾️ SATORU GOJO (MELEE • 500 HP)',
+        color: '#0284c7',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Black Flash Infinity', desc: 'Quyền thuật Tia Lửa Đen nổ tung không gian' },
+            { key: 'R (Skill)', name: 'Tử Phần (Hollow Purple 🟣)', desc: 'Cầu năng lượng hư thức hủy diệt xuyên thủng mọi hàng phòng ngự' },
+            { key: 'Space (Ultimate)', name: 'Vô Lượng Không Xứ (Unlimited Void 🌌)', desc: 'Bành trướng lãnh địa làm tê liệt tâm trí đối thủ trong vô tận thông tin' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Black Flash Infinity', desc: 'Quyền thuật Tia Lửa Đen nổ tung không gian' },
+            { key: 'I (Skill)', name: 'Tử Phần (Hollow Purple 🟣)', desc: 'Cầu năng lượng hư thức hủy diệt xuyên thủng mọi hàng phòng ngự' },
+            { key: 'Enter (Ultimate)', name: 'Vô Lượng Không Xứ (Unlimited Void 🌌)', desc: 'Bành trướng lãnh địa làm tê liệt tâm trí đối thủ trong vô tận thông tin' }
+        ]
+    },
+    sukuna: {
+        title: '⛩️ RYOMEN SUKUNA (MELEE • 530 HP)',
+        color: '#f43f5e',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes', desc: 'Vết chém vô hình Khai trảm tầm xa xé rách không khí' },
+            { key: 'R (Skill)', name: 'Hỏa Tiễn Kamino (Fuga 🔥)', desc: 'Mở hỏa tiễn nhiệt áp bắn cực mạnh gây nổ bốc cháy' },
+            { key: 'Space (Ultimate)', name: 'Phục Ma Ngự Khảm Tử (Malevolent Shrine ⛩️)', desc: 'Bành trướng lãnh địa vô vàn trảm kích Bát và Khai băm nát khu vực' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Dismantle Slashes', desc: 'Vết chém vô hình Khai trảm tầm xa xé rách không khí' },
+            { key: 'I (Skill)', name: 'Hỏa Tiễn Kamino (Fuga 🔥)', desc: 'Mở hỏa tiễn nhiệt áp bắn cực mạnh gây nổ bốc cháy' },
+            { key: 'Enter (Ultimate)', name: 'Phục Ma Ngự Khảm Tử (Malevolent Shrine ⛩️)', desc: 'Bành trướng lãnh địa vô vàn trảm kích Bát và Khai băm nát khu vực' }
         ]
     }
 };
@@ -232,6 +289,8 @@ export class UIManager {
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
+
+        this.setupKeybindsModal();
     }
 
     setupCharacterSelection() {
@@ -633,7 +692,7 @@ export class UIManager {
 
     updateCardSelection(player, charId) {
         document.querySelectorAll(`.char-card[data-player="${player}"]`).forEach(card => {
-            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno');
+            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno', 'selected-naoya', 'selected-luffy', 'selected-gojo', 'selected-sukuna');
             if (card.dataset.char === charId) {
                 card.classList.add('selected', `selected-${charId}`);
             }
@@ -645,8 +704,14 @@ export class UIManager {
         if (!box) return;
 
         const data = SKILL_DATA[charId];
-        const moves = data[player];
+        if (!data) return;
+        const moves = data[player] || [];
         const isOnlineClient = (this.gameMode === 'ONLINE' && (this.networkRole === 'CLIENT' || network.role === 'CLIENT') && player === 'p2');
+        const playerIndex = isOnlineClient ? 0 : (player === 'p1' ? 0 : 1);
+
+        const atkKey = input.getBindingDisplay(playerIndex, 'lightAttack');
+        const sklKey = input.getBindingDisplay(playerIndex, 'skill');
+        const ultKey = input.getBindingDisplay(playerIndex, 'ultimate');
 
         let html = `
             <div class="skill-info-header">
@@ -655,11 +720,16 @@ export class UIManager {
             </div>
         `;
 
-        moves.forEach(m => {
+        moves.forEach((m, idx) => {
             let keyDisplay = m.key;
-            if (isOnlineClient) {
-                keyDisplay = keyDisplay.replace('J (', 'F / J (').replace('I (', 'R / I (').replace('Enter (', 'Space / Enter (');
+            if (idx === 0) {
+                keyDisplay = (player === 'p1' || isOnlineClient) ? `Left Click / ${atkKey} (Attack)` : `${atkKey} (Attack)`;
+            } else if (idx === 1) {
+                keyDisplay = `${sklKey} (Skill)`;
+            } else if (idx === 2) {
+                keyDisplay = `${ultKey} (Ultimate)`;
             }
+
             html += `
                 <div class="skill-row">
                     <span class="skill-key">${keyDisplay}</span>
@@ -670,6 +740,114 @@ export class UIManager {
         });
 
         box.innerHTML = html;
+    }
+
+    setupKeybindsModal() {
+        const modal = document.getElementById('keybinds-modal');
+        const openBtn = document.getElementById('keybinds-toggle-btn');
+        const resetBtn = document.getElementById('btn-reset-keybinds');
+        const p1Table = document.getElementById('p1-keybinds-table');
+        const p2Table = document.getElementById('p2-keybinds-table');
+
+        if (!modal) return;
+
+        const ACTIONS = [
+            { id: 'up', label: 'Di chuyển Lên (Up)' },
+            { id: 'down', label: 'Di chuyển Xuống (Down)' },
+            { id: 'left', label: 'Di chuyển Trái (Left)' },
+            { id: 'right', label: 'Di chuyển Phải (Right)' },
+            { id: 'lightAttack', label: 'Đánh thường (Normal Attack)' },
+            { id: 'shield', label: 'Khiên / Đỡ (Shield / Parry)' },
+            { id: 'skill', label: 'Kỹ năng (Special Skill)' },
+            { id: 'strafe', label: 'Khóa hướng (Strafe)' },
+            { id: 'ultimate', label: 'Chiêu cuối (Ultimate)' }
+        ];
+
+        let activeListeningBtn = null;
+
+        const renderTables = () => {
+            if (p1Table) {
+                p1Table.innerHTML = ACTIONS.map(a => `
+                    <tr>
+                        <td><span class="keybind-label">${a.label}</span></td>
+                        <td style="text-align: right;">
+                            <button class="rebind-btn" data-player="0" data-action="${a.id}">${input.getBindingDisplay(0, a.id)}</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            if (p2Table) {
+                p2Table.innerHTML = ACTIONS.map(a => `
+                    <tr>
+                        <td><span class="keybind-label">${a.label}</span></td>
+                        <td style="text-align: right;">
+                            <button class="rebind-btn" data-player="1" data-action="${a.id}">${input.getBindingDisplay(1, a.id)}</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Add click listeners to all rebind buttons
+            modal.querySelectorAll('.rebind-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (activeListeningBtn && activeListeningBtn !== btn) {
+                        const p = parseInt(activeListeningBtn.dataset.player, 10);
+                        const a = activeListeningBtn.dataset.action;
+                        activeListeningBtn.classList.remove('listening');
+                        activeListeningBtn.textContent = input.getBindingDisplay(p, a);
+                    }
+
+                    activeListeningBtn = btn;
+                    btn.classList.add('listening');
+                    btn.textContent = 'BẤM PHÍM...';
+                });
+            });
+        };
+
+        // Key listening listener
+        window.addEventListener('keydown', (e) => {
+            if (!activeListeningBtn) return;
+            if (e.key === 'Escape') {
+                const p = parseInt(activeListeningBtn.dataset.player, 10);
+                const a = activeListeningBtn.dataset.action;
+                activeListeningBtn.classList.remove('listening');
+                activeListeningBtn.textContent = input.getBindingDisplay(p, a);
+                activeListeningBtn = null;
+                return;
+            }
+
+            e.preventDefault();
+            const playerIndex = parseInt(activeListeningBtn.dataset.player, 10);
+            const actionId = activeListeningBtn.dataset.action;
+
+            input.rebindAction(playerIndex, actionId, e.code, e.key);
+            activeListeningBtn.textContent = input.getBindingDisplay(playerIndex, actionId);
+            activeListeningBtn.classList.remove('listening');
+            activeListeningBtn = null;
+
+            // Re-render skill info box to reflect custom bindings
+            this.renderSkillInfo('p1', this.p1Char);
+            this.renderSkillInfo('p2', this.p2Char);
+        });
+
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                renderTables();
+            });
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                input.resetDefaults();
+                renderTables();
+                this.renderSkillInfo('p1', this.p1Char);
+                this.renderSkillInfo('p2', this.p2Char);
+            });
+        }
+
+        renderTables();
     }
 
     checkBothReady() {

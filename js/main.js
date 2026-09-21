@@ -112,7 +112,11 @@ class CyberClashGame {
             vivian: 'VIVIAN BANSHEE',
             jotaro: 'JOTARO KUJO',
             goku: 'SON GOKU',
-            giorno: 'GIORNO GIOVANNA'
+            giorno: 'GIORNO GIOVANNA',
+            naoya: "NAOYA ZEN'IN",
+            luffy: 'MONKEY D. LUFFY',
+            gojo: 'SATORU GOJO',
+            sukuna: 'RYOMEN SUKUNA'
         };
         const charColors = {
             yanagi: '#a78bfa',
@@ -122,7 +126,11 @@ class CyberClashGame {
             vivian: '#c084fc',
             jotaro: '#818cf8',
             goku: '#fbbf24',
-            giorno: '#facc15'
+            giorno: '#facc15',
+            naoya: '#a3e635',
+            luffy: '#ef4444',
+            gojo: '#0284c7',
+            sukuna: '#f43f5e'
         };
 
         const p1Name = charNames[p1Char] || 'TSUKISHIRO YANAGI';

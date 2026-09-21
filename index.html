@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=54">
+    <link rel="stylesheet" href="style.css?v=55">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -139,6 +139,26 @@
                             <div class="char-title">Giorno</div>
                             <span class="char-type type-giorno">⚔️ MELEE</span>
                         </div>
+                        <div class="char-card" data-player="p1" data-char="naoya">
+                            <img src="assets/naoya/avatar.png?v=55" class="char-avatar" alt="Naoya">
+                            <div class="char-title">Naoya</div>
+                            <span class="char-type type-naoya">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="luffy">
+                            <img src="assets/luffy/avatar.png?v=55" class="char-avatar" alt="Luffy">
+                            <div class="char-title">Luffy</div>
+                            <span class="char-type type-luffy">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="gojo">
+                            <img src="assets/gojo/avatar.png?v=55" class="char-avatar" alt="Gojo">
+                            <div class="char-title">Gojo</div>
+                            <span class="char-type type-gojo">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="sukuna">
+                            <img src="assets/sukuna/avatar.png?v=55" class="char-avatar" alt="Sukuna">
+                            <div class="char-title">Sukuna</div>
+                            <span class="char-type type-sukuna">⚔️ MELEE</span>
+                        </div>
                     </div>
 
                     <!-- POP-UP SKILL INFO P1 -->
@@ -215,6 +235,26 @@
                             <img src="assets/giorno/avatar.png?v=45" class="char-avatar" alt="Giorno">
                             <div class="char-title">Giorno</div>
                             <span class="char-type type-giorno">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="naoya">
+                            <img src="assets/naoya/avatar.png?v=55" class="char-avatar" alt="Naoya">
+                            <div class="char-title">Naoya</div>
+                            <span class="char-type type-naoya">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="luffy">
+                            <img src="assets/luffy/avatar.png?v=55" class="char-avatar" alt="Luffy">
+                            <div class="char-title">Luffy</div>
+                            <span class="char-type type-luffy">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="gojo">
+                            <img src="assets/gojo/avatar.png?v=55" class="char-avatar" alt="Gojo">
+                            <div class="char-title">Gojo</div>
+                            <span class="char-type type-gojo">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="sukuna">
+                            <img src="assets/sukuna/avatar.png?v=55" class="char-avatar" alt="Sukuna">
+                            <div class="char-title">Sukuna</div>
+                            <span class="char-type type-sukuna">⚔️ MELEE</span>
                         </div>
                     </div>
 
@@ -317,6 +357,40 @@
             </div>
         </div>
 
+        <!-- KEYBINDINGS MODAL -->
+        <div id="keybinds-modal" class="overlay hidden" onclick="if(event.target === this) this.classList.add('hidden')">
+            <div class="controls-content keybinds-content">
+                <button class="modal-close-btn" onclick="document.getElementById('keybinds-modal').classList.add('hidden')" title="Close">✕</button>
+                <h2 style="font-family: 'Orbitron', sans-serif; color: #f59e0b; margin-bottom: 6px;">⚙️ CUSTOM KEYBINDINGS / CÀI ĐẶT PHÍM</h2>
+                <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">
+                    Nhấp vào nút bất kỳ để gán phím mới (nhấn một phím trên bàn phím để gán). Tự động lưu vào bộ nhớ máy.
+                </p>
+
+                <div class="keybinds-container">
+                    <!-- PLAYER 1 COLUMN -->
+                    <div class="keybinds-col">
+                        <h3 style="color: #00f0ff; font-family: 'Orbitron', sans-serif; margin-bottom: 10px; font-size: 15px;">PLAYER 1 (Cyan)</h3>
+                        <table class="keybinds-table" id="p1-keybinds-table">
+                            <!-- Populated dynamically by UI -->
+                        </table>
+                    </div>
+
+                    <!-- PLAYER 2 COLUMN -->
+                    <div class="keybinds-col">
+                        <h3 style="color: #ff007f; font-family: 'Orbitron', sans-serif; margin-bottom: 10px; font-size: 15px;">PLAYER 2 (Magenta)</h3>
+                        <table class="keybinds-table" id="p2-keybinds-table">
+                            <!-- Populated dynamically by UI -->
+                        </table>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 18px;">
+                    <button id="btn-reset-keybinds" class="leave-btn" style="flex: 1; padding: 10px; font-size: 13px;">🔄 MẶC ĐỊNH (RESET)</button>
+                    <button id="btn-close-keybinds" class="ready-btn" style="flex: 1; padding: 10px; font-size: 13px;" onclick="document.getElementById('keybinds-modal').classList.add('hidden')">✔️ XONG (DONE)</button>
+                </div>
+            </div>
+        </div>
+
         <!-- DISCONNECT MODAL -->
         <div id="disconnect-modal" class="overlay hidden">
             <div class="modal-box p1-border" style="max-width: 480px; text-align: center;">
@@ -326,6 +400,7 @@
             </div>
         </div>
 
+        <button id="keybinds-toggle-btn" class="help-toggle" style="right: 210px;">⚙️ Keybinds</button>
         <button id="help-toggle-btn" class="help-toggle" onclick="document.getElementById('controls-modal').classList.toggle('hidden')">⌨️ Controls &amp; Tricks</button>
     </div>
 
@@ -340,6 +415,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=54"></script>
+    <script type="module" src="js/main.js?v=55"></script>
 </body>
 </html>
