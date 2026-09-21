@@ -1,7 +1,6 @@
-// Weapons, Skills, Projectiles & Combat Resolution Engine
-import { sound } from './audio.js';
-import { fx } from './particles.js';
-import { physics } from './physics.js';
+import { sound } from './audio.js?v=52';
+import { fx } from './particles.js?v=52';
+import { physics } from './physics.js?v=52';
 
 export const WEAPONS = {
     YANAGI: {

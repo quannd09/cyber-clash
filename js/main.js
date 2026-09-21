@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js';
-import { input } from './input.js';
-import { fx } from './particles.js';
-import { combat, Projectile } from './combat.js';
-import { Cyborg } from './cyborg.js';
-import { GameRenderer } from './renderer.js';
-import { UIManager } from './ui.js?v=50';
-import { network } from './network.js?v=50';
-import { BotController } from './bot.js?v=50';
+import { sound } from './audio.js?v=52';
+import { input } from './input.js?v=52';
+import { fx } from './particles.js?v=52';
+import { combat, Projectile } from './combat.js?v=52';
+import { Cyborg } from './cyborg.js?v=52';
+import { GameRenderer } from './renderer.js?v=52';
+import { UIManager } from './ui.js?v=52';
+import { network } from './network.js?v=52';
+import { BotController } from './bot.js?v=52';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -166,10 +166,14 @@ class CyberClashGame {
 
         // 1. Primary smooth 60/120+ FPS loop via requestAnimationFrame when tab is visible
         const rafLoop = (now) => {
-            if (!document.hidden) {
-                this.step(now);
-            }
             requestAnimationFrame(rafLoop);
+            if (!document.hidden) {
+                try {
+                    this.step(now);
+                } catch (err) {
+                    console.error('[GameLoop Error]', err);
+                }
+            }
         };
         requestAnimationFrame(rafLoop);
 
@@ -192,7 +196,11 @@ class CyberClashGame {
             this.worker.onmessage = () => {
                 // If tab is in background (requestAnimationFrame paused), keep game logic & network running!
                 if (document.hidden) {
-                    this.step(performance.now());
+                    try {
+                        this.step(performance.now());
+                    } catch (err) {
+                        console.error('[Worker Step Error]', err);
+                    }
                 }
             };
             this.worker.postMessage('start');
@@ -200,26 +208,38 @@ class CyberClashGame {
             console.warn('[Loop] Web Worker ticker fallback failed, using window interval fallback', e);
             setInterval(() => {
                 if (document.hidden) {
-                    this.step(performance.now());
+                    try {
+                        this.step(performance.now());
+                    } catch (err) {
+                        console.error('[Interval Step Error]', err);
+                    }
                 }
             }, 1000 / 60);
         }
     }
 
     step(now) {
-        const dtMs = now - this.lastTime;
-        this.lastTime = now;
-        // Clamp delta time to prevent physics spiral
-        const dt = Math.min(2.5, dtMs / (1000 / 60));
+        try {
+            const dtMs = now - this.lastTime;
+            this.lastTime = now;
+            // Ensure dt is always positive and valid number
+            const dt = Math.max(0.1, Math.min(2.5, (dtMs && !isNaN(dtMs)) ? (dtMs / (1000 / 60)) : 1));
 
-        input.update();
+            if (input && typeof input.update === 'function') {
+                input.update();
+            }
 
-        this.update(dt);
-        if (!document.hidden) {
-            this.render();
+            this.update(dt);
+            if (!document.hidden) {
+                this.render();
+            }
+
+            if (input && typeof input.postUpdate === 'function') {
+                input.postUpdate();
+            }
+        } catch (err) {
+            console.error('[Step Error]', err);
         }
-
-        input.postUpdate();
     }
 
     update(dt) {
@@ -259,11 +279,13 @@ class CyberClashGame {
 
         // CLIENT IN ONLINE MODE:
         if (this.isOnlineClient) {
-            if (input.isMouseActive()) {
-                const dx = input.mouse.x - this.p2.x;
-                const dy = input.mouse.y - this.p2.y;
-                if (Math.hypot(dx, dy) > 10) {
-                    this.p2.setAimAngle(Math.atan2(dy, dx));
+            if (input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
+                if (input.mouse && typeof input.mouse.x === 'number' && this.p2) {
+                    const dx = input.mouse.x - this.p2.x;
+                    const dy = input.mouse.y - this.p2.y;
+                    if (Math.hypot(dx, dy) > 10) {
+                        this.p2.setAimAngle(Math.atan2(dy, dx));
+                    }
                 }
             }
             this.sendClientInput();
@@ -291,22 +313,36 @@ class CyberClashGame {
         }
 
         if (this.state === STATE_FIGHT) {
-            if (this.gameMode === 'LOCAL') {
-                this.processPlayerInputs(this.p1, 0, this.p2);
-                this.processPlayerInputs(this.p2, 1, this.p1);
-            } else if (this.gameMode === 'BOT') {
-                this.processPlayerInputs(this.p1, 0, this.p2);
-                this.bot.update(this.p2, this.p1, dt, this.bounds);
-            } else if (this.isOnlineHost) {
-                this.processPlayerInputs(this.p1, 0, this.p2);
-                this.applyClientInputs(this.p2, this.latestClientInputs, this.p1);
+            try {
+                if (this.gameMode === 'LOCAL') {
+                    this.processPlayerInputs(this.p1, 0, this.p2);
+                    this.processPlayerInputs(this.p2, 1, this.p1);
+                } else if (this.gameMode === 'BOT') {
+                    this.processPlayerInputs(this.p1, 0, this.p2);
+                    if (this.bot && typeof this.bot.update === 'function') {
+                        this.bot.update(this.p2, this.p1, dt, this.bounds);
+                    }
+                } else if (this.isOnlineHost) {
+                    this.processPlayerInputs(this.p1, 0, this.p2);
+                    this.applyClientInputs(this.p2, this.latestClientInputs, this.p1);
+                }
+            } catch (err) {
+                console.error('[Fight Control Error]', err);
             }
 
-            this.p1.update(dt, this.bounds);
-            this.p2.update(dt, this.bounds);
+            try {
+                this.p1.update(dt, this.bounds);
+                this.p2.update(dt, this.bounds);
+            } catch (err) {
+                console.error('[Cyborg Update Error]', err);
+            }
 
-            combat.updateProjectiles(dt, this.bounds);
-            combat.resolve(this.p1, this.p2, (intensity, dur) => this.renderer.triggerShake(intensity, dur));
+            try {
+                combat.updateProjectiles(dt, this.bounds);
+                combat.resolve(this.p1, this.p2, (intensity, dur) => this.renderer.triggerShake(intensity, dur));
+            } catch (err) {
+                console.error('[Combat Resolve Error]', err);
+            }
 
             // Decrement match timer
             this.matchTimer -= (dt / 60);
@@ -339,34 +375,38 @@ class CyberClashGame {
     }
 
     processPlayerInputs(player, index, opponent) {
+        if (!player) return;
+
         // 1. Movement
         const move = input.getMovementVector(index);
-        if (move.x !== 0 || move.y !== 0) {
+        if (move && (move.x !== 0 || move.y !== 0)) {
             player.thrust(move.x, move.y);
         }
 
         // 2. Strafe Lock
         const strafe = input.getActionState(index, 'strafe');
-        player.setStrafing(strafe.isDown);
+        player.setStrafing(strafe ? strafe.isDown : false);
 
         // 2b. Mouse Aiming for Player 1 (Solo vs Bot, Online Host, Local P1)
-        if (index === 0 && input.isMouseActive()) {
-            const dx = input.mouse.x - player.x;
-            const dy = input.mouse.y - player.y;
-            if (Math.hypot(dx, dy) > 10) {
-                player.setAimAngle(Math.atan2(dy, dx));
+        if (index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
+            if (input.mouse && typeof input.mouse.x === 'number') {
+                const dx = input.mouse.x - player.x;
+                const dy = input.mouse.y - player.y;
+                if (Math.hypot(dx, dy) > 10) {
+                    player.setAimAngle(Math.atan2(dy, dx));
+                }
             }
         }
 
         // 3. Attacks (Mouse Left Click or F for P1, Num1/J for P2)
         const attack = input.getActionState(index, 'lightAttack');
-        if (attack.justDown) {
+        if (attack && attack.justDown) {
             player.attack();
         }
 
         // 4. Shield / Parry (Mouse Right Click or H for P1, Num3/L for P2)
         const shield = input.getActionState(index, 'shield');
-        if (shield.isDown) {
+        if (shield && shield.isDown) {
             player.activateShield();
         } else {
             player.releaseShield();
@@ -374,13 +414,13 @@ class CyberClashGame {
 
         // 5. Special Skill
         const skill = input.getActionState(index, 'skill');
-        if (skill.justDown) {
+        if (skill && skill.justDown) {
             player.activateSkill(opponent);
         }
 
         // 6. Ultimate or Boost Dash
         const ultimate = input.getActionState(index, 'ultimate');
-        if (ultimate.justDown) {
+        if (ultimate && ultimate.justDown) {
             player.activateUltimateOrDash();
         }
     }
@@ -391,11 +431,13 @@ class CyberClashGame {
         const move = (p2Move.x !== 0 || p2Move.y !== 0) ? p2Move : p2AltMove;
 
         let aimAngle = null;
-        if (input.isMouseActive()) {
-            const dx = input.mouse.x - this.p2.x;
-            const dy = input.mouse.y - this.p2.y;
-            if (Math.hypot(dx, dy) > 10) {
-                aimAngle = Math.atan2(dy, dx);
+        if (input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
+            if (input.mouse && typeof input.mouse.x === 'number' && this.p2) {
+                const dx = input.mouse.x - this.p2.x;
+                const dy = input.mouse.y - this.p2.y;
+                if (Math.hypot(dx, dy) > 10) {
+                    aimAngle = Math.atan2(dy, dx);
+                }
             }
         }
 

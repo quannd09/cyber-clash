@@ -66,7 +66,8 @@ export class InputManager {
     }
 
     isMouseActive(timeoutMs = 4000) {
-        return this.mouse.hasMoved && (Date.now() - this.mouse.lastMoveTime < timeoutMs);
+        if (!this.mouse) return false;
+        return Boolean(this.mouse.hasMoved && (Date.now() - (this.mouse.lastMoveTime || 0) < timeoutMs));
     }
 
     initListeners() {
@@ -184,7 +185,7 @@ export class InputManager {
         let justDown = keyList.some(k => this.isKeyJustPressed(k));
 
         // Player 1 Mouse Integration (used for Single Player, Online Client & P1)
-        if (playerIndex === 0) {
+        if (playerIndex === 0 && this.mouse) {
             if (action === 'lightAttack') {
                 if (this.mouse.leftDown) isDown = true;
                 if (this.mouse.leftJustDown) justDown = true;

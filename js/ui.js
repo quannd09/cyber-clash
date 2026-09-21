@@ -1,6 +1,5 @@
-// Character Selection, Overlay & Cheat Sheet UI Controller
-import { assets } from './assets.js?v=48';
-import { network } from './network.js?v=48';
+import { assets } from './assets.js?v=52';
+import { network } from './network.js?v=52';
 
 const SKILL_DATA = {
     yanagi: {
@@ -157,6 +156,7 @@ export class UIManager {
                 if (this.gameMode === 'ONLINE' && this.networkRole === 'CLIENT') return;
 
                 if (this.gameMode === 'BOT') {
+                    if (this.p1Ready) return;
                     this.p1Ready = true;
                     this.p2Ready = true;
                     p1ReadyBtn.classList.add('ready');
@@ -164,7 +164,7 @@ export class UIManager {
                     setTimeout(() => {
                         this.hideLoadout();
                         this.onStartMatch(this.p1Char, this.p2Char);
-                    }, 300);
+                    }, 250);
                     return;
                 }
 

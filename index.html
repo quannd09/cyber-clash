@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=50">
+    <link rel="stylesheet" href="style.css?v=52">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -323,8 +323,17 @@
         <button id="help-toggle-btn" class="help-toggle" onclick="document.getElementById('controls-modal').classList.toggle('hidden')">⌨️ Controls &amp; Tricks</button>
     </div>
 
+    <!-- Global error safety logger -->
+    <script>
+        window.addEventListener('error', function(e) {
+            console.error('[Engine Error]', e.message, e.filename, e.lineno, e.error);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('[Engine Unhandled Promise]', e.reason);
+        });
+    </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=50"></script>
+    <script type="module" src="js/main.js?v=52"></script>
 </body>
 </html>
