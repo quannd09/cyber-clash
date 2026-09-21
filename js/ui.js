@@ -4,7 +4,7 @@ import { network } from './network.js?v=48';
 
 const SKILL_DATA = {
     yanagi: {
-        title: '⚡ TSUKISHIRO YANAGI (MELEE • 500 HP)',
+        title: '⚡ TSUKISHIRO YANAGI (MELEE • 475 HP)',
         color: '#a78bfa',
         p1: [
             { key: 'F (Melee)', name: 'Moon Spear', desc: '' },
@@ -18,7 +18,7 @@ const SKILL_DATA = {
         ]
     },
     velina: {
-        title: '🌸 VERINA AIRGID (RANGED • 500 HP)',
+        title: '🌸 VERINA AIRGID (RANGED • 480 HP)',
         color: '#34d399',
         p1: [
             { key: 'F (Ranged)', name: 'Comet Blast', desc: '' },
@@ -46,7 +46,7 @@ const SKILL_DATA = {
         ]
     },
     trigger: {
-        title: '🎯 TRIGGER (RANGED • 500 HP)',
+        title: '🎯 TRIGGER (RANGED • 460 HP)',
         color: '#38bdf8',
         p1: [
             { key: 'F (Ranged)', name: 'Purge Shot', desc: '' },
@@ -74,7 +74,7 @@ const SKILL_DATA = {
         ]
     },
     jotaro: {
-        title: '👊 JOTARO KUJO (MELEE • 500 HP)',
+        title: '👊 JOTARO KUJO (MELEE • 550 HP)',
         color: '#818cf8',
         p1: [
             { key: 'F (Melee)', name: 'ORA ORA ORA!', desc: '' },
@@ -88,7 +88,7 @@ const SKILL_DATA = {
         ]
     },
     goku: {
-        title: '🥋 SON GOKU (MELEE • 500 HP)',
+        title: '🥋 SON GOKU (MELEE • 520 HP)',
         color: '#fbbf24',
         p1: [
             { key: 'F (Melee)', name: 'Dragon Fist Ki', desc: '' },
@@ -102,7 +102,7 @@ const SKILL_DATA = {
         ]
     },
     giorno: {
-        title: '🐞 GIORNO GIOVANNA (MELEE • 500 HP)',
+        title: '🐞 GIORNO GIOVANNA (MELEE • 510 HP)',
         color: '#facc15',
         p1: [
             { key: 'F (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },

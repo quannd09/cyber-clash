@@ -49,16 +49,16 @@ export class Cyborg {
         this.isBoosted = false;
         this.boostTimer = 0;
 
-        // Core Vitals (Vivian có 650 HP, các nhân vật khác 500 HP)
+        // Core Vitals (Balanced across archetypes)
         const charHp = {
             vivian: 650,
-            yanagi: 500,
-            velina: 500,
+            jotaro: 550,
+            goku: 520,
+            giorno: 510,
             nicole: 500,
-            trigger: 500,
-            jotaro: 500,
-            goku: 500,
-            giorno: 500
+            velina: 480,
+            yanagi: 475,
+            trigger: 460
         };
         this.maxHp = charHp[characterId] || 500;
         this.hp = this.maxHp;
@@ -371,8 +371,8 @@ export class Cyborg {
         } else if (skill.id === 'EMP_BLAST') {
             sound.playEMP();
             fx.spawnClashShockwave(this.x, this.y);
-            this.hp = Math.min(this.maxHp, this.hp + 60);
-            fx.addText(this.x, this.y - 30, '+60 HP HEAL!', '#34d399', 24);
+            this.hp = Math.min(this.maxHp, this.hp + 50);
+            fx.addText(this.x, this.y - 30, '+50 HP HEAL!', '#34d399', 24);
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 250) {
                 opponent.takeDamage(skillDmg);
@@ -417,7 +417,7 @@ export class Cyborg {
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 8);
         } else if (skill.id === 'ABLOOM_BURST') {
             sound.playSlash(false);
-            this.hp = Math.min(this.maxHp, this.hp + 30);
+            this.hp = Math.min(this.maxHp, this.hp + 25);
             fx.addText(this.x, this.y - 30, '🔮 ABLOOM BURST!', '#c084fc', 22);
 
             // Tự động căn góc bắn chuẩn về phía đối thủ

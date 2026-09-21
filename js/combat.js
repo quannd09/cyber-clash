@@ -6,50 +6,50 @@ import { physics } from './physics.js';
 export const WEAPONS = {
     YANAGI: {
         id: 'YANAGI',
-        name: 'Naginata Điện',
-        attackDmg: 35, 
-        attackRange: 80,
-        attackDuration: 20,
-        attackCooldown: 25,
+        name: 'Electric Naginata',
+        attackDmg: 32, 
+        attackRange: 85,
+        attackDuration: 18,
+        attackCooldown: 22,
         isRanged: false,
         icon: '⚔️'
     },
     VELINA: {
         id: 'VELINA',
-        name: 'Thực Vật Quang Học',
-        attackDmg: 24,
-        attackRange: 600,
-        attackDuration: 25,
-        attackCooldown: 30,
+        name: 'Photonic Flora',
+        attackDmg: 23,
+        attackRange: 580,
+        attackDuration: 24,
+        attackCooldown: 28,
         isRanged: true,
-        icon: '🌿'
+        icon: '🌸'
     },
     NICOLE: {
         id: 'NICOLE',
-        name: 'Pháo Cặp Táp',
+        name: 'Briefcase Cannon',
         attackDmg: 26,
-        attackRange: 550,
-        attackDuration: 24,
-        attackCooldown: 28,
+        attackRange: 520,
+        attackDuration: 22,
+        attackCooldown: 27,
         isRanged: true,
         icon: '💼'
     },
     TRIGGER: {
         id: 'TRIGGER',
-        name: 'Súng Bắn Tỉa Điện Từ',
-        attackDmg: 36,
-        attackRange: 750,
-        attackDuration: 28,
-        attackCooldown: 40,
+        name: 'Electromagnetic Sniper',
+        attackDmg: 38,
+        attackRange: 720,
+        attackDuration: 26,
+        attackCooldown: 38,
         isRanged: true,
         icon: '🎯'
     },
     VIVIAN: {
         id: 'VIVIAN',
-        name: 'Lông Vũ Ether',
-        attackDmg: 25,
-        attackRange: 520,
-        attackDuration: 22,
+        name: 'Ether Feathers',
+        attackDmg: 21,
+        attackRange: 500,
+        attackDuration: 20,
         attackCooldown: 24,
         isRanged: true,
         icon: '🔮'
@@ -59,42 +59,42 @@ export const WEAPONS = {
         name: 'Star Platinum ORA',
         attackDmg: 34,
         attackRange: 85,
-        attackDuration: 20,
+        attackDuration: 19,
         attackCooldown: 22,
         isRanged: false,
         icon: '👊'
     },
     GOKU: {
         id: 'GOKU',
-        name: 'Long Quyền Ki',
-        attackDmg: 28,
+        name: 'Dragon Fist Ki',
+        attackDmg: 29,
         attackRange: 80,
-        attackDuration: 22,
-        attackCooldown: 24,
+        attackDuration: 18,
+        attackCooldown: 20,
         isRanged: false,
         icon: '🥋'
     },
     GIORNO: {
         id: 'GIORNO',
         name: 'Gold Experience MUDA',
-        attackDmg: 33,
+        attackDmg: 31,
         attackRange: 80,
-        attackDuration: 20,
-        attackCooldown: 22,
+        attackDuration: 19,
+        attackCooldown: 21,
         isRanged: false,
         icon: '🐞'
     }
 };
 
 export const SKILLS = {
-    YANAGI_SKILL: { id: 'PHASE_BLINK', name: 'Lôi Điện Chớp Nhoáng', cooldown: 180, icon: '⚡' },
-    VERINA_SKILL: { id: 'EMP_BLAST', name: 'Hạt Giống Sinh Mệnh', cooldown: 220, icon: '🌸' },
-    NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Trượt Tiền Tài', cooldown: 200, icon: '💼' },
-    TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Thế Bắn Tỉa', cooldown: 220, icon: '🎯' },
-    VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Hộ Mệnh Nở Rộ', cooldown: 140, icon: '🔮' },
-    JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 210, icon: '👊' },
-    GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Dịch Chuyển Tức Thời', cooldown: 230, icon: '🥋' },
-    GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Cây Cối Sinh Mệnh', cooldown: 220, icon: '🐞' }
+    YANAGI_SKILL: { id: 'PHASE_BLINK', name: 'Phase Blink', cooldown: 180, icon: '⚡' },
+    VERINA_SKILL: { id: 'EMP_BLAST', name: 'EMP Blast', cooldown: 210, icon: '🌸' },
+    NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Sugar Slide', cooldown: 190, icon: '💼' },
+    TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Sniper Stance', cooldown: 230, icon: '🎯' },
+    VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Abloom Burst', cooldown: 150, icon: '🔮' },
+    JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 200, icon: '👊' },
+    GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Instant Transmission', cooldown: 210, icon: '🥋' },
+    GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Tree of Life', cooldown: 200, icon: '🐞' }
 };
 
 export class Projectile {
