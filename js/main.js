@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=52';
-import { input } from './input.js?v=52';
-import { fx } from './particles.js?v=52';
-import { combat, Projectile } from './combat.js?v=52';
-import { Cyborg } from './cyborg.js?v=52';
-import { GameRenderer } from './renderer.js?v=52';
-import { UIManager } from './ui.js?v=52';
-import { network } from './network.js?v=52';
-import { BotController } from './bot.js?v=52';
+import { sound } from './audio.js?v=53';
+import { input } from './input.js?v=53';
+import { fx } from './particles.js?v=53';
+import { combat, Projectile } from './combat.js?v=53';
+import { Cyborg } from './cyborg.js?v=53';
+import { GameRenderer } from './renderer.js?v=53';
+import { UIManager } from './ui.js?v=53';
+import { network } from './network.js?v=53';
+import { BotController } from './bot.js?v=53';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -20,6 +20,7 @@ class CyberClashGame {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
 
+        this.input = input;
         this.renderer = new GameRenderer(this.canvas, this.ctx);
 
         // Arena Boundaries (Margin inside canvas)
@@ -51,15 +52,27 @@ class CyberClashGame {
         this.ui = new UIManager(
             (p1Loadout, p2Loadout) => this.startMatch(p1Loadout, p2Loadout),
             () => this.resetMatch(),
-            (mode) => { this.gameMode = mode; },
+            (mode) => this.setGameMode(mode),
             (role, code) => { this.networkRole = role; },
             (data) => this.handleNetworkGameData(data),
             (diff) => { this.bot.setDifficulty(diff); }
         );
 
+        this.setGameMode('LOCAL');
         this.initResize();
         this.initAudioUnlock();
         this.initGameLoop();
+    }
+
+    setGameMode(mode) {
+        this.gameMode = mode;
+        const isLocal2P = (mode === 'LOCAL');
+        if (input && typeof input.setMouseEnabled === 'function') {
+            input.setMouseEnabled(!isLocal2P);
+        }
+        if (this.canvas) {
+            this.canvas.style.cursor = isLocal2P ? 'default' : 'crosshair';
+        }
     }
 
     get isOnlineHost() {
@@ -126,6 +139,9 @@ class CyberClashGame {
         this.p1.roundsWon = 0;
         this.p2.roundsWon = 0;
         this.round = 1;
+
+        // Ensure mode controls and cursor are in sync (e.g. mouse disabled in Local mode)
+        this.setGameMode(this.gameMode);
 
         // Ensure keyboard focus is on window/canvas so keystrokes register immediately
         if (document.activeElement && document.activeElement.blur) {
@@ -387,8 +403,9 @@ class CyberClashGame {
         const strafe = input.getActionState(index, 'strafe');
         player.setStrafing(strafe ? strafe.isDown : false);
 
-        // 2b. Mouse Aiming for Player 1 (Solo vs Bot, Online Host, Local P1)
-        if (index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
+        // 2b. Mouse Aiming for Player 1 (Only in BOT or ONLINE mode, NEVER in LOCAL 2-player mode)
+        const isLocal2P = (this.gameMode === 'LOCAL');
+        if (!isLocal2P && index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
             if (input.mouse && typeof input.mouse.x === 'number') {
                 const dx = input.mouse.x - player.x;
                 const dy = input.mouse.y - player.y;

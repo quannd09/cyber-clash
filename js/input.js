@@ -33,7 +33,8 @@ export class InputManager {
             ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo']
         };
 
-        // Mouse controls for Single Player / Online Client
+        // Mouse controls for Single Player / Online Client (Disabled in Local 2-Player)
+        this.mouseEnabled = false;
         this.mouse = {
             x: 640,
             y: 360,
@@ -50,7 +51,21 @@ export class InputManager {
         this.initListeners();
     }
 
+    setMouseEnabled(enabled) {
+        this.mouseEnabled = Boolean(enabled);
+        if (!this.mouseEnabled && this.mouse) {
+            this.mouse.leftDown = false;
+            this.mouse.leftJustDown = false;
+            this.mouse.prevLeftDown = false;
+            this.mouse.rightDown = false;
+            this.mouse.rightJustDown = false;
+            this.mouse.prevRightDown = false;
+            this.mouse.hasMoved = false;
+        }
+    }
+
     updateMousePosition(e) {
+        if (!this.mouseEnabled) return;
         const canvas = document.getElementById('gameCanvas');
         if (canvas) {
             const rect = canvas.getBoundingClientRect();
@@ -66,7 +81,7 @@ export class InputManager {
     }
 
     isMouseActive(timeoutMs = 4000) {
-        if (!this.mouse) return false;
+        if (!this.mouseEnabled || !this.mouse) return false;
         return Boolean(this.mouse.hasMoved && (Date.now() - (this.mouse.lastMoveTime || 0) < timeoutMs));
     }
 
@@ -95,10 +110,12 @@ export class InputManager {
 
         // Mouse event listeners
         window.addEventListener('mousemove', (e) => {
+            if (!this.mouseEnabled) return;
             this.updateMousePosition(e);
         });
 
         window.addEventListener('mousedown', (e) => {
+            if (!this.mouseEnabled) return;
             this.updateMousePosition(e);
 
             // Ignore clicks on UI cards, overlays, modals, buttons
@@ -121,6 +138,7 @@ export class InputManager {
         });
 
         window.addEventListener('mouseup', (e) => {
+            if (!this.mouseEnabled) return;
             if (e.button === 0) {
                 this.mouse.leftDown = false;
             } else if (e.button === 2) {
@@ -184,8 +202,8 @@ export class InputManager {
         let isDown = keyList.some(k => this.isKeyDown(k));
         let justDown = keyList.some(k => this.isKeyJustPressed(k));
 
-        // Player 1 Mouse Integration (used for Single Player, Online Client & P1)
-        if (playerIndex === 0 && this.mouse) {
+        // Player 1 Mouse Integration (ONLY active in Single Player vs BOT or Online mode, DISABLED in Local 2-Player mode)
+        if (this.mouseEnabled && playerIndex === 0 && this.mouse) {
             if (action === 'lightAttack') {
                 if (this.mouse.leftDown) isDown = true;
                 if (this.mouse.leftJustDown) justDown = true;
