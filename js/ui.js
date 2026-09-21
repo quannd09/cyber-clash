@@ -119,56 +119,56 @@ const SKILL_DATA = {
         title: '🎞️ NAOYA ZEN\'IN (MELEE • 465 HP)',
         color: '#a3e635',
         p1: [
-            { key: 'Left Click / F (Melee)', name: '24 FPS Projection Fists', desc: 'Đánh trúng 3 đòn liên tiếp đóng băng đối thủ vào khung ảnh' },
-            { key: 'R (Skill)', name: 'Projection Dash', desc: 'Lướt xuyên qua đối thủ và đóng băng 24 FPS (choáng)' },
-            { key: 'Space (Ultimate)', name: 'Mach 3 Barrage', desc: 'Liên hoàn trảm tốc độ Mach 3 bao trùm toàn bộ khu vực' }
+            { key: 'Left Click / F (Melee)', name: '24 FPS Projection Fists', desc: '' },
+            { key: 'R (Skill)', name: 'Projection Step', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Mach 3 Barrage', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: '24 FPS Projection Fists', desc: 'Đánh trúng 3 đòn liên tiếp đóng băng đối thủ vào khung ảnh' },
-            { key: 'I (Skill)', name: 'Projection Dash', desc: 'Lướt xuyên qua đối thủ và đóng băng 24 FPS (choáng)' },
-            { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage', desc: 'Liên hoàn trảm tốc độ Mach 3 bao trùm toàn bộ khu vực' }
+            { key: 'J (Melee)', name: '24 FPS Projection Fists', desc: '' },
+            { key: 'I (Skill)', name: 'Projection Step', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage', desc: '' }
         ]
     },
     luffy: {
         title: '🍖 MONKEY D. LUFFY (MELEE • 540 HP)',
         color: '#ef4444',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol', desc: 'Cú đấm cao su sải tay dài uy lực' },
-            { key: 'R (Skill)', name: 'Gigant Stomp', desc: 'Bật nhảy cao su dậm Haki diện rộng làm choáng' },
-            { key: 'Space (Ultimate)', name: 'Bajrang Gun', desc: 'Nắm đấm Haki thần Nika khổng lồ giáng từ tầng mây sấm sét' }
+            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol', desc: '' },
+            { key: 'R (Skill)', name: 'Gigant Stomp', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Gomu Gomu Pistol', desc: 'Cú đấm cao su sải tay dài uy lực' },
-            { key: 'I (Skill)', name: 'Gigant Stomp', desc: 'Bật nhảy cao su dậm Haki diện rộng làm choáng' },
-            { key: 'Enter (Ultimate)', name: 'Bajrang Gun', desc: 'Nắm đấm Haki thần Nika khổng lồ giáng từ tầng mây sấm sét' }
+            { key: 'J (Melee)', name: 'Gomu Gomu Pistol', desc: '' },
+            { key: 'I (Skill)', name: 'Gigant Stomp', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ]
     },
     gojo: {
         title: '♾️ SATORU GOJO (MELEE • 500 HP)',
         color: '#0284c7',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Black Flash Infinity', desc: 'Quyền thuật Tia Lửa Đen nổ tung không gian' },
-            { key: 'R (Skill)', name: 'Tử Phần (Hollow Purple 🟣)', desc: 'Cầu năng lượng hư thức hủy diệt xuyên thủng mọi hàng phòng ngự' },
-            { key: 'Space (Ultimate)', name: 'Vô Lượng Không Xứ (Unlimited Void 🌌)', desc: 'Bành trướng lãnh địa làm tê liệt tâm trí đối thủ trong vô tận thông tin' }
+            { key: 'Left Click / F (Melee)', name: 'Black Flash Infinity', desc: '' },
+            { key: 'R (Skill)', name: 'Hollow Purple 🟣', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Black Flash Infinity', desc: 'Quyền thuật Tia Lửa Đen nổ tung không gian' },
-            { key: 'I (Skill)', name: 'Tử Phần (Hollow Purple 🟣)', desc: 'Cầu năng lượng hư thức hủy diệt xuyên thủng mọi hàng phòng ngự' },
-            { key: 'Enter (Ultimate)', name: 'Vô Lượng Không Xứ (Unlimited Void 🌌)', desc: 'Bành trướng lãnh địa làm tê liệt tâm trí đối thủ trong vô tận thông tin' }
+            { key: 'J (Melee)', name: 'Black Flash Infinity', desc: '' },
+            { key: 'I (Skill)', name: 'Hollow Purple 🟣', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌', desc: '' }
         ]
     },
     sukuna: {
         title: '⛩️ RYOMEN SUKUNA (MELEE • 530 HP)',
         color: '#f43f5e',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes', desc: 'Vết chém vô hình Khai trảm tầm xa xé rách không khí' },
-            { key: 'R (Skill)', name: 'Hỏa Tiễn Kamino (Fuga 🔥)', desc: 'Mở hỏa tiễn nhiệt áp bắn cực mạnh gây nổ bốc cháy' },
-            { key: 'Space (Ultimate)', name: 'Phục Ma Ngự Khảm Tử (Malevolent Shrine ⛩️)', desc: 'Bành trướng lãnh địa vô vàn trảm kích Bát và Khai băm nát khu vực' }
+            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes', desc: '' },
+            { key: 'R (Skill)', name: 'Crimson Fireball 🔥', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dismantle Slashes', desc: 'Vết chém vô hình Khai trảm tầm xa xé rách không khí' },
-            { key: 'I (Skill)', name: 'Hỏa Tiễn Kamino (Fuga 🔥)', desc: 'Mở hỏa tiễn nhiệt áp bắn cực mạnh gây nổ bốc cháy' },
-            { key: 'Enter (Ultimate)', name: 'Phục Ma Ngự Khảm Tử (Malevolent Shrine ⛩️)', desc: 'Bành trướng lãnh địa vô vàn trảm kích Bát và Khai băm nát khu vực' }
+            { key: 'J (Melee)', name: 'Dismantle Slashes', desc: '' },
+            { key: 'I (Skill)', name: 'Crimson Fireball 🔥', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ]
     }
 };
@@ -752,15 +752,15 @@ export class UIManager {
         if (!modal) return;
 
         const ACTIONS = [
-            { id: 'up', label: 'Di chuyển Lên (Up)' },
-            { id: 'down', label: 'Di chuyển Xuống (Down)' },
-            { id: 'left', label: 'Di chuyển Trái (Left)' },
-            { id: 'right', label: 'Di chuyển Phải (Right)' },
-            { id: 'lightAttack', label: 'Đánh thường (Normal Attack)' },
-            { id: 'shield', label: 'Khiên / Đỡ (Shield / Parry)' },
-            { id: 'skill', label: 'Kỹ năng (Special Skill)' },
-            { id: 'strafe', label: 'Khóa hướng (Strafe)' },
-            { id: 'ultimate', label: 'Chiêu cuối (Ultimate)' }
+            { id: 'up', label: 'Move Up' },
+            { id: 'down', label: 'Move Down' },
+            { id: 'left', label: 'Move Left' },
+            { id: 'right', label: 'Move Right' },
+            { id: 'lightAttack', label: 'Normal Attack' },
+            { id: 'shield', label: 'Shield / Parry' },
+            { id: 'skill', label: 'Special Skill' },
+            { id: 'strafe', label: 'Strafe Lock' },
+            { id: 'ultimate', label: 'Ultimate Overdrive' }
         ];
 
         let activeListeningBtn = null;

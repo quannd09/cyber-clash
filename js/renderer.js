@@ -137,6 +137,36 @@ export class GameRenderer {
         // ALWAYS USE 1 SINGLE BASE IMAGE (thay vì đổi nhiều ảnh)
         const customSprite = assets.getCharacterSprite(c.characterId, 'idle');
 
+        // Draw Projection Afterimages (e.g. Naoya's 24 FPS Afterimages)
+        if (c.afterimages && c.afterimages.length > 0 && customSprite) {
+            const targetH = 135;
+            const aspect = (customSprite.naturalWidth && customSprite.naturalHeight) 
+                ? (customSprite.naturalWidth / customSprite.naturalHeight) 
+                : 1;
+            const targetW = targetH * aspect;
+            const pivotY = 48;
+
+            c.afterimages.forEach(ai => {
+                ctx.save();
+                ctx.translate(ai.x, ai.y);
+                ctx.scale(ai.facingDir, 1);
+                ctx.translate(0, pivotY);
+
+                // Cel-shaded green projection aura
+                ctx.globalAlpha = ai.alpha * 0.75;
+                ctx.shadowColor = '#a3e635';
+                ctx.shadowBlur = 18;
+                ctx.drawImage(customSprite, -targetW / 2, -targetH, targetW, targetH);
+
+                // 24 FPS Film Frame Border on afterimage
+                ctx.strokeStyle = '#a3e635';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(-targetW / 2 - 4, -targetH - 4, targetW + 8, targetH + 8);
+
+                ctx.restore();
+            });
+        }
+
         // Position Character
         ctx.translate(c.x, c.y);
 

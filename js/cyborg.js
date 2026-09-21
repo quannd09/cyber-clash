@@ -60,6 +60,7 @@ export class Cyborg {
         // Naoya 24-FPS Projection & Frame Freeze mechanism
         this.naoyaHitCount = 0;
         this.frameFrozenTimer = 0;
+        this.afterimages = []; // [{x, y, aimAngle, facingDir, alpha, frame}]
 
         // Core Vitals (Balanced across archetypes)
         const charHp = {
@@ -148,6 +149,7 @@ export class Cyborg {
         this.spamDelayTimer = 0;
         this.naoyaHitCount = 0;
         this.frameFrozenTimer = 0;
+        this.afterimages = [];
     }
 
     update(dt = 1, arenaBounds) {
@@ -224,6 +226,17 @@ export class Cyborg {
 
         // Physics update
         physics.updateBody(this, dt);
+
+        // Update Afterimages (Naoya Projection Afterimages)
+        if (this.afterimages && this.afterimages.length > 0) {
+            for (let i = this.afterimages.length - 1; i >= 0; i--) {
+                this.afterimages[i].life -= dt;
+                this.afterimages[i].alpha = Math.max(0, this.afterimages[i].life / this.afterimages[i].maxLife);
+                if (this.afterimages[i].life <= 0) {
+                    this.afterimages.splice(i, 1);
+                }
+            }
+        }
 
         // Arena boundary collision + Wall Bounce Trick callback
         physics.resolveArenaBounds(this, arenaBounds, (body, nx, ny) => {
@@ -388,7 +401,7 @@ export class Cyborg {
                 opponent.applyStun(25);
                 physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 9);
                 fx.spawnHitSparks(opponent.x, opponent.y, this.color, 16);
-                fx.addText(opponent.x, opponent.y - 35, `⚡ LÔI CHẤN! -${Math.round(skillDmg)}`, this.color, 22);
+                fx.addText(opponent.x, opponent.y - 35, `⚡ THUNDER CLAP! -${Math.round(skillDmg)}`, this.color, 22);
                 sound.playHit(true);
             }
         } else if (skill.id === 'EMP_BLAST') {
@@ -402,7 +415,7 @@ export class Cyborg {
                 opponent.releaseShield();
                 opponent.applyStun(30);
                 physics.applyKnockback(opponent, opponent.x - this.x, opponent.y - this.y, 10);
-                fx.addText(opponent.x, opponent.y - 30, `ĐẨY LÙI! -${Math.round(skillDmg)}`, '#34d399', 20);
+                fx.addText(opponent.x, opponent.y - 30, `KNOCKBACK! -${Math.round(skillDmg)}`, '#34d399', 20);
             }
         } else if (skill.id === 'SUGAR_SLIDE') {
             sound.playWallBounce();
@@ -489,7 +502,7 @@ export class Cyborg {
             this.y = behindY;
             this.aimAngle = Math.atan2(opponent.y - this.y, opponent.x - this.x);
             fx.spawnParryBurst(this.x, this.y, '#fbbf24');
-            fx.addText(this.x, this.y - 35, '⚡ DỊCH CHUYỂN!', '#fbbf24', 24);
+            fx.addText(this.x, this.y - 35, '⚡ INSTANT TRANSMISSION!', '#fbbf24', 24);
             // Gut punch gây 2x sát thương đòn thường
             opponent.takeDamage(skillDmg);
             opponent.applyStun(30);
@@ -498,21 +511,40 @@ export class Cyborg {
         } else if (skill.id === 'LIFE_TREE') {
             sound.playEMP();
             fx.spawnClashShockwave(opponent.x, opponent.y);
-            fx.addText(opponent.x, opponent.y - 45, '🌳 CÂY SINH MỆNH!', '#facc15', 24);
+            fx.addText(opponent.x, opponent.y - 45, '🌳 TREE OF LIFE!', '#facc15', 24);
             opponent.takeDamage(skillDmg);
             opponent.applyStun(32);
             opponent.vy = -12; // Launch into air
             physics.applyKnockback(opponent, (Math.random() - 0.5) * 2, -1, 10);
             sound.playHit(true);
         } else if (skill.id === 'PROJECTION_DASH') {
-            // NAOYA: Lướt xuyên qua đối thủ và đóng băng 24 FPS (choáng)
+            // NAOYA: PROJECTION SORCERY 24 FPS - LEAVES TRAIL OF PROJECTION AFTERIMAGES
             sound.playWallBounce();
             fx.spawnParryBurst(this.x, this.y, '#a3e635');
             const dashDist = 240;
+            const startX = this.x;
+            const startY = this.y;
+            const facingDir = Math.cos(this.aimAngle) >= 0 ? 1 : -1;
+
+            // Spawn 4 high-fidelity 24 FPS projection frame afterimages along the dash path
+            for (let step = 1; step <= 4; step++) {
+                const ratio = step / 4;
+                const fxX = startX + Math.cos(this.aimAngle) * (dashDist * ratio);
+                const fxY = startY + Math.sin(this.aimAngle) * (dashDist * ratio);
+                this.afterimages.push({
+                    x: fxX,
+                    y: fxY,
+                    facingDir: facingDir,
+                    life: 30 + step * 6,
+                    maxLife: 30 + step * 6,
+                    alpha: 0.85
+                });
+            }
+
             this.x += Math.cos(this.aimAngle) * dashDist;
             this.y += Math.sin(this.aimAngle) * dashDist;
             fx.spawnParryBurst(this.x, this.y, '#a3e635');
-            fx.addText(this.x, this.y - 35, '🎞️ LƯỚT 24 FPS!', '#a3e635', 24);
+            fx.addText(this.x, this.y - 35, '🎞️ PROJECTION STEP!', '#a3e635', 24);
 
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 230) {
@@ -523,7 +555,7 @@ export class Cyborg {
                 fx.spawnHitSparks(opponent.x, opponent.y, '#a3e635', 20);
             }
         } else if (skill.id === 'GIGANT_STOMP') {
-            // LUFFY: Dậm cao su khổng lồ
+            // LUFFY: GIGANT STOMP
             sound.playHit(true);
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 10);
             fx.spawnClashShockwave(this.x, this.y);
@@ -537,9 +569,26 @@ export class Cyborg {
                 sound.playHit(true);
             }
         } else if (skill.id === 'HOLLOW_PURPLE') {
-            // GOJO: Tử Phần (Hollow Purple 🟣)
+            // GOJO: HOLLOW PURPLE ORB 🟣 (Glowing purple sphere)
             sound.playLaser();
-            fx.addText(this.x, this.y - 35, '🟣 TỬ PHẦN (HOLLOW PURPLE)!', '#a855f7', 24);
+            fx.addText(this.x, this.y - 35, '🟣 HOLLOW PURPLE!', '#c084fc', 24);
+            const proj = new Projectile(
+                this.index,
+                this.x + Math.cos(this.aimAngle) * 35,
+                this.y + Math.sin(this.aimAngle) * 35,
+                Math.cos(this.aimAngle) * 16,
+                Math.sin(this.aimAngle) * 16,
+                skillDmg,
+                '#a855f7',
+                18,
+                'hollow_purple'
+            );
+            combat.addProjectile(proj);
+            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
+        } else if (skill.id === 'KAMINO_FIRE_ARROW') {
+            // SUKUNA: CRIMSON FIREBALL 🔥 (Intense red/orange fiery sphere)
+            sound.playLaser();
+            fx.addText(this.x, this.y - 35, '🔥 CRIMSON FIREBALL!', '#ef4444', 24);
             const proj = new Projectile(
                 this.index,
                 this.x + Math.cos(this.aimAngle) * 35,
@@ -547,24 +596,9 @@ export class Cyborg {
                 Math.cos(this.aimAngle) * 18,
                 Math.sin(this.aimAngle) * 18,
                 skillDmg,
-                '#9333ea',
-                14
-            );
-            combat.addProjectile(proj);
-            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
-        } else if (skill.id === 'KAMINO_FIRE_ARROW') {
-            // SUKUNA: Hỏa Tiễn Kamino (Fuga 🔥)
-            sound.playLaser();
-            fx.addText(this.x, this.y - 35, '🔥 FUGA (HỎA TIỄN)!', '#f97316', 24);
-            const proj = new Projectile(
-                this.index,
-                this.x + Math.cos(this.aimAngle) * 35,
-                this.y + Math.sin(this.aimAngle) * 35,
-                Math.cos(this.aimAngle) * 20,
-                Math.sin(this.aimAngle) * 20,
-                skillDmg,
-                '#ea580c',
-                13
+                '#dc2626',
+                17,
+                'fire_orb'
             );
             combat.addProjectile(proj);
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 8);
@@ -585,9 +619,9 @@ export class Cyborg {
                 physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 14.5);
                 sound.playWallBounce();
                 fx.spawnThrusterFlame(this.x, this.y, this.aimAngle, '#ffffff');
-                fx.addText(this.x, this.y - 30, `💨 DASH! (Nộ: ${Math.floor(this.overdrive)}%)`, this.color, 20);
+                fx.addText(this.x, this.y - 30, `💨 DASH! (Meter: ${Math.floor(this.overdrive)}%)`, this.color, 20);
             } else {
-                fx.addText(this.x, this.y - 30, 'CẦN NĂNG LƯỢNG!', '#ff0055', 18);
+                fx.addText(this.x, this.y - 30, 'NEED ENERGY!', '#ff0055', 18);
             }
         }
     }
@@ -605,18 +639,18 @@ export class Cyborg {
         fx.spawnClashShockwave(this.x, this.y);
         
         const ultShouts = {
-            yanagi: '⚡ PHÁO LÔI QUANG! ⚡',
-            velina: '🌪️ BÃO SINH MỆNH! 🌪️',
-            nicole: '🕳️ HỐ ĐEN TRỌNG LỰC! 🕳️',
-            trigger: '🎯 HỎA LỰC ĐỒNG BỘ! 🎯',
-            vivian: '🔮 ĐIỀM BÁO VĨNH CỬU! 🔮',
+            yanagi: '⚡ LIGHTNING CANNON! ⚡',
+            velina: '🌪️ LIFE BLOSSOM STORM! 🌪️',
+            nicole: '🕳️ GRAVITATIONAL BLACK HOLE! 🕳️',
+            trigger: '🎯 SYNCHRONIZED FIREPOWER! 🎯',
+            vivian: '🔮 FEATHER STORM HARBINGER! 🔮',
             jotaro: '⏳ THE WORLD: ORA ORA ORA! ⏳',
-            goku: '💥 SIÊU KAMEHAMEHA! 💥',
+            goku: '💥 SUPER KAMEHAMEHA! 💥',
             giorno: '♾️ RETURN TO ZERO! ♾️',
-            naoya: '⚡ PHÓNG CHIẾU: TỐC ĐỘ MACH 3! ⚡',
+            naoya: '⚡ PROJECTION: MACH 3 BARRAGE! ⚡',
             luffy: '🍖 GOMU GOMU NO BAJRANG GUN! 🍖',
-            gojo: '🌌 BẢNH CHƯỚNG LÃNH ĐỊA: VÔ LƯỢNG KHÔNG XỨ! 🌌',
-            sukuna: '⛩️ PHỤC MA NGỰ KHẢM TỬ: TRẢM PHÁ! ⛩️'
+            gojo: '🌌 DOMAIN EXPANSION: UNLIMITED VOID! 🌌',
+            sukuna: '⛩️ DOMAIN EXPANSION: MALEVOLENT SHRINE! ⛩️'
         };
         const shout = ultShouts[this.characterId] || '🔥 OVERDRIVE ULTIMATE! 🔥';
         fx.addText(this.x, this.y - 45, shout, this.color, 28, 60);
@@ -640,7 +674,7 @@ export class Cyborg {
     applyFrameFreeze(frames = 45) {
         this.applyStun(frames);
         this.frameFrozenTimer = frames;
-        fx.addText(this.x, this.y - 45, '🎞️ 24 FPS ĐÓNG BĂNG FRAME! 🎞️', '#a3e635', 24, 50);
+        fx.addText(this.x, this.y - 45, '🎞️ 24 FPS FRAME FREEZE! 🎞️', '#a3e635', 24, 50);
         sound.playHit(true);
     }
 }

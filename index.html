@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=57">
+    <link rel="stylesheet" href="style.css?v=58">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -361,9 +361,9 @@
         <div id="keybinds-modal" class="overlay hidden" onclick="if(event.target === this) this.classList.add('hidden')">
             <div class="controls-content keybinds-content">
                 <button class="modal-close-btn" onclick="document.getElementById('keybinds-modal').classList.add('hidden')" title="Close">✕</button>
-                <h2 style="font-family: 'Orbitron', sans-serif; color: #f59e0b; margin-bottom: 6px;">⚙️ CUSTOM KEYBINDINGS / CÀI ĐẶT PHÍM</h2>
+                <h2 style="font-family: 'Orbitron', sans-serif; color: #f59e0b; margin-bottom: 6px;">⚙️ CUSTOM KEYBINDINGS</h2>
                 <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">
-                    Nhấp vào nút bất kỳ để gán phím mới (nhấn một phím trên bàn phím để gán). Tự động lưu vào bộ nhớ máy.
+                    Click any key slot to rebind (then press a key on your keyboard). Settings are saved automatically.
                 </p>
 
                 <div class="keybinds-container">
@@ -385,8 +385,8 @@
                 </div>
 
                 <div style="display: flex; gap: 12px; margin-top: 18px;">
-                    <button id="btn-reset-keybinds" class="leave-btn" style="flex: 1; padding: 10px; font-size: 13px;">🔄 MẶC ĐỊNH (RESET)</button>
-                    <button id="btn-close-keybinds" class="ready-btn" style="flex: 1; padding: 10px; font-size: 13px;" onclick="document.getElementById('keybinds-modal').classList.add('hidden')">✔️ XONG (DONE)</button>
+                    <button id="btn-reset-keybinds" class="leave-btn" style="flex: 1; padding: 10px; font-size: 13px;">🔄 RESET DEFAULTS</button>
+                    <button id="btn-close-keybinds" class="ready-btn" style="flex: 1; padding: 10px; font-size: 13px;" onclick="document.getElementById('keybinds-modal').classList.add('hidden')">✔️ DONE</button>
                 </div>
             </div>
         </div>
@@ -415,6 +415,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=55"></script>
+    <script type="module" src="js/main.js?v=58"></script>
 </body>
 </html>

@@ -134,14 +134,14 @@ export const SKILLS = {
     JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 200, icon: '👊' },
     GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Instant Transmission', cooldown: 210, icon: '🥋' },
     GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Tree of Life', cooldown: 200, icon: '🐞' },
-    NAOYA_SKILL: { id: 'PROJECTION_DASH', name: 'Projection Dash', cooldown: 200, icon: '🎞️' },
+    NAOYA_SKILL: { id: 'PROJECTION_DASH', name: 'Projection Step', cooldown: 200, icon: '🎞️' },
     LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
     GOJO_SKILL: { id: 'HOLLOW_PURPLE', name: 'Hollow Purple', cooldown: 220, icon: '🟣' },
-    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino Fire Arrow', cooldown: 210, icon: '🔥' }
+    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Crimson Fireball', cooldown: 210, icon: '🔥' }
 };
 
 export class Projectile {
-    constructor(ownerIndex, x, y, vx, vy, damage, color, radius = 8) {
+    constructor(ownerIndex, x, y, vx, vy, damage, color, radius = 8, type = 'standard') {
         this.ownerIndex = ownerIndex;
         this.x = x;
         this.y = y;
@@ -152,38 +152,156 @@ export class Projectile {
         this.radius = radius;
         this.life = 160;
         this.isReflected = false;
+        this.type = type; // 'standard', 'hollow_purple', 'fire_orb'
+        this.animTimer = 0;
     }
 
     update(dt = 1) {
         this.x += this.vx * dt;
         this.y += this.vy * dt;
         this.life -= dt;
+        this.animTimer += dt;
 
-        // Spark tail
-        if (Math.random() < 0.4) {
-            fx.spawnHitSparks(this.x, this.y, this.color, 1);
+        // Specialized particles per projectile type
+        if (this.type === 'hollow_purple') {
+            // Purple & blue/red unstable energy sparks
+            if (Math.random() < 0.8) {
+                const sparkColor = Math.random() < 0.5 ? '#a855f7' : (Math.random() < 0.5 ? '#3b82f6' : '#ef4444');
+                fx.spawnHitSparks(this.x, this.y, sparkColor, 2);
+            }
+        } else if (this.type === 'fire_orb') {
+            // Intense red/orange fireball flames
+            if (Math.random() < 0.8) {
+                const flameColor = Math.random() < 0.6 ? '#dc2626' : '#f97316';
+                fx.spawnHitSparks(this.x, this.y, flameColor, 2);
+            }
+        } else {
+            // Standard Spark tail
+            if (Math.random() < 0.4) {
+                fx.spawnHitSparks(this.x, this.y, this.color, 1);
+            }
         }
     }
 
     draw(ctx) {
         ctx.save();
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = 15;
-        ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = 3;
 
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+        if (this.type === 'hollow_purple') {
+            // GOJO: HOLLOW PURPLE ORB (Vivid purple sphere with swirling red/blue cosmic aura)
+            const r = this.radius;
+            const pulse = Math.sin(this.animTimer * 0.25) * 3;
 
-        // Projectile direction beam tail
-        const angle = Math.atan2(this.vy, this.vx);
-        ctx.beginPath();
-        ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x - Math.cos(angle) * 22, this.y - Math.sin(angle) * 22);
-        ctx.stroke();
+            // Outer purple aura glow
+            ctx.shadowColor = '#c084fc';
+            ctx.shadowBlur = 30;
+
+            // Outer Red & Blue orbiting energy rings (Convergence of Reversal Red & Lapse Blue)
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.animTimer * 0.15);
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)'; // Red
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, r + 7 + pulse, 0, Math.PI);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)'; // Blue
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, r + 7 + pulse, Math.PI, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Main Hollow Purple core
+            const purpleGrad = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, r + 4);
+            purpleGrad.addColorStop(0, '#ffffff');
+            purpleGrad.addColorStop(0.35, '#c084fc');
+            purpleGrad.addColorStop(0.7, '#7e22ce');
+            purpleGrad.addColorStop(1, '#3b0764');
+
+            ctx.fillStyle = purpleGrad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, r + 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Energy trailing particles
+            const angle = Math.atan2(this.vy, this.vx);
+            ctx.strokeStyle = '#a855f7';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 32, this.y - Math.sin(angle) * 32);
+            ctx.stroke();
+
+        } else if (this.type === 'fire_orb') {
+            // SUKUNA: CRIMSON FIRE ORB / FIREBALL (Rực lửa đỏ cam cuồn cuộn)
+            const r = this.radius;
+            const pulse = Math.sin(this.animTimer * 0.3) * 3;
+
+            ctx.shadowColor = '#ef4444';
+            ctx.shadowBlur = 35;
+
+            // Outer flame spikes
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.animTimer * 0.2);
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const fa = i * (Math.PI / 4);
+                const fr = r + (i % 2 === 0 ? 8 : 3) + pulse;
+                const fx = Math.cos(fa) * fr;
+                const fy = Math.sin(fa) * fr;
+                if (i === 0) ctx.moveTo(fx, fy);
+                else ctx.lineTo(fx, fy);
+            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.restore();
+
+            // Dense Crimson Flame Gradient Core
+            const fireGrad = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, r + 4);
+            fireGrad.addColorStop(0, '#ffffff');
+            fireGrad.addColorStop(0.3, '#fef08a');
+            fireGrad.addColorStop(0.6, '#f97316');
+            fireGrad.addColorStop(0.85, '#dc2626');
+            fireGrad.addColorStop(1, '#7f1d1d');
+
+            ctx.fillStyle = fireGrad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, r + 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Blazing flame tail
+            const angle = Math.atan2(this.vy, this.vx);
+            ctx.strokeStyle = '#ea580c';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 36, this.y - Math.sin(angle) * 36);
+            ctx.stroke();
+
+        } else {
+            // Standard Projectile
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Projectile direction beam tail
+            const angle = Math.atan2(this.vy, this.vx);
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 22, this.y - Math.sin(angle) * 22);
+            ctx.stroke();
+        }
 
         ctx.restore();
     }
