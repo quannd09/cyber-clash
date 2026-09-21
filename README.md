@@ -7,15 +7,7 @@
 ## 🌟 Key Features
 
 - **Zero-G Physics & Momentum:** Omni-directional thrusters, inertia drifting, and **Wall Bounce Boost** for high-speed counterattacks.
-- **8 Unique Fighters:**
-  1. **⚡ Tsukishiro Yanagi (500 HP • Melee):** Moon Spear • Flash Blink • Lightning Cannon.
-  2. **🌸 Verina Airgid (500 HP • Ranged):** Comet Blast • Photosynthesis • Life Blossom Storm.
-  3. **💼 Nicole Demara (500 HP • Ranged):** Briefcase Cannon • Vault Dash • Gravitational Black Hole.
-  4. **🎯 Trigger (500 HP • Ranged):** Purge Shot • Sniper Stance • Synchronized Firepower.
-  5. **🔮 Vivian Banshee (650 HP • Ranged):** Phantom Feathers • Blooming Ward • Feather Storm Harbinger.
-  6. **👊 Jotaro Kujo (500 HP • Melee):** ORA ORA ORA! • Star Finger • The World (Time Stop).
-  7. **🥋 Son Goku (500 HP • Melee):** Dragon Fist Ki • Instant Transmission • Super Kamehameha.
-  8. **🐞 Giorno Giovanna (500 HP • Melee):** MUDA MUDA MUDA! • Tree of Life • Return To Zero.
+- **Diverse Roster of Unique Fighters:** Multiple distinct anime & cyberpunk characters, featuring specialized combat archetypes (Melee & Ranged), unique skill kits, and devastating Ultimates.
 - **Deep Combat Mechanics:**
   - **Perfect Parry:** Block right before impact to stun melee foes or reflect plasma shots back at x1.3 speed.
   - **Blade Clash:** Simultaneous melee strikes nullify damage and trigger a concussive shockwave.
