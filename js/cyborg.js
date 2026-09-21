@@ -82,6 +82,8 @@ export class Cyborg {
         this.maxEnergy = 100;
         this.energy = 100;
         this.overdrive = 0; // 0 to 100
+        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.75x longer to charge overdrive
+        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.75) : 1.0;
         this.roundsWon = 0;
 
         // State Flags
@@ -158,9 +160,9 @@ export class Cyborg {
             this.energy = Math.min(this.maxEnergy, this.energy + 0.35 * dt);
         }
 
-        // Tự động hồi nộ chiêu cuối (Overdrive) theo thời gian (Vivian hồi nộ nhanh hơn)
+        // Tự động hồi nộ chiêu cuối (Overdrive) theo thời gian (Vivian hồi nộ nhanh hơn, Gojo/Sukuna chậm hơn 1.75 lần)
         if (!this.isUsingUltimate && this.overdrive < 100) {
-            const passiveGain = this.characterId === 'vivian' ? 0.13 : 0.08;
+            const passiveGain = (this.characterId === 'vivian' ? 0.13 : 0.08) * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + passiveGain * dt);
         }
 
@@ -375,7 +377,11 @@ export class Cyborg {
             vivian: SKILLS.VIVIAN_SKILL,
             jotaro: SKILLS.JOTARO_SKILL,
             goku: SKILLS.GOKU_SKILL,
-            giorno: SKILLS.GIORNO_SKILL
+            giorno: SKILLS.GIORNO_SKILL,
+            naoya: SKILLS.NAOYA_SKILL,
+            luffy: SKILLS.LUFFY_SKILL,
+            gojo: SKILLS.GOJO_SKILL,
+            sukuna: SKILLS.SUKUNA_SKILL
         };
         const skill = skillMap[this.characterId] || SKILLS.YANAGI_SKILL;
         this.skillCooldownTimer = skill.cooldown;
@@ -658,9 +664,9 @@ export class Cyborg {
 
     takeDamage(amount) {
         this.hp = Math.max(0, this.hp - amount);
-        // Hồi nộ chiêu cuối (Overdrive) khi bị đánh
+        // Hồi nộ chiêu cuối (Overdrive) khi bị đánh (Gojo/Sukuna nạp chậm hơn 1.75 lần)
         if (!this.isUsingUltimate && this.overdrive < 100) {
-            this.overdrive = Math.min(100, this.overdrive + amount * 0.22);
+            this.overdrive = Math.min(100, this.overdrive + (amount * 0.22) * this.overdriveChargeRate);
         }
     }
 

@@ -86,7 +86,7 @@ export const WEAPONS = {
     NAOYA: {
         id: 'NAOYA',
         name: '24 FPS Projection Fists',
-        attackDmg: 28,
+        attackDmg: 36,
         attackRange: 82,
         attackDuration: 16,
         attackCooldown: 18,
@@ -411,7 +411,7 @@ export class CombatResolver {
                 // TRICK #1: PERFECT PARRY WINDOW (first 10 frames = ~0.16s of shield activation)
                 if (defender.shieldTimer <= 10) {
                     // PERFECT PARRY SUCCESS!
-                    defender.overdrive = Math.min(100, defender.overdrive + 25);
+                    defender.overdrive = Math.min(100, defender.overdrive + 25 * (defender.overdriveChargeRate || 1.0));
                     attacker.applyStun(55); // 0.9s Stun on attacker!
                     physics.applyKnockback(attacker, -Math.cos(aimAngle), -Math.sin(aimAngle), 11);
 
@@ -433,7 +433,7 @@ export class CombatResolver {
 
             // Direct unshielded hit!
             defender.takeDamage(baseDmg);
-            attacker.overdrive = Math.min(100, attacker.overdrive + 14);
+            attacker.overdrive = Math.min(100, attacker.overdrive + 14 * (attacker.overdriveChargeRate || 1.0));
             defender.applyStun(20);
             physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 10);
 
@@ -441,7 +441,9 @@ export class CombatResolver {
             if (attacker.characterId === 'naoya') {
                 attacker.naoyaHitCount = (attacker.naoyaHitCount || 0) + 1;
                 if (attacker.naoyaHitCount >= 3) {
+                    defender.takeDamage(16); // Bonus crush damage on frame freeze
                     defender.applyFrameFreeze(50);
+                    fx.addText(defender.x, defender.y - 45, '💥 FRAME CRUSH! -16', '#a3e635', 24);
                     attacker.naoyaHitCount = 0;
                 } else {
                     fx.addText(attacker.x, attacker.y - 25, `🎞️ FRAME [${attacker.naoyaHitCount}/3]`, '#a3e635', 18);
@@ -475,7 +477,7 @@ export class CombatResolver {
                         proj.vx = -proj.vx * 1.35;
                         proj.vy = -proj.vy * 1.35;
                         proj.damage *= 1.3;
-                        defender.overdrive = Math.min(100, defender.overdrive + 20);
+                        defender.overdrive = Math.min(100, defender.overdrive + 20 * (defender.overdriveChargeRate || 1.0));
 
                         sound.playParry();
                         fx.spawnParryBurst(proj.x, proj.y, defender.color);
@@ -494,7 +496,7 @@ export class CombatResolver {
 
                 // Direct hit!
                 defender.takeDamage(proj.damage);
-                attacker.overdrive = Math.min(100, attacker.overdrive + 12);
+                attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
                 defender.applyStun(16);
                 physics.applyKnockback(defender, proj.vx * 0.3, proj.vy * 0.3, 6);
 
@@ -650,9 +652,9 @@ export class CombatResolver {
                     const strikeY = user.y;
                     const dist = Math.hypot(target.x - strikeX, target.y - strikeY);
                     if (dist < target.radius + 320) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame * 1.35); // Buffed damage for Bajrang Gun
                         target.applyStun(14);
-                        physics.applyKnockback(target, facingDir * 0.8, 1.2, 3.0); // Downward & forward slam
+                        physics.applyKnockback(target, facingDir * 0.8, 1.2, 3.2); // Downward & forward slam
                         fx.spawnHitSparks(target.x, target.y, '#ef4444', 6);
                         triggerScreenShake(5, 8);
                     }
