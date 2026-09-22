@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=72';
-import { fx } from './particles.js?v=72';
-import { physics } from './physics.js?v=72';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=72';
-import { input } from './input.js?v=72';
+import { sound } from './audio.js?v=73';
+import { fx } from './particles.js?v=73';
+import { physics } from './physics.js?v=73';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=73';
+import { input } from './input.js?v=73';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -219,7 +219,7 @@ export class Cyborg {
         }
 
         if (!this.isUsingUltimate && !isOpponentUltActive && this.overdrive < 100) {
-            const passiveGain = (this.characterId === 'vivian' ? 0.13 : 0.08) * this.overdriveChargeRate;
+            const passiveGain = 0.08 * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + passiveGain * dt);
         }
 

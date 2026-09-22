@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=72';
-import { fx } from './particles.js?v=72';
-import { physics } from './physics.js?v=72';
+import { sound } from './audio.js?v=73';
+import { fx } from './particles.js?v=73';
+import { physics } from './physics.js?v=73';
 
 export const WEAPONS = {
     YANAGI: {
@@ -130,7 +130,7 @@ export const SKILLS = {
     VERINA_SKILL: { id: 'PHOTOSYNTHESIS', name: 'Photosynthesis', cooldown: 210, icon: '🌸' },
     NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Sugar Slide', cooldown: 190, icon: '💼' },
     TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Sniper Stance', cooldown: 230, icon: '🎯' },
-    VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Abloom Burst', cooldown: 150, icon: '🔮' },
+    VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Abloom Burst', cooldown: 210, icon: '🔮' },
     JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 200, icon: '👊' },
     GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Instant Transmission', cooldown: 210, icon: '🥋' },
     GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Tree of Life', cooldown: 200, icon: '🐞' },
