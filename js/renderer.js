@@ -1,6 +1,6 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=69';
-import { assets } from './assets.js?v=69';
+import { WEAPONS } from './combat.js?v=71';
+import { assets } from './assets.js?v=71';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -836,47 +836,45 @@ export class GameRenderer {
                     ctx.restore();
                 }
             } else if (c.characterId === 'naoya') {
-                // NAOYA: MACH 3 PROJECTION SORCERY MULTI-DASH BARRAGE
+                // NAOYA: MACH 3 PROJECTION SORCERY MULTI-DASH BARRAGE (10 FPS OPTIMIZED - ZERO LAG)
                 const zoneR = 340;
                 ctx.save();
                 ctx.strokeStyle = 'rgba(163, 230, 53, 0.45)';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2.5;
                 ctx.setLineDash([12, 8]);
                 ctx.beginPath();
                 ctx.arc(0, 0, zoneR, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Mach 3 Supersonic Zigzag Dash Lines
-                ctx.strokeStyle = '#a3e635';
-                ctx.shadowColor = '#bef264';
-                ctx.shadowBlur = 25;
-                ctx.lineWidth = 4;
+                // Mach 3 Supersonic Zigzag Dash Lines (Crisp neon, reduced path overhead)
+                ctx.strokeStyle = '#bef264';
+                ctx.lineWidth = 3;
                 ctx.beginPath();
-                for (let i = 0; i < 8; i++) {
-                    const a1 = (c.ultimateTimer * 0.4 + i * (Math.PI / 4)) % (Math.PI * 2);
-                    const r1 = 80 + (i % 3) * 80;
+                for (let i = 0; i < 5; i++) {
+                    const a1 = (c.ultimateTimer * 0.35 + i * (Math.PI * 2 / 5)) % (Math.PI * 2);
+                    const r1 = 80 + (i % 3) * 70;
                     const x1 = Math.cos(a1) * r1;
                     const y1 = Math.sin(a1) * r1;
-                    const a2 = a1 + 2.2;
-                    const x2 = Math.cos(a2) * (r1 + 50);
-                    const y2 = Math.sin(a2) * (r1 + 50);
+                    const a2 = a1 + 2.0;
+                    const x2 = Math.cos(a2) * (r1 + 45);
+                    const y2 = Math.sin(a2) * (r1 + 45);
                     ctx.moveTo(x1, y1);
                     ctx.lineTo(x2, y2);
                 }
                 ctx.stroke();
 
-                // Celluloid film frame afterimages scattered across zone
+                // Celluloid film frame afterimages scattered across zone (10 FPS)
                 for (let i = 0; i < 4; i++) {
-                    const fa = c.ultimateTimer * 0.2 + i * 1.57;
+                    const fa = c.ultimateTimer * 0.15 + i * 1.57;
                     const fx = Math.cos(fa) * 160;
                     const fy = Math.sin(fa) * 110;
-                    ctx.strokeStyle = 'rgba(163, 230, 53, 0.7)';
-                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgba(163, 230, 53, 0.65)';
+                    ctx.lineWidth = 1.5;
                     ctx.strokeRect(fx - 20, fy - 25, 40, 50);
                     ctx.fillStyle = '#a3e635';
                     ctx.font = '7px Orbitron, sans-serif';
-                    ctx.fillText('24 FPS', fx - 16, fy - 14);
+                    ctx.fillText('10 FPS', fx - 16, fy - 14);
                 }
                 ctx.restore();
 

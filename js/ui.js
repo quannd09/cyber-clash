@@ -1,6 +1,6 @@
-import { assets } from './assets.js?v=69';
-import { network } from './network.js?v=69';
-import { input } from './input.js?v=69';
+import { assets } from './assets.js?v=71';
+import { network } from './network.js?v=71';
+import { input } from './input.js?v=71';
 
 const SKILL_DATA = {
     yanagi: {
@@ -22,13 +22,13 @@ const SKILL_DATA = {
         color: '#34d399',
         p1: [
             { key: 'Left Click / F (Ranged)', name: 'Comet Blast', desc: '' },
-            { key: 'R (Skill)', name: 'Photosynthesis', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Life Blossom Storm', desc: '' }
+            { key: 'R (Skill)', name: 'Photosynthesis (Hồi 50 HP)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Life Blossom Storm (Không hồi máu)', desc: '' }
         ],
         p2: [
             { key: 'J (Ranged)', name: 'Comet Blast', desc: '' },
-            { key: 'I (Skill)', name: 'Photosynthesis', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Life Blossom Storm', desc: '' }
+            { key: 'I (Skill)', name: 'Photosynthesis (Hồi 50 HP)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Life Blossom Storm (Không hồi máu)', desc: '' }
         ]
     },
     nicole: {
@@ -92,12 +92,12 @@ const SKILL_DATA = {
         color: '#fbbf24',
         p1: [
             { key: 'Left Click / F (Melee)', name: 'Dragon Fist Ki', desc: '' },
-            { key: 'R (Skill)', name: 'Instant Transmission', desc: '' },
+            { key: 'R (Skill)', name: 'Instant Transmission (1.5x Dame)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ],
         p2: [
             { key: 'J (Melee)', name: 'Dragon Fist Ki', desc: '' },
-            { key: 'I (Skill)', name: 'Instant Transmission', desc: '' },
+            { key: 'I (Skill)', name: 'Instant Transmission (1.5x Dame)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ]
     },
@@ -121,12 +121,12 @@ const SKILL_DATA = {
         p1: [
             { key: 'Left Click / F (Melee)', name: '24 FPS Projection Fists', desc: '' },
             { key: 'R (Skill)', name: 'Projection Step', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Mach 3 Barrage', desc: '' }
+            { key: 'Space (Ultimate)', name: '10 FPS Mach 3 Barrage (x1.25 Dame)', desc: '' }
         ],
         p2: [
             { key: 'J (Melee)', name: '24 FPS Projection Fists', desc: '' },
             { key: 'I (Skill)', name: 'Projection Step', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage', desc: '' }
+            { key: 'Enter (Ultimate)', name: '10 FPS Mach 3 Barrage (x1.25 Dame)', desc: '' }
         ]
     },
     luffy: {

@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=69';
-import { fx } from './particles.js?v=69';
-import { physics } from './physics.js?v=69';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=69';
-import { input } from './input.js?v=69';
+import { sound } from './audio.js?v=71';
+import { fx } from './particles.js?v=71';
+import { physics } from './physics.js?v=71';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=71';
+import { input } from './input.js?v=71';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -209,6 +209,18 @@ export class Cyborg {
         // Regenerate Energy slowly
         if (!this.isShielding && this.energy < this.maxEnergy) {
             this.energy = Math.min(this.maxEnergy, this.energy + 0.35 * dt);
+        }
+
+        // Tự động hồi nộ chiêu cuối (Overdrive) theo thời gian (khi đứng im, né chạy, di chuyển)
+        let isOpponentUltActive = false;
+        if (typeof window !== 'undefined' && window.game) {
+            const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
+            if (opp && opp.isUsingUltimate) isOpponentUltActive = true;
+        }
+
+        if (!this.isUsingUltimate && !isOpponentUltActive && this.overdrive < 100) {
+            const passiveGain = (this.characterId === 'vivian' ? 0.13 : 0.08) * this.overdriveChargeRate;
+            this.overdrive = Math.min(100, this.overdrive + passiveGain * dt);
         }
 
         // Energy drain if shielding
@@ -474,9 +486,10 @@ export class Cyborg {
                 fx.addText(opponent.x, opponent.y - 35, `⚡ THUNDER CLAP! -${Math.round(skillDmg)}`, this.color, 22);
                 sound.playHit(true);
             }
-        } else if (skill.id === 'EMP_BLAST') {
+        } else if (skill.id === 'PHOTOSYNTHESIS' || skill.id === 'EMP_BLAST') {
             sound.playEMP();
             fx.spawnClashShockwave(this.x, this.y);
+            // Quang Hợp (Photosynthesis): Hồi 50 HP & Sóng đẩy bảo hộ
             this.hp = Math.min(this.maxHp, this.hp + 50);
             fx.addText(this.x, this.y - 30, '+50 HP HEAL!', '#34d399', 24);
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
@@ -573,8 +586,9 @@ export class Cyborg {
             this.aimAngle = Math.atan2(opponent.y - this.y, opponent.x - this.x);
             fx.spawnParryBurst(this.x, this.y, '#fbbf24');
             fx.addText(this.x, this.y - 35, '⚡ INSTANT TRANSMISSION!', '#fbbf24', 24);
-            // Gut punch gây 2x sát thương đòn thường
-            opponent.takeDamage(skillDmg);
+            // Gut punch gây 1.5x sát thương đòn thường (giảm từ 2x)
+            const gokuSkillDmg = normalDmg * 1.5;
+            opponent.takeDamage(gokuSkillDmg);
             opponent.applyStun(30);
             physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 12);
             sound.playHit(true);
@@ -708,6 +722,9 @@ export class Cyborg {
         this.ultimateTimer = 0;
         this.isAttacking = false;
         this.isShielding = false;
+        this.isUsingSkill = false;
+        this.skillActionTimer = 0;
+        this.lastNaoyaHitIndex = -1;
 
         sound.playUltimate();
         fx.spawnClashShockwave(this.x, this.y);
@@ -788,7 +805,7 @@ export class Cyborg {
     applyFrameFreeze(frames = 45) {
         this.applyStun(frames);
         this.frameFrozenTimer = frames;
-        fx.addText(this.x, this.y - 45, '🎞️ 24 FPS FRAME FREEZE! 🎞️', '#a3e635', 24, 50);
+        fx.addText(this.x, this.y - 45, '🎞️ 10 FPS FRAME FREEZE! 🎞️', '#a3e635', 24, 45);
         sound.playHit(true);
     }
 }
