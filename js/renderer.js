@@ -1,6 +1,6 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=73';
-import { assets } from './assets.js?v=73';
+import { WEAPONS } from './combat.js?v=74';
+import { assets } from './assets.js?v=74';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -1067,6 +1067,55 @@ export class GameRenderer {
 
                 ctx.restore();
             }
+
+            ctx.restore();
+        }
+
+        // 7. Overhead Player Indicator Tag (P1 / P2)
+        if (!c.isDead && c.hp > 0) {
+            ctx.save();
+            // Counteract facingDir so text and badge are never flipped horizontally
+            ctx.scale(facingDir, 1);
+
+            const isP1 = c.index === 0;
+            const tagText = isP1 ? 'P1' : 'P2';
+            const tagColor = isP1 ? '#00f0ff' : '#f43f5e';
+            const tagY = -94;
+
+            ctx.shadowColor = tagColor;
+            ctx.shadowBlur = 8;
+
+            // Badge pill background
+            const pillW = 28;
+            const pillH = 14;
+            ctx.fillStyle = 'rgba(11, 15, 25, 0.88)';
+            ctx.strokeStyle = tagColor;
+            ctx.lineWidth = 1.2;
+
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(-pillW / 2, tagY - pillH / 2, pillW, pillH, 4);
+            } else {
+                ctx.rect(-pillW / 2, tagY - pillH / 2, pillW, pillH);
+            }
+            ctx.fill();
+            ctx.stroke();
+
+            // Tiny downward pointing indicator triangle
+            ctx.fillStyle = tagColor;
+            ctx.beginPath();
+            ctx.moveTo(-3.5, tagY + pillH / 2);
+            ctx.lineTo(3.5, tagY + pillH / 2);
+            ctx.lineTo(0, tagY + pillH / 2 + 3.5);
+            ctx.closePath();
+            ctx.fill();
+
+            // P1 / P2 Text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = "900 9px 'Orbitron', sans-serif";
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(tagText, 0, tagY + 0.5);
 
             ctx.restore();
         }
