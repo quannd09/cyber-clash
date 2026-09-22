@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=75">
+    <link rel="stylesheet" href="style.css?v=80">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -25,7 +25,6 @@
                 <button id="mode-bot-tab" class="mode-tab">VS BOT</button>
                 <button id="mode-online1-tab" class="mode-tab mode-online1">🌐 ONLINE 1</button>
                 <button id="mode-online2-tab" class="mode-tab mode-online2">📡 ONLINE 2</button>
-                <a href="cyber_clash_test.html" class="mode-tab" style="text-decoration: none; display: flex; align-items: center; gap: 6px; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe;">🤖 BOT VS BOT (TEST)</a>
             </div>
 
             <!-- BOT DIFFICULTY SELECTOR -->
@@ -305,7 +304,7 @@
             <h1 id="winner-title" class="victory-title">PLAYER 1 DOMINATES!</h1>
             <div class="victory-btn-group">
                 <button id="rematch-btn" class="rematch-btn">⚔️ REMATCH</button>
-                <button id="btn-victory-lobby" class="victory-exit-btn">🏠 THOÁT RA MENU CHÍNH</button>
+                <button id="btn-victory-lobby" class="victory-exit-btn">🏠 EXIT TO MAIN MENU</button>
             </div>
         </div>
 
@@ -356,8 +355,8 @@
                         </tr>
                         <tr>
                             <td><strong>Ultimate Overdrive</strong></td>
-                            <td><code>Space</code> (Cần 100% Overdrive)</td>
-                            <td><code>Enter</code> or <code>O</code> (Cần 100% Overdrive)</td>
+                            <td><code>Space</code> (Requires 100% Overdrive)</td>
+                            <td><code>Enter</code> or <code>O</code> (Requires 100% Overdrive)</td>
                             <td>Right Trigger (RT / R1)</td>
                         </tr>
                     </tbody>
@@ -404,6 +403,26 @@
                 <div style="display: flex; gap: 12px; margin-top: 18px;">
                     <button id="btn-reset-keybinds" class="leave-btn" style="flex: 1; padding: 10px; font-size: 13px;">🔄 RESET DEFAULTS</button>
                     <button id="btn-close-keybinds" class="ready-btn" style="flex: 1; padding: 10px; font-size: 13px;" onclick="document.getElementById('keybinds-modal').classList.add('hidden')">✔️ DONE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECRET TERMINAL MODAL (PRIVATE: ACCESSED VIA CTRL+SHIFT+CAPSLOCK ONLY) -->
+        <div id="secret-code-modal" class="overlay hidden" onclick="if(event.target === this) this.classList.add('hidden')">
+            <div class="modal-box" style="max-width: 440px; text-align: center; border: 2px solid #eab308; box-shadow: 0 0 35px rgba(234, 179, 8, 0.45); background: #090d16; padding: 22px 24px; position: relative; border-radius: 12px;">
+                <button class="modal-close-btn" id="btn-close-secret" title="Close" style="position: absolute; top: 10px; right: 12px; background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+                <div style="font-size: 26px; margin-bottom: 6px;">⚡ 🔒 ⚡</div>
+                <h2 style="font-family: 'Orbitron', monospace; color: #facc15; font-size: 18px; letter-spacing: 2px; margin-bottom: 6px; font-weight: 900;">RESTRICTED ACCESS TERMINAL</h2>
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 16px; font-family: monospace;">
+                    ENTER PROTOCOL AUTHORIZATION KEY:
+                </p>
+                <div style="margin-bottom: 14px;">
+                    <input type="text" id="input-secret-key" class="room-input" placeholder="ACCESS KEY..." maxlength="20" autocomplete="off" spellcheck="false" style="text-align: center; font-family: 'Orbitron', monospace; font-size: 16px; letter-spacing: 3px; border-color: #eab308; color: #fef08a; width: 100%; box-sizing: border-box; background: #040711;">
+                </div>
+                <div id="secret-terminal-msg" style="min-height: 22px; font-family: monospace; font-size: 12px; font-weight: 700; margin-bottom: 14px; line-height: 1.4;"></div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="btn-submit-secret" class="ready-btn" style="flex: 1; background: #eab308; color: #000; font-weight: 900; border-color: #facc15; box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); cursor: pointer;">AUTHORIZE</button>
+                    <button id="btn-cancel-secret" class="leave-btn" style="flex: 1; cursor: pointer;">ABORT</button>
                 </div>
             </div>
         </div>
@@ -476,6 +495,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=75"></script>
+    <script type="module" src="js/main.js?v=80"></script>
 </body>
 </html>

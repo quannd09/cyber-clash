@@ -135,7 +135,7 @@ wss.on('connection', (ws, req) => {
             case 'CREATE_ROOM': {
                 const code = (packet.roomCode || '').toUpperCase().trim();
                 if (!code) {
-                    safeSend(ws, { type: 'ERROR', message: 'Mã phòng không hợp lệ!' });
+                    safeSend(ws, { type: 'ERROR', message: 'Invalid room code!' });
                     return;
                 }
 
@@ -143,7 +143,7 @@ wss.on('connection', (ws, req) => {
                 if (rooms.has(code)) {
                     const existing = rooms.get(code);
                     if (existing.host && existing.host !== ws) {
-                        safeSend(existing.host, { type: 'ERROR', message: 'Phòng đã được tạo lại từ thiết bị khác!' });
+                        safeSend(existing.host, { type: 'ERROR', message: 'Room recreated from another device!' });
                     }
                 }
 
@@ -164,13 +164,13 @@ wss.on('connection', (ws, req) => {
             case 'JOIN_ROOM': {
                 const code = (packet.roomCode || '').toUpperCase().trim();
                 if (!code || !rooms.has(code)) {
-                    safeSend(ws, { type: 'ERROR', message: `Phòng [${code}] không tồn tại hoặc đã hết hạn!` });
+                    safeSend(ws, { type: 'ERROR', message: `Room [${code}] does not exist or has expired!` });
                     return;
                 }
 
                 const room = rooms.get(code);
                 if (room.client && room.client !== ws && room.client.readyState === WebSocket.OPEN) {
-                    safeSend(ws, { type: 'ERROR', message: `Phòng [${code}] đã đủ 2 người chơi!` });
+                    safeSend(ws, { type: 'ERROR', message: `Room [${code}] is already full!` });
                     return;
                 }
 
@@ -235,14 +235,14 @@ function cleanupClient(ws) {
     if (ws.role === 'HOST') {
         // Host left -> inform client and destroy room
         if (room.client && room.client.readyState === WebSocket.OPEN) {
-            safeSend(room.client, { type: 'OPPONENT_LEFT', message: 'Chủ phòng (Host) đã thoát!' });
+            safeSend(room.client, { type: 'OPPONENT_LEFT', message: 'Host has left the room!' });
         }
         rooms.delete(code);
         console.log(`[Room Closed] Host left room ${code}`);
     } else if (ws.role === 'CLIENT') {
         // Client left -> inform host and reset client slot
         if (room.host && room.host.readyState === WebSocket.OPEN) {
-            safeSend(room.host, { type: 'OPPONENT_LEFT', message: 'Đối thủ đã ngắt kết nối!' });
+            safeSend(room.host, { type: 'OPPONENT_LEFT', message: 'Opponent disconnected!' });
         }
         room.client = null;
         console.log(`[Client Disconnected] Room ${code} waiting for new player`);

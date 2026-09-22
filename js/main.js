@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=75';
-import { input } from './input.js?v=75';
-import { fx } from './particles.js?v=75';
-import { combat, Projectile } from './combat.js?v=75';
-import { Cyborg } from './cyborg.js?v=75';
-import { GameRenderer } from './renderer.js?v=75';
-import { UIManager } from './ui.js?v=75';
-import { network } from './network.js?v=75';
-import { BotController } from './bot.js?v=75';
+import { sound } from './audio.js?v=80';
+import { input } from './input.js?v=80';
+import { fx } from './particles.js?v=80';
+import { combat, Projectile } from './combat.js?v=80';
+import { Cyborg } from './cyborg.js?v=80';
+import { GameRenderer } from './renderer.js?v=80';
+import { UIManager } from './ui.js?v=80';
+import { network } from './network.js?v=80';
+import { BotController } from './bot.js?v=80';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -272,7 +272,7 @@ class CyberClashGame {
     syncFullscreenUI(active) {
         const fsBtn = document.getElementById('fullscreen-toggle-btn');
         if (fsBtn) {
-            fsBtn.textContent = active ? '🗗 Thu nhỏ' : '⛶ Fullscreen';
+            fsBtn.textContent = active ? '🗗 Windowed' : '⛶ Fullscreen';
         }
     }
 
@@ -304,7 +304,9 @@ class CyberClashGame {
             naoya: "NAOYA ZEN'IN",
             luffy: 'MONKEY D. LUFFY',
             gojo: 'SATORU GOJO',
-            sukuna: 'RYOMEN SUKUNA'
+            sukuna: 'RYOMEN SUKUNA',
+            saitama: 'SAITAMA',
+            tst26: 'TST-26'
         };
         const charColors = {
             yanagi: '#a78bfa',
@@ -318,7 +320,9 @@ class CyberClashGame {
             naoya: '#a3e635',
             luffy: '#ef4444',
             gojo: '#0284c7',
-            sukuna: '#f43f5e'
+            sukuna: '#f43f5e',
+            saitama: '#eab308',
+            tst26: '#ec4899'
         };
 
         const p1Name = charNames[p1Char] || 'TSUKISHIRO YANAGI';

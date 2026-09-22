@@ -122,6 +122,26 @@ export const WEAPONS = {
         attackCooldown: 21,
         isRanged: false,
         icon: '⛩️'
+    },
+    SAITAMA: {
+        id: 'SAITAMA',
+        name: 'Serious Combat Fist',
+        attackDmg: 45,
+        attackRange: 105,
+        attackDuration: 16,
+        attackCooldown: 18,
+        isRanged: false,
+        icon: '🥊'
+    },
+    TST26: {
+        id: 'TST26',
+        name: 'Maid Precision Protocol',
+        attackDmg: 38,
+        attackRange: 560,
+        attackDuration: 17,
+        attackCooldown: 19,
+        isRanged: true,
+        icon: '🎀'
     }
 };
 
@@ -137,7 +157,9 @@ export const SKILLS = {
     NAOYA_SKILL: { id: 'PROJECTION_DASH', name: 'Projection Step', cooldown: 200, icon: '🎞️' },
     LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
     GOJO_SKILL: { id: 'LAPSE_BLUE', name: 'Lapse Blue', cooldown: 210, icon: '🌀' },
-    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' }
+    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' },
+    SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 170, icon: '🥊' },
+    TST26_SKILL: { id: 'MAID_PURGE', name: 'Absolute Sanitization Sweep', cooldown: 175, icon: '🎀' }
 };
 
 export class Projectile {
@@ -234,7 +256,7 @@ export class Projectile {
             ctx.stroke();
 
         } else if (this.type === 'fire_orb') {
-            // SUKUNA: CRIMSON FIRE ORB / FIREBALL (Rực lửa đỏ cam cuồn cuộn)
+            // SUKUNA: CRIMSON FIRE ORB / FIREBALL (Swirling crimson flame sphere)
             const r = this.radius;
             const pulse = Math.sin(this.animTimer * 0.3) * 3;
 
@@ -324,7 +346,7 @@ export class CombatResolver {
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
 
-            // Satoru Gojo: Infinity Barrier (Vô Hạn Trụ) - Làm chậm đạn đạo của đối thủ trong phạm vi 150px
+            // Satoru Gojo: Infinity Barrier - Slows opponent projectiles within 150px
             if (p1 && p2) {
                 const target = (p.ownerIndex === 0) ? p2 : p1;
                 if (target && target.characterId === 'gojo' && !target.isStunned && !target.isDead) {
@@ -495,7 +517,7 @@ export class CombatResolver {
                     defender.takeDamage(16);
                     defender.bleedTimer = 45;
                     defender.applyStun(16);
-                    fx.addText(defender.x, defender.y - 45, '🩸 CLEAVE (BÁT TRẢM)! -16', '#f43f5e', 24);
+                    fx.addText(defender.x, defender.y - 45, '🩸 CLEAVE! -16', '#f43f5e', 24);
                     fx.spawnHitSparks(defender.x, defender.y, '#f43f5e', 20);
                     attacker.signatureHits = 0;
                 } else {
@@ -506,7 +528,7 @@ export class CombatResolver {
                     defender.takeDamage(15);
                     attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
                     defender.applyStun(16);
-                    fx.addText(defender.x, defender.y - 45, '⚡ HẮC THIỂM (BLACK FLASH)! -15', '#0284c7', 24);
+                    fx.addText(defender.x, defender.y - 45, '⚡ BLACK FLASH! -15', '#0284c7', 24);
                     fx.spawnHitSparks(defender.x, defender.y, '#ef4444', 22);
                     attacker.signatureHits = 0;
                 } else {
@@ -544,6 +566,29 @@ export class CombatResolver {
                 } else {
                     fx.addText(attacker.x, attacker.y - 25, `🐞 MUDA [${hitCount}/3]`, '#facc15', 18);
                 }
+            } else if (attacker.characterId === 'saitama') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(28);
+                    defender.applyStun(22);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 22);
+                    fx.addText(defender.x, defender.y - 45, '💥 CONSECUTIVE NORMAL PUNCHES! -28', '#eab308', 26);
+                    fx.spawnHitSparks(defender.x, defender.y, '#eab308', 28);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🥊 SERIOUS [${hitCount}/3]`, '#eab308', 18);
+                }
+            } else if (attacker.characterId === 'tst26') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(24);
+                    defender.applyStun(18);
+                    attacker.hp = Math.min(attacker.maxHp, attacker.hp + 20);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 18);
+                    fx.addText(defender.x, defender.y - 45, '🎀 MAID ORDER EXECUTE! -24', '#ec4899', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#ec4899', 24);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🎀 ORDER [${hitCount}/3]`, '#ec4899', 18);
+                }
             }
 
             sound.playHit(true);
@@ -558,7 +603,7 @@ export class CombatResolver {
             const defender = proj.ownerIndex === 0 ? p2 : p1;
             const attacker = proj.ownerIndex === 0 ? p1 : p2;
 
-            // Hitbox dạng hình con nhộng (Capsule) bao phủ toàn bộ cơ thể nhân vật từ đầu tới chân
+            // Capsule hitbox covering entire character body from head to feet
             const targetY = Math.max(defender.y - 55, Math.min(defender.y + 30, proj.y));
             const dist = Math.hypot(defender.x - proj.x, targetY - proj.y);
 
@@ -657,21 +702,21 @@ export class CombatResolver {
             if (user.isUsingUltimate && user.ultimateTimer > 15 && user.ultimateTimer < 65) {
                 const userWeapon = WEAPONS[user.characterId.toUpperCase()];
                 const normalDmg = userWeapon ? userWeapon.attackDmg : 30;
-                // Dame ulti = 3.5x dame 1 đòn đánh thường (chia đều qua 50 frame hoạt động)
+                // Ultimate damage = 3.5x normal attack damage (distributed over 50 active frames)
                 const ultDmgPerFrame = (normalDmg * 3.5) / 50;
 
                 if (user.characterId === 'yanagi') {
-                    // YANAGI: PHÁO LÔI QUANG (LIGHTNING CANNON BEAM)
+                    // YANAGI: LIGHTNING CANNON BEAM
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1500;
-                    const halfThickness = 28; // Khớp chính xác với bề rộng tia lôi quang hiển thị
+                    const halfThickness = 28; // Matches visual lightning beam width
 
-                    // Chỉ dính dame khi đối thủ thực sự nằm trong luồng tia lôi quang phía trước:
-                    // 1. Phải ở phía trước nòng pháo (từ 40px phía trước trở đi, không dính dame khi đứng sau lưng)
-                    // 2. Nằm trong chiều dài tia (<= 1500px)
-                    // 3. Khoảng cách vuông góc tới tia phải nhỏ hơn bán kính tia + bán kính nhân vật
+                    // Damage applies only when opponent is inside forward beam trajectory:
+                    // 1. Must be in front of barrel (>= 40px forward)
+                    // 2. Within beam length (<= 1500px)
+                    // 3. Perpendicular distance within beam radius + target radius
                     if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(8);
@@ -692,12 +737,12 @@ export class CombatResolver {
                         triggerScreenShake(3, 5);
                     }
                 } else if (user.characterId === 'nicole') {
-                    // NICOLE: GRAVITATIONAL SINGULARITY (HỐ ĐEN TRỌNG LỰC)
+                    // NICOLE: GRAVITATIONAL SINGULARITY (BLACK HOLE)
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const hX = user.x + facingDir * 320;
                     const hY = user.y;
                     const dist = Math.hypot(target.x - hX, target.y - hY);
-                    // Bán kính hút hố đen chuẩn xác theo vòng xoáy đĩa bồi tụ (120px)
+                    // Singularity gravitational pull radius (120px accretion disk)
                     if (dist < target.radius + 95) {
                         // Sucking pull force towards black hole
                         const pullAngle = Math.atan2(hY - target.y, hX - target.x);
@@ -713,7 +758,7 @@ export class CombatResolver {
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1600;
-                    const halfThickness = 18; // Bán kính đường đạn xuyên phá chuẩn xác
+                    const halfThickness = 18; // Precise piercing railgun radius
 
                     if (forwardDist >= 35 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
@@ -723,7 +768,7 @@ export class CombatResolver {
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'vivian') {
-                    // VIVIAN: BANSHEE BLOOM (BÃO LÔNG VŨ ETHER) - Tăng phạm vi tác dụng lên 500px
+                    // VIVIAN: BANSHEE BLOOM (ETHER FEATHER STORM) - 500px effect range
                     const stormRadius = 460;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + stormRadius) {
@@ -753,9 +798,9 @@ export class CombatResolver {
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1500;
-                    const halfThickness = 38; // Bán kính chuẩn cột sóng Kamehameha hoàng kim (bề rộng 76px)
+                    const halfThickness = 38; // Radius of golden Kamehameha beam (76px width)
 
-                    // Chỉ dính dame khi đối thủ thực sự nằm trong luồng sóng Kamehameha phía trước
+                    // Damage only when opponent is inside forward Kamehameha wave
                     if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(10);
@@ -777,16 +822,16 @@ export class CombatResolver {
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'naoya') {
-                    // NAOYA: TỐC ĐỘ MACH 3 LIÊN HOÀN TRẢM (PROJECTION SORCERY 10 FPS)
-                    // 1. Tăng dame x1.25 lần: tổng dame = (normalDmg * 3.5) * 1.25
-                    // 2. Giảm lag xuống 10 FPS: chỉ đánh theo nhịp 10 FPS (1 hit mỗi 5 frames = 10 hits trọn vẹn trong 50 frames ult)
+                    // NAOYA: MACH 3 CONSECUTIVE STRIKES (PROJECTION SORCERY 10 FPS)
+                    // 1. 1.25x damage multiplier: total damage = (normalDmg * 3.5) * 1.25
+                    // 2. 10 FPS cadence: 1 hit every 5 frames = 10 full hits across 50 frames
                     const barrageRadius = 350;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
-                    const hitIndex = Math.floor((user.ultimateTimer - 15) / 5); // 0 đến 9 tương ứng 10 hits
+                    const hitIndex = Math.floor((user.ultimateTimer - 15) / 5); // 0 to 9 corresponds to 10 hits
                     if (hitIndex >= 0 && hitIndex < 10 && hitIndex > (user.lastNaoyaHitIndex ?? -1)) {
                         user.lastNaoyaHitIndex = hitIndex;
                         if (dist < target.radius + barrageRadius) {
-                            // Chia đều tổng dame x1.25 qua 10 hits -> nhận trọn vẹn 100% dame x1.25
+                            // Distribute 1.25x damage equally across 10 hits
                             const totalNaoyaUltDmg = (normalDmg * 3.5) * 1.25;
                             const perHitDmg = totalNaoyaUltDmg / 10;
                             target.takeDamage(perHitDmg, true, user.x, user.y);
@@ -803,7 +848,7 @@ export class CombatResolver {
                         }
                     }
                 } else if (user.characterId === 'luffy') {
-                    // LUFFY: GOMU GOMU NO BAJRANG GUN (NẮM ĐẤM HAKI HÓA THẦN NIKA KHỔNG LỒ)
+                    // LUFFY: GOMU GOMU NO BAJRANG GUN (GIANT NIKA HAKI FIST)
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const strikeX = user.x + facingDir * 180;
                     const strikeY = user.y;
@@ -816,7 +861,7 @@ export class CombatResolver {
                         triggerScreenShake(5, 8);
                     }
                 } else if (user.characterId === 'gojo') {
-                    // GOJO: BÀNH TRƯỚNG LÃNH ĐỊA - VÔ LƯỢNG KHÔNG XỨ (UNLIMITED VOID)
+                    // GOJO: DOMAIN EXPANSION - UNLIMITED VOID
                     const domainRadius = 450;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + domainRadius) {
@@ -828,7 +873,7 @@ export class CombatResolver {
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'sukuna') {
-                    // SUKUNA: BÀNH TRƯỚNG LÃNH ĐỊA - PHỤC MA NGỰ KHẢM TỬ (MALEVOLENT SHRINE)
+                    // SUKUNA: DOMAIN EXPANSION - MALEVOLENT SHRINE
                     const shrineRadius = 420;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + shrineRadius) {
@@ -838,6 +883,32 @@ export class CombatResolver {
                         physics.applyKnockback(target, Math.cos(sliceAngle), Math.sin(sliceAngle), 1.8);
                         fx.spawnHitSparks(target.x, target.y, '#f43f5e', 6);
                         triggerScreenShake(4, 7);
+                    }
+                } else if (user.characterId === 'saitama') {
+                    // SAITAMA: SERIOUS PUNCH - DEATH IMPACT
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const forwardDist = (target.x - user.x) * facingDir;
+                    const verticalDist = Math.abs(target.y - user.y);
+                    const beamLen = 1600;
+                    const halfThickness = 55;
+                    if (forwardDist >= 30 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
+                        target.takeDamage(ultDmgPerFrame * 1.45, true, user.x, user.y);
+                        target.applyStun(18);
+                        physics.applyKnockback(target, facingDir * 1.8, -0.6, 4.5);
+                        fx.spawnHitSparks(target.x, target.y, '#eab308', 8);
+                        triggerScreenShake(7, 12);
+                    }
+                } else if (user.characterId === 'tst26') {
+                    // TST-26: MAXIMUM MAID SANITIZATION VORTEX
+                    const purgeRadius = 480;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + purgeRadius) {
+                        target.takeDamage(ultDmgPerFrame * 1.3, true, user.x, user.y);
+                        target.applyStun(14);
+                        const angle = Math.atan2(target.y - user.y, target.x - user.x);
+                        physics.applyKnockback(target, Math.cos(angle), Math.sin(angle), 2.5);
+                        fx.spawnHitSparks(target.x, target.y, '#ec4899', 7);
+                        triggerScreenShake(4, 8);
                     }
                 }
             }

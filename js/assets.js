@@ -18,7 +18,7 @@ export class AssetManager {
         this.loadImage('p1', `assets/p1.png?v=${v}`);
         this.loadImage('p2', `assets/p2.png?v=${v}`);
 
-        const allChars = ['yanagi', 'velina', 'nicole', 'trigger', 'vivian', 'jotaro', 'goku', 'giorno', 'naoya', 'luffy', 'gojo', 'sukuna'];
+        const allChars = ['yanagi', 'velina', 'nicole', 'trigger', 'vivian', 'jotaro', 'goku', 'giorno', 'naoya', 'luffy', 'gojo', 'sukuna', 'saitama', 'tst26'];
         allChars.forEach(char => {
             this.loadImage(`${char}_idle`, `assets/${char}/idle.png?v=${v}`);
         });
