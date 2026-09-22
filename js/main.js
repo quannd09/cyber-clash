@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=74';
-import { input } from './input.js?v=74';
-import { fx } from './particles.js?v=74';
-import { combat, Projectile } from './combat.js?v=74';
-import { Cyborg } from './cyborg.js?v=74';
-import { GameRenderer } from './renderer.js?v=74';
-import { UIManager } from './ui.js?v=74';
-import { network } from './network.js?v=74';
-import { BotController } from './bot.js?v=74';
+import { sound } from './audio.js?v=75';
+import { input } from './input.js?v=75';
+import { fx } from './particles.js?v=75';
+import { combat, Projectile } from './combat.js?v=75';
+import { Cyborg } from './cyborg.js?v=75';
+import { GameRenderer } from './renderer.js?v=75';
+import { UIManager } from './ui.js?v=75';
+import { network } from './network.js?v=75';
+import { BotController } from './bot.js?v=75';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -555,7 +555,7 @@ class CyberClashGame {
             }
 
             try {
-                combat.updateProjectiles(dt, this.bounds);
+                combat.updateProjectiles(dt, this.bounds, this.p1, this.p2);
                 combat.resolve(this.p1, this.p2, (intensity, dur) => this.renderer.triggerShake(intensity, dur));
             } catch (err) {
                 console.error('[Combat Resolve Error]', err);
@@ -581,7 +581,7 @@ class CyberClashGame {
             // Still update physics & particles during slow-mo
             this.p1.update(dt * 0.4, this.bounds);
             this.p2.update(dt * 0.4, this.bounds);
-            combat.updateProjectiles(dt * 0.4, this.bounds);
+            combat.updateProjectiles(dt * 0.4, this.bounds, this.p1, this.p2);
 
             if (this.isOnlineHost) {
                 this.broadcastStateSnapshot();

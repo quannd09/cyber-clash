@@ -624,6 +624,87 @@ canvas {
     box-shadow: 0 0 16px rgba(56, 189, 248, 0.45);
 }
 
+.mode-tab.mode-online1.active {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.5);
+}
+
+.mode-tab.mode-online2.active {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.5);
+}
+
+/* Online 1 vs Online 2 Header Badge & Server Config in Lobby */
+.lobby-mode-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.lobby-mode-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+
+.lobby-mode-title.online1 {
+    color: #10b981;
+    text-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+}
+
+.lobby-mode-title.online2 {
+    color: #c084fc;
+    text-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+}
+
+.lobby-mode-sub {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.server-config-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    background: rgba(15, 23, 42, 0.8);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 11px;
+}
+
+.server-config-label {
+    font-family: 'Orbitron', sans-serif;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.server-input {
+    background: #090d16;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: #38bdf8;
+    font-family: monospace;
+    font-size: 11px;
+    width: 250px;
+}
+
+.server-input:focus {
+    outline: none;
+    border-color: #10b981;
+}
+
 /* AI Bot Difficulty Selector */
 .bot-difficulty-panel {
     display: flex;
@@ -1493,5 +1574,121 @@ body.mobile-fullscreen-active {
     max-height: 100% !important;
     object-fit: contain !important;
 }
+
+/* ============================================================
+   ONLINE 1 & ONLINE 2 MULTIPLAYER STYLES
+   ============================================================ */
+.mode-tab.mode-online1 {
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #a7f3d0;
+}
+.mode-tab.mode-online1:hover {
+    border-color: #10b981;
+    color: #6ee7b7;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+}
+.mode-tab.mode-online1.active {
+    background: #10b981 !important;
+    color: #06261c !important;
+    border-color: #34d399 !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.7) !important;
+    font-weight: 900;
+}
+
+.mode-tab.mode-online2 {
+    border-color: rgba(168, 85, 247, 0.4);
+    color: #e9d5ff;
+}
+.mode-tab.mode-online2:hover {
+    border-color: #a855f7;
+    color: #d8b4fe;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+}
+.mode-tab.mode-online2.active {
+    background: #a855f7 !important;
+    color: #1a052e !important;
+    border-color: #c084fc !important;
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.7) !important;
+    font-weight: 900;
+}
+
+.lobby-mode-header {
+    text-align: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lobby-mode-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.lobby-mode-sub {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.server-config-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 8px;
+}
+
+.server-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #38bdf8;
+    white-space: nowrap;
+}
+
+.server-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #f1f5f9;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.server-input:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+.server-save-btn {
+    background: #0284c7;
+    border: 1px solid #38bdf8;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.server-save-btn:hover {
+    background: #0369a1;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
 
 

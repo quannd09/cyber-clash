@@ -1,6 +1,6 @@
 // AI Bot Controller for Cyber Clash: Zero-G Arena
 // Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
-import { WEAPONS, combat } from './combat.js?v=74';
+import { WEAPONS, combat } from './combat.js?v=75';
 
 export class BotController {
     constructor(difficulty = 'normal') {
@@ -323,8 +323,8 @@ export class BotController {
                 // Gigant stomp: close to mid range
                 if (dist < 230) fireSkill = true;
             } else if (charId === 'gojo') {
-                // Hollow purple: mid to long range
-                if (dist > 160) fireSkill = true;
+                // Lapse Blue: mid to close range vacuum suction
+                if (dist > 100 && dist < 320) fireSkill = true;
             } else if (charId === 'sukuna') {
                 // Kamino fire arrow: mid to long range
                 if (dist > 140) fireSkill = true;

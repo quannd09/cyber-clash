@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=74';
-import { fx } from './particles.js?v=74';
-import { physics } from './physics.js?v=74';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=74';
-import { input } from './input.js?v=74';
+import { sound } from './audio.js?v=75';
+import { fx } from './particles.js?v=75';
+import { physics } from './physics.js?v=75';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=75';
+import { input } from './input.js?v=75';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -65,26 +65,26 @@ export class Cyborg {
 
         // Core Vitals (Balanced across archetypes)
         const charHp = {
-            vivian: 600, // Nerfed from 650 down to 600
-            jotaro: 550,
-            luffy: 540,
-            sukuna: 530,
+            jotaro: 525,
+            luffy: 520,
+            sukuna: 520,
             goku: 520,
-            giorno: 510,
-            nicole: 500,
-            gojo: 500,
-            velina: 480,
-            yanagi: 475,
-            naoya: 465,
-            trigger: 460
+            vivian: 520,
+            yanagi: 515,
+            giorno: 515,
+            gojo: 515,
+            velina: 510,
+            nicole: 510,
+            naoya: 510,
+            trigger: 505
         };
-        this.maxHp = charHp[characterId] || 500;
+        this.maxHp = charHp[characterId] || 515;
         this.hp = this.maxHp;
         this.maxEnergy = 100;
         this.energy = 100;
         this.overdrive = 0; // 0 to 100
-        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.75x longer to charge overdrive
-        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.75) : 1.0;
+        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive
+        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : 1.0;
         this.roundsWon = 0;
 
         // State Flags
@@ -156,7 +156,11 @@ export class Cyborg {
         this.hasClashed = false;
         this.recentAttackTimes = [];
         this.spamDelayTimer = 0;
-        this.attackBufferTimer = 0;
+        this.signatureHits = 0;
+        this.bleedTimer = 0;
+        this.sensoryOverloadTimer = 0;
+        this.curseTimer = 0;
+        this.hasLockOn = false;
         this.naoyaHitCount = 0;
         this.frameFrozenTimer = 0;
         this.afterimages = [];
@@ -246,6 +250,26 @@ export class Cyborg {
         // Handle 24 FPS Frame Freeze
         if (this.frameFrozenTimer > 0) {
             this.frameFrozenTimer -= dt;
+        }
+
+        // Handle Signature Status Effects (Bleed, Sensory Overload, Curse)
+        if (this.bleedTimer > 0) {
+            this.bleedTimer -= dt;
+            this.takeDamage(0.25 * dt, false);
+            if (Math.random() < 0.25) {
+                fx.spawnHitSparks(this.x, this.y, '#f43f5e', 2);
+            }
+        }
+        if (this.sensoryOverloadTimer > 0) {
+            this.sensoryOverloadTimer -= dt;
+            this.vx *= Math.pow(0.92, dt);
+            this.vy *= Math.pow(0.92, dt);
+            if (Math.random() < 0.2) {
+                fx.spawnHitSparks(this.x, this.y, '#facc15', 1);
+            }
+        }
+        if (this.curseTimer > 0) {
+            this.curseTimer -= dt;
         }
 
         // Handle Skill Cooldown & Active Skill Pose Duration
@@ -482,7 +506,7 @@ export class Cyborg {
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 140) {
                 opponent.takeDamage(skillDmg);
-                opponent.applyStun(25);
+                opponent.applyStun(16);
                 physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 9);
                 fx.spawnHitSparks(opponent.x, opponent.y, this.color, 16);
                 fx.addText(opponent.x, opponent.y - 35, `⚡ THUNDER CLAP! -${Math.round(skillDmg)}`, this.color, 22);
@@ -491,14 +515,14 @@ export class Cyborg {
         } else if (skill.id === 'PHOTOSYNTHESIS' || skill.id === 'EMP_BLAST') {
             sound.playEMP();
             fx.spawnClashShockwave(this.x, this.y);
-            // Quang Hợp (Photosynthesis): Hồi 50 HP & Sóng đẩy bảo hộ
-            this.hp = Math.min(this.maxHp, this.hp + 50);
-            fx.addText(this.x, this.y - 30, '+50 HP HEAL!', '#34d399', 24);
+            // Quang Hợp (Photosynthesis): Hồi 25 HP & Sóng đẩy bảo hộ
+            this.hp = Math.min(this.maxHp, this.hp + 25);
+            fx.addText(this.x, this.y - 30, '+25 HP HEAL!', '#34d399', 24);
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 250) {
                 opponent.takeDamage(skillDmg);
                 opponent.releaseShield();
-                opponent.applyStun(30);
+                opponent.applyStun(16);
                 physics.applyKnockback(opponent, opponent.x - this.x, opponent.y - this.y, 10);
                 fx.addText(opponent.x, opponent.y - 30, `KNOCKBACK! -${Math.round(skillDmg)}`, '#34d399', 20);
             }
@@ -538,7 +562,7 @@ export class Cyborg {
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 8);
         } else if (skill.id === 'ABLOOM_BURST') {
             sound.playSlash(false);
-            this.hp = Math.min(this.maxHp, this.hp + 25);
+            this.hp = Math.min(this.maxHp, this.hp + 16);
             fx.addText(this.x, this.y - 30, '🔮 ABLOOM BURST!', '#c084fc', 22);
 
             // Tự động căn góc bắn chuẩn về phía đối thủ
@@ -572,7 +596,7 @@ export class Cyborg {
             const dist = Math.hypot(opponent.x - fxX, opponent.y - fxY);
             if (dist < opponent.radius + reach * 0.5) {
                 opponent.takeDamage(skillDmg);
-                opponent.applyStun(35);
+                opponent.applyStun(16);
                 physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 13);
                 fx.spawnHitSparks(opponent.x, opponent.y, '#818cf8', 20);
                 sound.playHit(true);
@@ -587,20 +611,25 @@ export class Cyborg {
             this.y = behindY;
             this.aimAngle = Math.atan2(opponent.y - this.y, opponent.x - this.x);
             fx.spawnParryBurst(this.x, this.y, '#fbbf24');
-            fx.addText(this.x, this.y - 35, '⚡ INSTANT TRANSMISSION!', '#fbbf24', 24);
-            // Gut punch gây 1.5x sát thương đòn thường (giảm từ 2x)
+            fx.addText(this.x, this.y - 35, '⚡ METEOR SMASH!', '#fbbf24', 24);
+            // Meteor strike shockwave
             const gokuSkillDmg = normalDmg * 1.5;
-            opponent.takeDamage(gokuSkillDmg);
-            opponent.applyStun(30);
-            physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 12);
-            sound.playHit(true);
+            if (opponent.isShielding && opponent.shieldTimer <= 10) {
+                this.applyStun(18);
+                sound.playParry();
+            } else {
+                opponent.takeDamage(gokuSkillDmg);
+                opponent.applyStun(16);
+                physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 11);
+                sound.playHit(true);
+            }
         } else if (skill.id === 'LIFE_TREE') {
             sound.playEMP();
             fx.spawnClashShockwave(opponent.x, opponent.y);
             fx.addText(opponent.x, opponent.y - 45, '🌳 TREE OF LIFE!', '#facc15', 24);
             opponent.takeDamage(skillDmg);
-            opponent.applyStun(32);
-            opponent.vy = -12; // Launch into air
+            opponent.applyStun(16);
+            opponent.vy = -11; // Launch into air
             physics.applyKnockback(opponent, (Math.random() - 0.5) * 2, -1, 10);
             sound.playHit(true);
         } else if (skill.id === 'PROJECTION_DASH') {
@@ -635,7 +664,7 @@ export class Cyborg {
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 230) {
                 opponent.takeDamage(skillDmg);
-                opponent.applyFrameFreeze(50);
+                opponent.applyFrameFreeze(20);
                 physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 11);
                 sound.playHit(true);
                 fx.spawnHitSparks(opponent.x, opponent.y, '#a3e635', 20);
@@ -649,32 +678,33 @@ export class Cyborg {
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 210) {
                 opponent.takeDamage(skillDmg);
-                opponent.applyStun(35);
+                opponent.applyStun(16);
                 physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 13);
                 fx.spawnHitSparks(opponent.x, opponent.y, '#ef4444', 22);
                 sound.playHit(true);
             }
-        } else if (skill.id === 'HOLLOW_PURPLE') {
-            // GOJO: HOLLOW PURPLE ORB 🟣 (Glowing purple sphere)
-            sound.playLaser();
-            fx.addText(this.x, this.y - 35, '🟣 HOLLOW PURPLE!', '#c084fc', 24);
-            const proj = new Projectile(
-                this.index,
-                this.x + Math.cos(this.aimAngle) * 35,
-                this.y + Math.sin(this.aimAngle) * 35,
-                Math.cos(this.aimAngle) * 16,
-                Math.sin(this.aimAngle) * 16,
-                skillDmg,
-                '#a855f7',
-                22,
-                'hollow_purple'
-            );
-            combat.addProjectile(proj);
-            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
+        } else if (skill.id === 'LAPSE_BLUE') {
+            // GOJO: CURSED TECHNIQUE LAPSE - BLUE (THUẬN CHUYỂN: THƯƠNG) 🌀
+            sound.playEMP();
+            const pullX = this.x + Math.cos(this.aimAngle) * 200;
+            const pullY = this.y + Math.sin(this.aimAngle) * 200;
+            fx.spawnClashShockwave(pullX, pullY);
+            fx.addText(this.x, this.y - 35, '🌀 LAPSE: BLUE!', '#0284c7', 24);
+
+            // Gravitational suction vortex pulling opponent into the center
+            const dx = pullX - opponent.x;
+            const dy = pullY - opponent.y;
+            const distToVortex = Math.hypot(dx, dy) || 1;
+            opponent.vx += (dx / distToVortex) * 15;
+            opponent.vy += (dy / distToVortex) * 15;
+            opponent.takeDamage(skillDmg);
+            opponent.applyStun(16);
+            sound.playHit(true);
+            fx.spawnHitSparks(opponent.x, opponent.y, '#0284c7', 18);
         } else if (skill.id === 'KAMINO_FIRE_ARROW') {
-            // SUKUNA: CRIMSON FIREBALL 🔥 (Intense red/orange fiery sphere)
+            // SUKUNA: KAMINO FUGA (HỎA KHAI / FLAME ARROW) 🔥
             sound.playLaser();
-            fx.addText(this.x, this.y - 35, '🔥 CRIMSON FIREBALL!', '#ef4444', 24);
+            fx.addText(this.x, this.y - 35, '🔥 KAMINO: FUGA!', '#ef4444', 24);
             const proj = new Projectile(
                 this.index,
                 this.x + Math.cos(this.aimAngle) * 35,
@@ -683,11 +713,11 @@ export class Cyborg {
                 Math.sin(this.aimAngle) * 18,
                 skillDmg,
                 '#dc2626',
-                17,
+                18,
                 'fire_orb'
             );
             combat.addProjectile(proj);
-            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 8);
+            physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
         }
     }
 

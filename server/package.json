@@ -1,0 +1,15 @@
+{
+  "name": "cyber-clash-server",
+  "version": "1.0.0",
+  "description": "High-Performance WebSocket Relay Server for Cyber Clash Multiplayer",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

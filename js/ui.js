@@ -1,173 +1,173 @@
-import { assets } from './assets.js?v=74';
-import { network } from './network.js?v=74';
-import { input } from './input.js?v=74';
+import { assets } from './assets.js?v=75';
+import { network } from './network.js?v=75';
+import { input } from './input.js?v=75';
 
 const SKILL_DATA = {
     yanagi: {
-        title: '⚡ TSUKISHIRO YANAGI (MELEE • 475 HP)',
+        title: '⚡ TSUKISHIRO YANAGI (MELEE • 515 HP)',
         color: '#a78bfa',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Moon Spear', desc: '' },
-            { key: 'R (Skill)', name: 'Flash Blink', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Electric Naginata (3-Hit: Đảo Cực Hút Nộ)', desc: '' },
+            { key: 'R (Skill)', name: 'Phase Blink ⚡', desc: '' },
             { key: 'Space (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Moon Spear', desc: '' },
-            { key: 'I (Skill)', name: 'Flash Blink', desc: '' },
+            { key: 'J (Melee)', name: 'Electric Naginata (3-Hit: Đảo Cực Hút Nộ)', desc: '' },
+            { key: 'I (Skill)', name: 'Phase Blink ⚡', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ]
     },
     velina: {
-        title: '🌸 VERINA AIRGID (RANGED • 480 HP)',
+        title: '🌸 VERINA AIRGID (RANGED • 510 HP)',
         color: '#34d399',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Comet Blast', desc: '' },
-            { key: 'R (Skill)', name: 'Photosynthesis (Hồi 50 HP)', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Life Blossom Storm (Không hồi máu)', desc: '' }
+            { key: 'Left Click / F (Ranged)', name: 'Photonic Flora (3-Hit: Nở Hoa Hồi 18 HP)', desc: '' },
+            { key: 'R (Skill)', name: 'Photosynthesis (Hồi 35 HP + Đẩy lùi)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Comet Blast', desc: '' },
-            { key: 'I (Skill)', name: 'Photosynthesis (Hồi 50 HP)', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Life Blossom Storm (Không hồi máu)', desc: '' }
+            { key: 'J (Ranged)', name: 'Photonic Flora (3-Hit: Nở Hoa Hồi 18 HP)', desc: '' },
+            { key: 'I (Skill)', name: 'Photosynthesis (Hồi 35 HP + Đẩy lùi)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ]
     },
     nicole: {
-        title: '💼 NICOLE DEMARA (RANGED • 500 HP)',
+        title: '💼 NICOLE DEMARA (RANGED • 510 HP)',
         color: '#f472b6',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon', desc: '' },
-            { key: 'R (Skill)', name: 'Vault Dash', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon (3-Hit: Nổ Chùm Ether)', desc: '' },
+            { key: 'R (Skill)', name: 'Sugar Slide (Trượt lùi bắn pháo)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Briefcase Cannon', desc: '' },
-            { key: 'I (Skill)', name: 'Vault Dash', desc: '' },
+            { key: 'J (Ranged)', name: 'Briefcase Cannon (3-Hit: Nổ Chùm Ether)', desc: '' },
+            { key: 'I (Skill)', name: 'Sugar Slide (Trượt lùi bắn pháo)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ]
     },
     trigger: {
-        title: '🎯 TRIGGER (RANGED • 460 HP)',
+        title: '🎯 TRIGGER (RANGED • 505 HP)',
         color: '#38bdf8',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Purge Shot', desc: '' },
-            { key: 'R (Skill)', name: 'Sniper Stance', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Sniper Beam (3-Hit: Khóa Bạo Kích x1.4)', desc: '' },
+            { key: 'R (Skill)', name: 'Sniper Stance 🎯', desc: '' },
             { key: 'Space (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Purge Shot', desc: '' },
-            { key: 'I (Skill)', name: 'Sniper Stance', desc: '' },
+            { key: 'J (Ranged)', name: 'Sniper Beam (3-Hit: Khóa Bạo Kích x1.4)', desc: '' },
+            { key: 'I (Skill)', name: 'Sniper Stance 🎯', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ]
     },
     vivian: {
-        title: '🔮 VIVIAN BANSHEE (RANGED • 600 HP)',
+        title: '🔮 VIVIAN BANSHEE (RANGED • 520 HP)',
         color: '#c084fc',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Phantom Feathers', desc: '' },
-            { key: 'R (Skill)', name: 'Blooming Ward', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Ether Feathers (3-Hit: Lời Nguyền Chậm Đánh)', desc: '' },
+            { key: 'R (Skill)', name: 'Abloom Burst (Hồi 20 HP + Chùm lông)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Phantom Feathers', desc: '' },
-            { key: 'I (Skill)', name: 'Blooming Ward', desc: '' },
+            { key: 'J (Ranged)', name: 'Ether Feathers (3-Hit: Lời Nguyền Chậm Đánh)', desc: '' },
+            { key: 'I (Skill)', name: 'Abloom Burst (Hồi 20 HP + Chùm lông)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ]
     },
     jotaro: {
-        title: '👊 JOTARO KUJO (MELEE • 550 HP)',
+        title: '👊 JOTARO KUJO (MELEE • 525 HP)',
         color: '#818cf8',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'ORA ORA ORA!', desc: '' },
-            { key: 'R (Skill)', name: 'Star Finger', desc: '' },
-            { key: 'Space (Ultimate)', name: 'The World: Time Stop', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Liên Hoàn)', desc: '' },
+            { key: 'R (Skill)', name: 'Star Finger 👊', desc: '' },
+            { key: 'Space (Ultimate)', name: 'The World: Dừng Thời Gian', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'ORA ORA ORA!', desc: '' },
-            { key: 'I (Skill)', name: 'Star Finger', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'The World: Time Stop', desc: '' }
+            { key: 'J (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Liên Hoàn)', desc: '' },
+            { key: 'I (Skill)', name: 'Star Finger 👊', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'The World: Dừng Thời Gian', desc: '' }
         ]
     },
     goku: {
         title: '🥋 SON GOKU (MELEE • 520 HP)',
         color: '#fbbf24',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dragon Fist Ki', desc: '' },
-            { key: 'R (Skill)', name: 'Instant Transmission (1.5x Dame)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dragon Fist (3-Hit: Nộ Kaioken +Speed +25 Eng)', desc: '' },
+            { key: 'R (Skill)', name: 'Meteor Smash (Dịch chuyển bổ búa)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dragon Fist Ki', desc: '' },
-            { key: 'I (Skill)', name: 'Instant Transmission (1.5x Dame)', desc: '' },
+            { key: 'J (Melee)', name: 'Dragon Fist (3-Hit: Nộ Kaioken +Speed +25 Eng)', desc: '' },
+            { key: 'I (Skill)', name: 'Meteor Smash (Dịch chuyển bổ búa)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ]
     },
     giorno: {
-        title: '🐞 GIORNO GIOVANNA (MELEE • 510 HP)',
+        title: '🐞 GIORNO GIOVANNA (MELEE • 515 HP)',
         color: '#facc15',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
-            { key: 'R (Skill)', name: 'Tree of Life', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Return To Zero', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA (3-Hit: Quá Tải Cảm Giác -50% Speed)', desc: '' },
+            { key: 'R (Skill)', name: 'Tree of Life 🌳', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Return To Zero (GER)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'MUDA MUDA MUDA!', desc: '' },
-            { key: 'I (Skill)', name: 'Tree of Life', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Return To Zero', desc: '' }
+            { key: 'J (Melee)', name: 'MUDA MUDA (3-Hit: Quá Tải Cảm Giác -50% Speed)', desc: '' },
+            { key: 'I (Skill)', name: 'Tree of Life 🌳', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Return To Zero (GER)', desc: '' }
         ]
     },
     naoya: {
-        title: '🎞️ NAOYA ZEN\'IN (MELEE • 465 HP)',
+        title: '🎞️ NAOYA ZEN\'IN (MELEE • 510 HP)',
         color: '#a3e635',
         p1: [
-            { key: 'Left Click / F (Melee)', name: '24 FPS Projection Fists', desc: '' },
-            { key: 'R (Skill)', name: 'Projection Step', desc: '' },
-            { key: 'Space (Ultimate)', name: '10 FPS Mach 3 Barrage (x1.25 Dame)', desc: '' }
+            { key: 'Left Click / F (Melee)', name: '24 FPS Fists (3-Hit: Đóng Băng Khung Hình)', desc: '' },
+            { key: 'R (Skill)', name: 'Projection Step 🎞️ (Tàn ảnh)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Mach 3 Barrage (10 FPS)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: '24 FPS Projection Fists', desc: '' },
-            { key: 'I (Skill)', name: 'Projection Step', desc: '' },
-            { key: 'Enter (Ultimate)', name: '10 FPS Mach 3 Barrage (x1.25 Dame)', desc: '' }
+            { key: 'J (Melee)', name: '24 FPS Fists (3-Hit: Đóng Băng Khung Hình)', desc: '' },
+            { key: 'I (Skill)', name: 'Projection Step 🎞️ (Tàn ảnh)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage (10 FPS)', desc: '' }
         ]
     },
     luffy: {
-        title: '🍖 MONKEY D. LUFFY (MELEE • 540 HP)',
+        title: '🍖 MONKEY D. LUFFY (MELEE • 520 HP)',
         color: '#ef4444',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol', desc: '' },
-            { key: 'R (Skill)', name: 'Gigant Stomp', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Bazooka Dội Tường)', desc: '' },
+            { key: 'R (Skill)', name: 'Gigant Stomp 🍖', desc: '' },
             { key: 'Space (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Gomu Gomu Pistol', desc: '' },
-            { key: 'I (Skill)', name: 'Gigant Stomp', desc: '' },
+            { key: 'J (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Bazooka Dội Tường)', desc: '' },
+            { key: 'I (Skill)', name: 'Gigant Stomp 🍖', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ]
     },
     gojo: {
-        title: '♾️ SATORU GOJO (MELEE • 500 HP)',
+        title: '♾️ SATORU GOJO (MELEE • 515 HP)',
         color: '#0284c7',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Black Flash Infinity', desc: '' },
-            { key: 'R (Skill)', name: 'Hollow Purple 🟣', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'Black Flash (Passive: Vô Hạn Trụ Chậm Đạn • 3-Hit: Hắc Thiểm)', desc: '' },
+            { key: 'R (Skill)', name: 'Lapse Blue 🌀 (Hút Chân Không)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌 (Tê Liệt Vô Hạn)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Black Flash Infinity', desc: '' },
-            { key: 'I (Skill)', name: 'Hollow Purple 🟣', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌', desc: '' }
+            { key: 'J (Melee)', name: 'Black Flash (Passive: Vô Hạn Trụ Chậm Đạn • 3-Hit: Hắc Thiểm)', desc: '' },
+            { key: 'I (Skill)', name: 'Lapse Blue 🌀 (Hút Chân Không)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌 (Tê Liệt Vô Hạn)', desc: '' }
         ]
     },
     sukuna: {
-        title: '⛩️ RYOMEN SUKUNA (MELEE • 530 HP)',
+        title: '⛩️ RYOMEN SUKUNA (MELEE • 520 HP)',
         color: '#f43f5e',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes', desc: '' },
-            { key: 'R (Skill)', name: 'Crimson Fireball 🔥', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes (3-Hit: Bát Trảm Xé Giáp + Chảy Máu)', desc: '' },
+            { key: 'R (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dismantle Slashes', desc: '' },
-            { key: 'I (Skill)', name: 'Crimson Fireball 🔥', desc: '' },
+            { key: 'J (Melee)', name: 'Dismantle Slashes (3-Hit: Bát Trảm Xé Giáp + Chảy Máu)', desc: '' },
+            { key: 'I (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ]
     }
@@ -357,11 +357,19 @@ export class UIManager {
     setupOnlineUI() {
         const localTab = document.getElementById('mode-local-tab');
         const botTab = document.getElementById('mode-bot-tab');
-        const onlineTab = document.getElementById('mode-online-tab');
+        const online1Tab = document.getElementById('mode-online1-tab');
+        const online2Tab = document.getElementById('mode-online2-tab');
         const botDiffPanel = document.getElementById('bot-difficulty-panel');
         const lobbyPanel = document.getElementById('online-lobby-panel');
         const fightersContainer = document.getElementById('loadout-fighters-container');
         const matchBanner = document.getElementById('online-match-banner');
+        const bannerModeIndicator = document.getElementById('banner-mode-indicator');
+        const lobbyModeTitle = document.getElementById('lobby-mode-title');
+        const lobbyModeSub = document.getElementById('lobby-mode-sub');
+        const lobbyGuideNote = document.getElementById('lobby-guide-note');
+        const wsServerConfig = document.getElementById('ws-server-config');
+        const inputWsServer = document.getElementById('input-ws-server');
+        const btnSaveServer = document.getElementById('btn-save-server');
         const btnCreateRoom = document.getElementById('btn-create-room');
         const btnJoinRoom = document.getElementById('btn-join-room');
         const btnCopyCode = document.getElementById('btn-copy-code');
@@ -377,6 +385,11 @@ export class UIManager {
         const bannerRoomCode = document.getElementById('banner-room-code');
         const bannerRoleText = document.getElementById('banner-role-text');
 
+        // Populate server URL in input
+        if (inputWsServer) {
+            inputWsServer.value = network.getWsServerUrl();
+        }
+
         const switchToLocal = () => {
             this.gameMode = 'LOCAL';
             this.networkRole = null;
@@ -385,7 +398,8 @@ export class UIManager {
 
             if (localTab) localTab.classList.add('active');
             if (botTab) botTab.classList.remove('active');
-            if (onlineTab) onlineTab.classList.remove('active');
+            if (online1Tab) online1Tab.classList.remove('active');
+            if (online2Tab) online2Tab.classList.remove('active');
             if (botDiffPanel) botDiffPanel.classList.add('hidden');
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
@@ -406,7 +420,8 @@ export class UIManager {
 
             if (localTab) localTab.classList.remove('active');
             if (botTab) botTab.classList.add('active');
-            if (onlineTab) onlineTab.classList.remove('active');
+            if (online1Tab) online1Tab.classList.remove('active');
+            if (online2Tab) online2Tab.classList.remove('active');
             if (botDiffPanel) botDiffPanel.classList.remove('hidden');
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
@@ -419,12 +434,44 @@ export class UIManager {
             if (this.onBotDifficultyChange) this.onBotDifficultyChange(this.botDifficulty);
         };
 
-        const switchToOnline = () => {
+        const switchToOnline = (mode) => {
             this.gameMode = 'ONLINE';
+            network.setMode(mode);
+
             if (localTab) localTab.classList.remove('active');
             if (botTab) botTab.classList.remove('active');
-            if (onlineTab) onlineTab.classList.add('active');
             if (botDiffPanel) botDiffPanel.classList.add('hidden');
+
+            if (mode === 'WEBSOCKET') {
+                if (online1Tab) online1Tab.classList.add('active');
+                if (online2Tab) online2Tab.classList.remove('active');
+                if (lobbyModeTitle) lobbyModeTitle.textContent = '🌐 ONLINE 1 (WEBSOCKET RELAY)';
+                if (lobbyModeSub) lobbyModeSub.textContent = 'Real-time WebSocket connection via central server. High stability across different WiFi/NAT networks.';
+                if (wsServerConfig) wsServerConfig.style.display = 'flex';
+                if (inputWsServer) inputWsServer.value = network.getWsServerUrl();
+                if (bannerModeIndicator) {
+                    bannerModeIndicator.textContent = '🌐 ONLINE 1 (WS)';
+                    bannerModeIndicator.style.borderColor = '#10b981';
+                    bannerModeIndicator.style.color = '#34d399';
+                }
+                if (lobbyGuideNote) {
+                    lobbyGuideNote.innerHTML = '💡 <strong>Online 1 (WebSocket):</strong> Cả 2 người chơi kết nối qua Server trung gian (Render/Localhost). Host bấm <strong>⚡ CREATE ROOM</strong> và chia sẻ mã CLASH-XXXX cho Khách bấm <strong>🚀 JOIN</strong>.';
+                }
+            } else {
+                if (online1Tab) online1Tab.classList.remove('active');
+                if (online2Tab) online2Tab.classList.add('active');
+                if (lobbyModeTitle) lobbyModeTitle.textContent = '📡 ONLINE 2 (P2P WEBRTC)';
+                if (lobbyModeSub) lobbyModeSub.textContent = 'Direct Peer-to-Peer connection via WebRTC DataChannel (PeerJS + STUN/TURN). Zero server latency when connected.';
+                if (wsServerConfig) wsServerConfig.style.display = 'none';
+                if (bannerModeIndicator) {
+                    bannerModeIndicator.textContent = '📡 ONLINE 2 (RTC)';
+                    bannerModeIndicator.style.borderColor = '#a855f7';
+                    bannerModeIndicator.style.color = '#c084fc';
+                }
+                if (lobbyGuideNote) {
+                    lobbyGuideNote.innerHTML = '💡 <strong>Online 2 (WebRTC P2P):</strong> Kết nối trực tiếp máy-đến-máy thông qua PeerJS STUN/TURN. Host bấm <strong>⚡ CREATE ROOM</strong> và gửi mã cho Player 2 bấm <strong>🚀 JOIN</strong>.';
+                }
+            }
 
             if (network.isConnected) {
                 if (lobbyPanel) lobbyPanel.classList.add('hidden');
@@ -440,7 +487,22 @@ export class UIManager {
 
         if (localTab) localTab.addEventListener('click', switchToLocal);
         if (botTab) botTab.addEventListener('click', switchToBot);
-        if (onlineTab) onlineTab.addEventListener('click', switchToOnline);
+        if (online1Tab) online1Tab.addEventListener('click', () => switchToOnline('WEBSOCKET'));
+        if (online2Tab) online2Tab.addEventListener('click', () => switchToOnline('WEBRTC'));
+
+        // Save server URL button
+        if (btnSaveServer && inputWsServer) {
+            btnSaveServer.addEventListener('click', () => {
+                const url = inputWsServer.value.trim();
+                network.setWsServerUrl(url);
+                if (globalMsg) {
+                    globalMsg.textContent = url ? `Đã lưu Relay Server: ${url}` : 'Đã khôi phục Relay Server mặc định (localhost / Render)';
+                    globalMsg.classList.remove('error');
+                }
+                btnSaveServer.textContent = '✔️ SAVED!';
+                setTimeout(() => { btnSaveServer.textContent = '💾 SET SERVER'; }, 1800);
+            });
+        }
 
         // Difficulty Buttons
         document.querySelectorAll('.diff-btn').forEach(btn => {
@@ -459,7 +521,9 @@ export class UIManager {
                 if (clientWaitBox) clientWaitBox.classList.add('hidden');
                 if (inputRoomCode) inputRoomCode.value = '';
                 if (globalMsg) {
-                    globalMsg.textContent = 'Initializing WebRTC peer room...';
+                    globalMsg.textContent = network.activeMode === 'WEBSOCKET'
+                        ? 'Connecting to WebSocket relay server...'
+                        : 'Initializing WebRTC peer room...';
                     globalMsg.classList.remove('error');
                 }
                 network.createRoom();
@@ -574,6 +638,17 @@ export class UIManager {
             if (bannerRoomCode) bannerRoomCode.textContent = code;
             if (bannerRoleText) {
                 bannerRoleText.textContent = role === 'HOST' ? 'ROLE: HOST (P1)' : 'ROLE: CLIENT (P2)';
+            }
+            if (bannerModeIndicator) {
+                if (network.activeMode === 'WEBSOCKET') {
+                    bannerModeIndicator.textContent = '🌐 ONLINE 1 (WS)';
+                    bannerModeIndicator.style.borderColor = '#10b981';
+                    bannerModeIndicator.style.color = '#34d399';
+                } else {
+                    bannerModeIndicator.textContent = '📡 ONLINE 2 (RTC)';
+                    bannerModeIndicator.style.borderColor = '#a855f7';
+                    bannerModeIndicator.style.color = '#c084fc';
+                }
             }
 
             this.applyOnlinePermissions(role);

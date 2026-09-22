@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=74';
-import { fx } from './particles.js?v=74';
-import { physics } from './physics.js?v=74';
+import { sound } from './audio.js?v=75';
+import { fx } from './particles.js?v=75';
+import { physics } from './physics.js?v=75';
 
 export const WEAPONS = {
     YANAGI: {
@@ -9,66 +9,66 @@ export const WEAPONS = {
         attackDmg: 32, 
         attackRange: 85,
         attackDuration: 18,
-        attackCooldown: 22,
+        attackCooldown: 21,
         isRanged: false,
         icon: '⚔️'
     },
     VELINA: {
         id: 'VELINA',
         name: 'Photonic Flora',
-        attackDmg: 21, // Nerfed 10% (from 23)
-        attackRange: 580,
-        attackDuration: 24,
-        attackCooldown: 28,
+        attackDmg: 25,
+        attackRange: 540,
+        attackDuration: 20,
+        attackCooldown: 22,
         isRanged: true,
         icon: '🌸'
     },
     NICOLE: {
         id: 'NICOLE',
         name: 'Briefcase Cannon',
-        attackDmg: 23, // Nerfed 10% (from 26)
+        attackDmg: 26,
         attackRange: 520,
-        attackDuration: 22,
-        attackCooldown: 27,
+        attackDuration: 20,
+        attackCooldown: 22,
         isRanged: true,
         icon: '💼'
     },
     TRIGGER: {
         id: 'TRIGGER',
         name: 'Electromagnetic Sniper',
-        attackDmg: 34, // Nerfed 10% (from 38)
-        attackRange: 720,
-        attackDuration: 26,
-        attackCooldown: 38,
+        attackDmg: 32,
+        attackRange: 600,
+        attackDuration: 22,
+        attackCooldown: 25,
         isRanged: true,
         icon: '🎯'
     },
     VIVIAN: {
         id: 'VIVIAN',
         name: 'Ether Feathers',
-        attackDmg: 19, // Nerfed 10% (from 21)
+        attackDmg: 24,
         attackRange: 500,
-        attackDuration: 20,
-        attackCooldown: 24,
+        attackDuration: 19,
+        attackCooldown: 21,
         isRanged: true,
         icon: '🔮'
     },
     JOTARO: {
         id: 'JOTARO',
         name: 'Star Platinum ORA',
-        attackDmg: 34,
+        attackDmg: 32,
         attackRange: 85,
-        attackDuration: 19,
-        attackCooldown: 22,
+        attackDuration: 18,
+        attackCooldown: 21,
         isRanged: false,
         icon: '👊'
     },
     GOKU: {
         id: 'GOKU',
         name: 'Dragon Fist Ki',
-        attackDmg: 29,
-        attackRange: 80,
-        attackDuration: 18,
+        attackDmg: 31,
+        attackRange: 82,
+        attackDuration: 17,
         attackCooldown: 20,
         isRanged: false,
         icon: '🥋'
@@ -77,36 +77,36 @@ export const WEAPONS = {
         id: 'GIORNO',
         name: 'Gold Experience MUDA',
         attackDmg: 31,
-        attackRange: 80,
-        attackDuration: 19,
-        attackCooldown: 21,
+        attackRange: 82,
+        attackDuration: 18,
+        attackCooldown: 20,
         isRanged: false,
         icon: '🐞'
     },
     NAOYA: {
         id: 'NAOYA',
         name: '24 FPS Projection Fists',
-        attackDmg: 36,
+        attackDmg: 31,
         attackRange: 82,
-        attackDuration: 16,
-        attackCooldown: 18,
+        attackDuration: 17,
+        attackCooldown: 20,
         isRanged: false,
         icon: '🎞️'
     },
     LUFFY: {
         id: 'LUFFY',
         name: 'Gomu Gomu no Pistol',
-        attackDmg: 30,
-        attackRange: 110,
-        attackDuration: 20,
-        attackCooldown: 22,
+        attackDmg: 31,
+        attackRange: 105,
+        attackDuration: 19,
+        attackCooldown: 21,
         isRanged: false,
         icon: '🍖'
     },
     GOJO: {
         id: 'GOJO',
         name: 'Black Flash Infinity',
-        attackDmg: 33,
+        attackDmg: 31,
         attackRange: 85,
         attackDuration: 18,
         attackCooldown: 21,
@@ -116,8 +116,8 @@ export const WEAPONS = {
     SUKUNA: {
         id: 'SUKUNA',
         name: 'Dismantle Slashes',
-        attackDmg: 34,
-        attackRange: 92,
+        attackDmg: 32,
+        attackRange: 90,
         attackDuration: 18,
         attackCooldown: 21,
         isRanged: false,
@@ -126,18 +126,18 @@ export const WEAPONS = {
 };
 
 export const SKILLS = {
-    YANAGI_SKILL: { id: 'PHASE_BLINK', name: 'Phase Blink', cooldown: 180, icon: '⚡' },
-    VERINA_SKILL: { id: 'PHOTOSYNTHESIS', name: 'Photosynthesis', cooldown: 210, icon: '🌸' },
-    NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Sugar Slide', cooldown: 190, icon: '💼' },
-    TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Sniper Stance', cooldown: 230, icon: '🎯' },
+    YANAGI_SKILL: { id: 'PHASE_BLINK', name: 'Phase Blink', cooldown: 190, icon: '⚡' },
+    VERINA_SKILL: { id: 'PHOTOSYNTHESIS', name: 'Photosynthesis', cooldown: 200, icon: '🌸' },
+    NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Sugar Slide', cooldown: 195, icon: '💼' },
+    TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Sniper Stance', cooldown: 210, icon: '🎯' },
     VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Abloom Burst', cooldown: 210, icon: '🔮' },
     JOTARO_SKILL: { id: 'STAR_FINGER', name: 'Star Finger', cooldown: 200, icon: '👊' },
     GOKU_SKILL: { id: 'INSTANT_TRANSMISSION', name: 'Instant Transmission', cooldown: 210, icon: '🥋' },
     GIORNO_SKILL: { id: 'LIFE_TREE', name: 'Tree of Life', cooldown: 200, icon: '🐞' },
     NAOYA_SKILL: { id: 'PROJECTION_DASH', name: 'Projection Step', cooldown: 200, icon: '🎞️' },
     LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
-    GOJO_SKILL: { id: 'HOLLOW_PURPLE', name: 'Hollow Purple', cooldown: 220, icon: '🟣' },
-    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Crimson Fireball', cooldown: 210, icon: '🔥' }
+    GOJO_SKILL: { id: 'LAPSE_BLUE', name: 'Lapse Blue', cooldown: 210, icon: '🌀' },
+    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' }
 };
 
 export class Projectile {
@@ -320,9 +320,25 @@ export class CombatResolver {
         this.projectiles.push(p);
     }
 
-    updateProjectiles(dt = 1, arenaBounds) {
+    updateProjectiles(dt = 1, arenaBounds, p1 = null, p2 = null) {
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
+
+            // Satoru Gojo: Infinity Barrier (Vô Hạn Trụ) - Làm chậm đạn đạo của đối thủ trong phạm vi 150px
+            if (p1 && p2) {
+                const target = (p.ownerIndex === 0) ? p2 : p1;
+                if (target && target.characterId === 'gojo' && !target.isStunned && !target.isDead) {
+                    const distToGo = Math.hypot(target.x - p.x, target.y - p.y);
+                    if (distToGo < 150) {
+                        p.vx *= 0.70;
+                        p.vy *= 0.70;
+                        if (Math.random() < 0.25) {
+                            fx.spawnHitSparks(p.x, p.y, '#0284c7', 1);
+                        }
+                    }
+                }
+            }
+
             p.update(dt);
 
             // Bounds check
@@ -412,7 +428,7 @@ export class CombatResolver {
                 if (defender.shieldTimer <= 10) {
                     // PERFECT PARRY SUCCESS!
                     defender.overdrive = Math.min(100, defender.overdrive + 25 * (defender.overdriveChargeRate || 1.0));
-                    attacker.applyStun(55); // 0.9s Stun on attacker!
+                    attacker.applyStun(45); // 0.75s Stun on attacker!
                     physics.applyKnockback(attacker, -Math.cos(aimAngle), -Math.sin(aimAngle), 11);
 
                     sound.playParry();
@@ -434,19 +450,99 @@ export class CombatResolver {
             // Direct unshielded hit!
             defender.takeDamage(baseDmg, false, attacker.x, attacker.y);
             attacker.overdrive = Math.min(100, attacker.overdrive + 14 * (attacker.overdriveChargeRate || 1.0));
-            defender.applyStun(20);
-            physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 10);
+            defender.applyStun(16);
+            physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 9);
 
-            // Check Naoya 3-hit frame freeze passive
+            // Signature 3-hit / Stacking Passives for Melee Fighters
+            attacker.signatureHits = (attacker.signatureHits || 0) + 1;
+            const hitCount = attacker.signatureHits;
+
             if (attacker.characterId === 'naoya') {
-                attacker.naoyaHitCount = (attacker.naoyaHitCount || 0) + 1;
-                if (attacker.naoyaHitCount >= 3) {
-                    defender.takeDamage(16); // Bonus crush damage on frame freeze
-                    defender.applyFrameFreeze(50);
-                    fx.addText(defender.x, defender.y - 45, '💥 FRAME CRUSH! -16', '#a3e635', 24);
-                    attacker.naoyaHitCount = 0;
+                if (hitCount >= 3) {
+                    defender.takeDamage(14);
+                    defender.applyFrameFreeze(20);
+                    fx.addText(defender.x, defender.y - 45, '🎞️ 24 FPS FREEZE! -14', '#a3e635', 24);
+                    attacker.signatureHits = 0;
                 } else {
-                    fx.addText(attacker.x, attacker.y - 25, `🎞️ FRAME [${attacker.naoyaHitCount}/3]`, '#a3e635', 18);
+                    fx.addText(attacker.x, attacker.y - 25, `🎞️ FRAME [${hitCount}/3]`, '#a3e635', 18);
+                }
+            } else if (attacker.characterId === 'goku') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(14);
+                    attacker.energy = Math.min(attacker.maxEnergy, attacker.energy + 25);
+                    attacker.isBoosted = true;
+                    attacker.boostTimer = 75;
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 14);
+                    fx.addText(attacker.x, attacker.y - 45, '🥋 KAIOKEN BURST! -14', '#fbbf24', 24);
+                    sound.playWallBounce();
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🥋 KI STACK [${hitCount}/3]`, '#fbbf24', 18);
+                }
+            } else if (attacker.characterId === 'yanagi') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(14);
+                    defender.applyStun(16);
+                    defender.overdrive = Math.max(0, defender.overdrive - 10);
+                    fx.addText(defender.x, defender.y - 45, '⚡ POLARITY DISCHARGE! -14', '#a78bfa', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#a78bfa', 16);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `⚡ POLARITY [${hitCount}/3]`, '#a78bfa', 18);
+                }
+            } else if (attacker.characterId === 'sukuna') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(16);
+                    defender.bleedTimer = 45;
+                    defender.applyStun(16);
+                    fx.addText(defender.x, defender.y - 45, '🩸 CLEAVE (BÁT TRẢM)! -16', '#f43f5e', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#f43f5e', 20);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🩸 DISMANTLE [${hitCount}/3]`, '#f43f5e', 18);
+                }
+            } else if (attacker.characterId === 'gojo') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(15);
+                    attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
+                    defender.applyStun(16);
+                    fx.addText(defender.x, defender.y - 45, '⚡ HẮC THIỂM (BLACK FLASH)! -15', '#0284c7', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#ef4444', 22);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `♾️ INFINITY [${hitCount}/3]`, '#0284c7', 18);
+                }
+            } else if (attacker.characterId === 'jotaro') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(15);
+                    defender.applyStun(16);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 12);
+                    fx.addText(defender.x, defender.y - 45, '👊 ORA ORA RUSH! -15', '#818cf8', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#818cf8', 18);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `👊 ORA [${hitCount}/3]`, '#818cf8', 18);
+                }
+            } else if (attacker.characterId === 'luffy') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(15);
+                    defender.applyStun(16);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 15);
+                    fx.addText(defender.x, defender.y - 45, '🍖 GOMU GOMU BAZOOKA! -15', '#ef4444', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#ef4444', 18);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🍖 GOMU [${hitCount}/3]`, '#ef4444', 18);
+                }
+            } else if (attacker.characterId === 'giorno') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(14);
+                    defender.sensoryOverloadTimer = 90;
+                    fx.addText(defender.x, defender.y - 45, '🐞 SENSORY OVERLOAD! -14', '#facc15', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#facc15', 18);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🐞 MUDA [${hitCount}/3]`, '#facc15', 18);
                 }
             }
 
@@ -495,14 +591,61 @@ export class CombatResolver {
                 }
 
                 // Direct hit!
-                defender.takeDamage(proj.damage, false, proj.x, proj.y);
+                let dmg = proj.damage;
+                if (attacker.hasLockOn) {
+                    dmg *= 1.4;
+                    attacker.hasLockOn = false;
+                    fx.addText(defender.x, targetY - 45, '🎯 LOCK-ON CRIT!', '#38bdf8', 22);
+                }
+                defender.takeDamage(dmg, false, proj.x, proj.y);
                 attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
-                defender.applyStun(16);
-                physics.applyKnockback(defender, proj.vx * 0.3, proj.vy * 0.3, 6);
+                defender.applyStun(14);
+                physics.applyKnockback(defender, proj.vx * 0.25, proj.vy * 0.25, 5);
+
+                // Ranged Signature 3-hit passives
+                attacker.signatureHits = (attacker.signatureHits || 0) + 1;
+                const rHitCount = attacker.signatureHits;
+
+                if (attacker.characterId === 'velina') {
+                    if (rHitCount >= 3) {
+                        attacker.hp = Math.min(attacker.maxHp, attacker.hp + 18);
+                        defender.applyStun(16);
+                        fx.addText(attacker.x, attacker.y - 45, '🌸 BLOOM HEAL +18!', '#34d399', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `🌸 FLORA [${rHitCount}/3]`, '#34d399', 18);
+                    }
+                } else if (attacker.characterId === 'nicole') {
+                    if (rHitCount >= 3) {
+                        defender.takeDamage(14);
+                        physics.applyKnockback(defender, proj.vx * 0.4, proj.vy * 0.4, 8);
+                        fx.addText(defender.x, defender.y - 45, '💼 SUGAR BOMB! -14', '#f472b6', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `💼 SUGAR [${rHitCount}/3]`, '#f472b6', 18);
+                    }
+                } else if (attacker.characterId === 'trigger') {
+                    if (rHitCount >= 3) {
+                        attacker.hasLockOn = true;
+                        fx.addText(attacker.x, attacker.y - 45, '🎯 LOCK-ON CRIT READY!', '#38bdf8', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `🎯 LOCK-ON [${rHitCount}/3]`, '#38bdf8', 18);
+                    }
+                } else if (attacker.characterId === 'vivian') {
+                    if (rHitCount >= 3) {
+                        defender.takeDamage(14);
+                        defender.curseTimer = 90;
+                        fx.addText(defender.x, defender.y - 45, '🔮 BANSHEE CURSE! -14', '#c084fc', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `🔮 FEATHER [${rHitCount}/3]`, '#c084fc', 18);
+                    }
+                }
 
                 sound.playHit(true);
                 fx.spawnHitSparks(proj.x, proj.y, proj.color, 18);
-                fx.addText(defender.x, targetY - 20, `-${Math.round(proj.damage)}`, attacker.color, 20);
+                fx.addText(defender.x, targetY - 20, `-${Math.round(dmg)}`, attacker.color, 20);
                 triggerScreenShake(7, 10);
                 this.projectiles.splice(i, 1);
             }
@@ -666,8 +809,8 @@ export class CombatResolver {
                     const strikeY = user.y;
                     const dist = Math.hypot(target.x - strikeX, target.y - strikeY);
                     if (dist < target.radius + 320) {
-                        target.takeDamage(ultDmgPerFrame * 1.35, true, user.x, user.y); // Buffed damage for Bajrang Gun
-                        target.applyStun(14);
+                        target.takeDamage(ultDmgPerFrame * 1.1, true, user.x, user.y);
+                        target.applyStun(12);
                         physics.applyKnockback(target, facingDir * 0.8, 1.2, 3.2); // Downward & forward slam
                         fx.spawnHitSparks(target.x, target.y, '#ef4444', 6);
                         triggerScreenShake(5, 8);
@@ -678,7 +821,7 @@ export class CombatResolver {
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + domainRadius) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
-                        target.applyStun(22);
+                        target.applyStun(12);
                         target.vx *= 0.1;
                         target.vy *= 0.1;
                         fx.spawnHitSparks(target.x, target.y, '#0284c7', 5);

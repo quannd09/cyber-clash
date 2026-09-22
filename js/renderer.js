@@ -1,6 +1,6 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=74';
-import { assets } from './assets.js?v=74';
+import { WEAPONS } from './combat.js?v=75';
+import { assets } from './assets.js?v=75';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -478,9 +478,45 @@ export class GameRenderer {
                 ctx.beginPath();
                 ctx.arc(20, -10, c.attackReach * 0.95, startAngle - 0.7, startAngle + 0.3);
                 ctx.stroke();
+            } else if (c.characterId === 'goku') {
+                // Goku: Saiyan Golden Ki Fist Shockwave & Kaioken Fire Arc
+                ctx.strokeStyle = c.isBoosted ? '#ef4444' : '#fbbf24';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach, startAngle - 0.7, startAngle + 0.7);
+                ctx.stroke();
+                ctx.strokeStyle = c.isBoosted ? '#f97316' : '#ffffff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(18, 0, c.attackReach * 0.85, startAngle - 0.4, startAngle + 0.4);
+                ctx.stroke();
+            } else if (c.characterId === 'jotaro') {
+                // Jotaro: Star Platinum Indigo ORA Punch Shockwave
+                ctx.strokeStyle = '#818cf8';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach, startAngle - 0.75, startAngle + 0.75);
+                ctx.stroke();
+                ctx.strokeStyle = '#c7d2fe';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(18, 0, c.attackReach * 0.85, startAngle - 0.4, startAngle + 0.4);
+                ctx.stroke();
+            } else if (c.characterId === 'giorno') {
+                // Giorno: Gold Experience Radiant Life Energy Arc
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 5.5;
+                ctx.beginPath();
+                ctx.arc(15, 0, c.attackReach, startAngle - 0.7, startAngle + 0.7);
+                ctx.stroke();
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(18, 0, c.attackReach * 0.85, startAngle - 0.4, startAngle + 0.4);
+                ctx.stroke();
             } else if (isYanagi) {
                 // Sharp Electric Purple / Blue Crescent Slash
-                ctx.strokeStyle = swingProgress < 0.5 ? '#38bdf8' : '#a855f7';
+                ctx.strokeStyle = swingProgress < 0.5 ? '#38bdf8' : '#a78bfa';
                 ctx.lineWidth = c.attackType === 'heavy' ? 8 : 4;
                 ctx.beginPath();
                 ctx.arc(15, 0, c.attackReach, startAngle - 0.7, startAngle + 0.7);
@@ -548,6 +584,38 @@ export class GameRenderer {
                 ctx.fill();
             }
             ctx.restore();
+        }
+
+        // 5.5 Signature Passive Auras
+        if (!c.isDead && !c.isStunned) {
+            if (c.characterId === 'gojo') {
+                // Gojo: Infinity Barrier Spatial Ripple (Vô Hạn Trụ)
+                ctx.save();
+                const pulse = Math.sin(Date.now() * 0.005) * 3;
+                ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(0, 0, 48 + pulse, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(0, 0, 56 + pulse * 1.5, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            } else if (c.characterId === 'goku' && c.isBoosted) {
+                // Goku: Kaioken Blazing Crimson Flame Aura
+                ctx.save();
+                const pulse = Math.sin(Date.now() * 0.015) * 4;
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2.5;
+                ctx.shadowColor = '#dc2626';
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(0, 0, 36 + pulse, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
         }
 
         // 6. Character-Specific Ultimate Visuals

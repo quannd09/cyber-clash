@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=74">
+    <link rel="stylesheet" href="style.css?v=75">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -23,7 +23,9 @@
             <div class="mode-tabs">
                 <button id="mode-local-tab" class="mode-tab active">LOCAL</button>
                 <button id="mode-bot-tab" class="mode-tab">VS BOT</button>
-                <button id="mode-online-tab" class="mode-tab">ONLINE</button>
+                <button id="mode-online1-tab" class="mode-tab mode-online1">🌐 ONLINE 1</button>
+                <button id="mode-online2-tab" class="mode-tab mode-online2">📡 ONLINE 2</button>
+                <a href="cyber_clash_test.html" class="mode-tab" style="text-decoration: none; display: flex; align-items: center; gap: 6px; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe;">🤖 BOT VS BOT (TEST)</a>
             </div>
 
             <!-- BOT DIFFICULTY SELECTOR -->
@@ -39,7 +41,7 @@
 
             <!-- ONLINE MATCH BANNER -->
             <div id="online-match-banner" class="online-banner hidden">
-                <span class="online-indicator">🟢 ONLINE</span>
+                <span id="banner-mode-indicator" class="online-indicator">🌐 ONLINE 1 (WS)</span>
                 <span class="room-pill">ROOM: <strong id="banner-room-code">CLASH-XXXX</strong></span>
                 <span class="role-pill" id="banner-role-text">ROLE: HOST (P1)</span>
                 <button id="btn-leave-online" class="leave-btn">❌ LEAVE</button>
@@ -47,6 +49,18 @@
 
             <!-- ONLINE LOBBY PANEL -->
             <div id="online-lobby-panel" class="online-lobby hidden">
+                <div class="lobby-mode-header">
+                    <div id="lobby-mode-title" class="lobby-mode-title">🌐 ONLINE 1 (WEBSOCKET RELAY)</div>
+                    <div id="lobby-mode-sub" class="lobby-mode-sub">Real-time WebSocket connection via central server. High stability across different WiFi/NAT networks.</div>
+                </div>
+
+                <!-- SERVER CONFIG ROW (Online 1 only) -->
+                <div id="ws-server-config" class="server-config-row">
+                    <label for="input-ws-server" class="server-label">RELAY SERVER:</label>
+                    <input type="text" id="input-ws-server" class="server-input" placeholder="ws://localhost:3000 or wss://cyber-clash-server.onrender.com" spellcheck="false">
+                    <button id="btn-save-server" class="server-save-btn">💾 SET SERVER</button>
+                </div>
+
                 <div class="lobby-columns">
                     <!-- HOST -->
                     <div class="lobby-col host-col">
@@ -84,7 +98,7 @@
                 </div>
 
                 <div id="online-global-msg" class="lobby-status-msg"></div>
-                <p class="lobby-guide-note" style="text-align: center; color: #94a3b8; font-size: 13px; margin: 16px 0 0 0; line-height: 1.5;">
+                <p id="lobby-guide-note" class="lobby-guide-note" style="text-align: center; color: #94a3b8; font-size: 13px; margin: 16px 0 0 0; line-height: 1.5;">
                     💡 <strong>How to connect:</strong> Player 1 clicks <strong>⚡ CREATE ROOM</strong> and shares the code with Player 2. Player 2 enters the code and clicks <strong>🚀 JOIN</strong> (Do NOT both create rooms).
                 </p>
             </div>
@@ -462,6 +476,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=74"></script>
+    <script type="module" src="js/main.js?v=75"></script>
 </body>
 </html>
