@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: cyber-clash-server
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+    autoDeploy: true

@@ -64,9 +64,13 @@ export class WebSocketNetworkProvider {
             if (host === 'localhost' || host === '127.0.0.1') {
                 return 'ws://localhost:3000';
             }
+            // Auto-detect when hosted on web platforms like Render
+            if (window.location.protocol === 'https:' || window.location.protocol === 'http:') {
+                return window.location.origin.replace(/^http/, 'ws');
+            }
         }
         // Default Render cloud server
-        return 'wss://cyber-clash-server.onrender.com';
+        return 'wss://cyber-clash-itv1.onrender.com';
     }
 
     setServerUrl(url) {

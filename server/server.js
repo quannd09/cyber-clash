@@ -3,9 +3,34 @@
 const http = require('http');
 const { WebSocketServer, WebSocket } = require('ws');
 
-const PORT = process.env.PORT || 3000;
+const fs = require('fs');
+const path = require('path');
 
-// HTTP server for health checks & ping
+const PORT = process.env.PORT || 3000;
+const GAME_ROOT = path.resolve(__dirname, '..');
+
+const MIME_TYPES = {
+    '.html': 'text/html; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.js': 'application/javascript; charset=utf-8',
+    '.mjs': 'application/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+    '.wav': 'audio/wav',
+    '.mp3': 'audio/mpeg',
+    '.ogg': 'audio/ogg',
+    '.ttf': 'font/ttf',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2'
+};
+
+// HTTP server for static game files & health checks
 const server = http.createServer((req, res) => {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,11 +43,14 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    if (req.url === '/health' || req.url === '/') {
+    const urlPath = req.url.split('?')[0];
+
+    // Dedicated health check endpoint for Render
+    if (urlPath === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             status: 'online',
-            service: 'Cyber Clash WebSocket Relay',
+            service: 'Cyber Clash WebSocket Relay + Web Host',
             activeRooms: rooms.size,
             uptime: Math.round(process.uptime()),
             timestamp: new Date().toISOString()
@@ -30,8 +58,36 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
+    // Serve game files
+    let relativeFile = urlPath === '/' ? '/index.html' : urlPath;
+    const safeFilePath = path.normalize(path.join(GAME_ROOT, relativeFile));
+
+    // Prevent directory traversal attacks
+    if (!safeFilePath.startsWith(GAME_ROOT)) {
+        res.writeHead(403, { 'Content-Type': 'text/plain' });
+        res.end('403 Forbidden');
+        return;
+    }
+
+    fs.stat(safeFilePath, (err, stats) => {
+        if (err || !stats.isFile()) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('404 Not Found');
+            return;
+        }
+
+        const ext = path.extname(safeFilePath).toLowerCase();
+        const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+
+        res.writeHead(200, {
+            'Content-Type': contentType,
+            'Content-Length': stats.size,
+            'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600'
+        });
+
+        const stream = fs.createReadStream(safeFilePath);
+        stream.pipe(res);
+    });
 });
 
 // WebSocket Server attached to HTTP Server
