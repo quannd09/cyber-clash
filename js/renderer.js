@@ -1,6 +1,6 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=71';
-import { assets } from './assets.js?v=71';
+import { WEAPONS } from './combat.js?v=72';
+import { assets } from './assets.js?v=72';
 
 export class GameRenderer {
     constructor(canvas, ctx) {

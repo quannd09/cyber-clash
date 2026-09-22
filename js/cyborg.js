@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=71';
-import { fx } from './particles.js?v=71';
-import { physics } from './physics.js?v=71';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=71';
-import { input } from './input.js?v=71';
+import { sound } from './audio.js?v=72';
+import { fx } from './particles.js?v=72';
+import { physics } from './physics.js?v=72';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=72';
+import { input } from './input.js?v=72';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -318,7 +318,7 @@ export class Cyborg {
 
     // --- ACTIONS ---
 
-    thrust(dirX, dirY) {
+    thrust(dirX, dirY, updateAim = true) {
         if (this.isStunned || this.isUsingUltimate) return;
 
         const thrustPower = this.isBoosted ? 1.2 : 0.6;
@@ -329,7 +329,9 @@ export class Cyborg {
         if (Math.hypot(dirX, dirY) > 0.1) {
             const moveAngle = Math.atan2(dirY, dirX);
             this.facingAngle = moveAngle;
-            this.aimAngle = moveAngle;
+            if (updateAim) {
+                this.aimAngle = moveAngle;
+            }
         }
 
         // Spawn thruster particle flame

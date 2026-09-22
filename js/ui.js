@@ -1,6 +1,6 @@
-import { assets } from './assets.js?v=71';
-import { network } from './network.js?v=71';
-import { input } from './input.js?v=71';
+import { assets } from './assets.js?v=72';
+import { network } from './network.js?v=72';
+import { input } from './input.js?v=72';
 
 const SKILL_DATA = {
     yanagi: {

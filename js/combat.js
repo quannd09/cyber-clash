@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=71';
-import { fx } from './particles.js?v=71';
-import { physics } from './physics.js?v=71';
+import { sound } from './audio.js?v=72';
+import { fx } from './particles.js?v=72';
+import { physics } from './physics.js?v=72';
 
 export const WEAPONS = {
     YANAGI: {

@@ -1,6 +1,6 @@
 // AI Bot Controller for Cyber Clash: Zero-G Arena
 // Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
-import { WEAPONS, combat } from './combat.js?v=71';
+import { WEAPONS, combat } from './combat.js?v=72';
 
 export class BotController {
     constructor(difficulty = 'normal') {
@@ -109,34 +109,7 @@ export class BotController {
         }
 
         // -------------------------------------------------------------
-        // 2. PREDICTIVE AIMING SYSTEM
-        // -------------------------------------------------------------
-        let targetAimAngle = Math.atan2(opponent.y - bot.y, opponent.x - bot.x);
-
-        if (this.difficulty === 'impossible' || this.difficulty === 'master') {
-            // Ballistic lead aim calculation
-            const bulletSpeed = 14.5;
-            const travelTime = dist / bulletSpeed;
-            const predX = opponent.x + opponent.vx * travelTime;
-            const predY = opponent.y + opponent.vy * travelTime;
-            targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
-
-            if (this.difficulty === 'master') {
-                // Tiny human jitter (±2 degrees)
-                targetAimAngle += (Math.random() - 0.5) * 0.04;
-            }
-        } else if (this.difficulty === 'normal') {
-            // Slight jitter (±6 degrees)
-            targetAimAngle += (Math.random() - 0.5) * 0.12;
-        } else {
-            // Easy: moderate lag & jitter (±18 degrees)
-            targetAimAngle += (Math.random() - 0.5) * 0.32;
-        }
-
-        bot.setAimAngle(targetAimAngle);
-
-        // -------------------------------------------------------------
-        // 3. ZERO-G MOVEMENT & KITING BEHAVIOR
+        // 2. ZERO-G MOVEMENT & KITING BEHAVIOR
         // -------------------------------------------------------------
         this.orbitTimer += dt;
         if (this.orbitTimer > 90) {
@@ -218,10 +191,47 @@ export class BotController {
             }
         }
 
-        // Apply thrust
+        // Apply thrust (updateAim = false so thrust movement never clobbers bot's aim angle!)
         if (Math.hypot(thrustX, thrustY) > 0.1) {
-            bot.thrust(thrustX, thrustY);
+            bot.thrust(thrustX, thrustY, false);
         }
+
+        // -------------------------------------------------------------
+        // 3. PREDICTIVE AIMING SYSTEM (Luôn khóa góc ngắm về phía đối thủ)
+        // -------------------------------------------------------------
+        let targetAimAngle = Math.atan2(opponent.y - bot.y, opponent.x - bot.x);
+
+        if (isMelee) {
+            // Tướng cận chiến: Khóa thẳng góc ngắm trực tiếp vào đối thủ
+            // Bù nhẹ 2 frames nếu đối thủ di chuyển nhanh để vung kiếm/đấm trúng đích
+            const leadFrames = (this.difficulty === 'impossible' || this.difficulty === 'master') ? 2 : 0;
+            const predX = opponent.x + opponent.vx * leadFrames;
+            const predY = opponent.y + opponent.vy * leadFrames;
+            targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
+        } else {
+            // Tướng tầm xa: Tính toán đón đầu đường đạn (Ballistic Lead Aim)
+            if (this.difficulty === 'impossible' || this.difficulty === 'master') {
+                const bulletSpeed = 14.5;
+                const travelTime = dist / bulletSpeed;
+                const predX = opponent.x + opponent.vx * travelTime;
+                const predY = opponent.y + opponent.vy * travelTime;
+                targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
+
+                if (this.difficulty === 'master') {
+                    // Sai lệch người chơi siêu nhỏ (±2 độ)
+                    targetAimAngle += (Math.random() - 0.5) * 0.04;
+                }
+            } else if (this.difficulty === 'normal') {
+                // Độ lệch nhẹ (±5 độ)
+                targetAimAngle += (Math.random() - 0.5) * 0.09;
+            } else {
+                // Easy: Độ lệch vừa phải (±12 độ)
+                targetAimAngle += (Math.random() - 0.5) * 0.20;
+            }
+        }
+
+        // Thiết lập góc ngắm và hướng mặt chuẩn xác về đối thủ
+        bot.setAimAngle(targetAimAngle);
 
         // -------------------------------------------------------------
         // 4. COMBAT & ATTACK EXECUTION (GLOBAL BOT NERF: MAX 6 SHOTS IN 4.5S -> 1.5S OVERHEAT LOCKOUT)
@@ -233,9 +243,9 @@ export class BotController {
         this.overheatEndTime = this.overheatEndTime || 0;
         const isOverheated = now < this.overheatEndTime;
 
-        // Attack range check
-        const weapon = WEAPONS[bot.characterId.toUpperCase()] || { attackRange: 80 };
-        const inAttackRange = isMelee ? (dist <= weapon.attackRange + 25) : (dist <= 650);
+        // Attack range check chuẩn theo tầm đánh từng vũ khí
+        const weapon = WEAPONS[bot.characterId.toUpperCase()] || { attackRange: isMelee ? 85 : 550 };
+        const inAttackRange = isMelee ? (dist <= weapon.attackRange + 25) : (dist <= (weapon.attackRange || 600));
 
         // Shield baiting: if player is shielding with high energy, avoid wasting strikes
         let shouldStrike = inAttackRange && !isOverheated && !bot.isShielding && bot.attackCooldown <= 0;
@@ -269,6 +279,7 @@ export class BotController {
             }
 
             if (willAttack) {
+                bot.setAimAngle(targetAimAngle);
                 bot.attack();
                 this.shotTimestamps.push(now);
             }
@@ -320,6 +331,7 @@ export class BotController {
             }
 
             if (fireSkill) {
+                bot.setAimAngle(targetAimAngle);
                 if (this.difficulty === 'impossible' || this.difficulty === 'master') {
                     bot.activateSkill(opponent);
                 } else if (this.difficulty === 'normal' && Math.random() < 0.7) {
@@ -334,6 +346,7 @@ export class BotController {
         // 6. ULTIMATE ABILITY (OVERDRIVE)
         // -------------------------------------------------------------
         if (bot.overdrive >= 100 && !bot.isShielding) {
+            bot.setAimAngle(targetAimAngle);
             if (this.difficulty === 'impossible') {
                 // Lethal execution: Fire Ultimate when opponent is stunned or guard broken
                 if (opponent.isStunned || dist < 380 || opponent.hp < 200) {
@@ -358,7 +371,7 @@ export class BotController {
             if (this.difficulty === 'impossible' || this.difficulty === 'master') {
                 // Use boost dash if opponent is stunned to close distance instantly, or to escape corner
                 if (opponent.isStunned && dist > 140 && isMelee) {
-                    bot.dash();
+                    bot.dash(normDx, normDy);
                 }
             }
         }
