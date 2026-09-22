@@ -1,6 +1,6 @@
 // AI Bot Controller for Cyber Clash: Zero-G Arena
 // Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
-import { WEAPONS, combat } from './combat.js?v=63';
+import { WEAPONS, combat } from './combat.js?v=69';
 
 export class BotController {
     constructor(difficulty = 'normal') {
@@ -32,80 +32,65 @@ export class BotController {
         let shouldShield = false;
         let parryDuration = 6;
 
-        // A. Incoming Projectiles Detection
-        if (combat && combat.projectiles) {
-            for (let i = 0; i < combat.projectiles.length; i++) {
-                const p = combat.projectiles[i];
-                if (p.ownerIndex === bot.index) continue; // Ignore own projectiles
+        // Nerf bot Easy & Normal: Hoàn toàn không được block/parry bất kỳ đòn đánh nào
+        const canBlock = (this.difficulty === 'impossible' || this.difficulty === 'master');
 
-                const dx = bot.x - p.x;
-                const dy = bot.y - p.y;
-                const pDist = Math.hypot(dx, dy);
+        if (canBlock) {
+            // A. Incoming Projectiles Detection
+            if (combat && combat.projectiles) {
+                for (let i = 0; i < combat.projectiles.length; i++) {
+                    const p = combat.projectiles[i];
+                    if (p.ownerIndex === bot.index) continue; // Ignore own projectiles
 
-                // Relative velocity
-                const rvx = p.vx - bot.vx;
-                const rvy = p.vy - bot.vy;
-                const relSpeed = Math.hypot(rvx, rvy);
-                const dot = dx * rvx + dy * rvy;
+                    const dx = bot.x - p.x;
+                    const dy = bot.y - p.y;
+                    const pDist = Math.hypot(dx, dy);
 
-                // Moving towards bot
-                if (dot > 0 && relSpeed > 0.5) {
-                    const timeToImpact = pDist / relSpeed;
-                    // Closest approach distance
-                    const cross = Math.abs(dx * rvy - dy * rvx) / relSpeed;
+                    // Relative velocity
+                    const rvx = p.vx - bot.vx;
+                    const rvy = p.vy - bot.vy;
+                    const relSpeed = Math.hypot(rvx, rvy);
+                    const dot = dx * rvx + dy * rvy;
 
-                    if (cross <= bot.radius + p.radius + 14) {
-                        if (this.difficulty === 'impossible') {
-                            // Frame-perfect 0-1 frame reflex, within 8 frames of impact
-                            if (timeToImpact <= 8) {
-                                shouldShield = true;
-                                parryDuration = 4;
-                                break;
-                            }
-                        } else if (this.difficulty === 'master') {
-                            // 85% reflex within 7 frames
-                            if (timeToImpact <= 7 && Math.random() < 0.85) {
-                                shouldShield = true;
-                                parryDuration = 5;
-                                break;
-                            }
-                        } else if (this.difficulty === 'normal') {
-                            // 50% reflex within 10 frames
-                            if (timeToImpact <= 10 && Math.random() < 0.50) {
-                                shouldShield = true;
-                                parryDuration = 9;
-                                break;
-                            }
-                        } else if (this.difficulty === 'easy') {
-                            // 15% reflex within 12 frames
-                            if (timeToImpact <= 12 && Math.random() < 0.15) {
-                                shouldShield = true;
-                                parryDuration = 18;
-                                break;
+                    // Moving towards bot
+                    if (dot > 0 && relSpeed > 0.5) {
+                        const timeToImpact = pDist / relSpeed;
+                        // Closest approach distance
+                        const cross = Math.abs(dx * rvy - dy * rvx) / relSpeed;
+
+                        if (cross <= bot.radius + p.radius + 14) {
+                            if (this.difficulty === 'impossible') {
+                                // Frame-perfect 0-1 frame reflex, within 8 frames of impact
+                                if (timeToImpact <= 8) {
+                                    shouldShield = true;
+                                    parryDuration = 4;
+                                    break;
+                                }
+                            } else if (this.difficulty === 'master') {
+                                // 85% reflex within 7 frames
+                                if (timeToImpact <= 7 && Math.random() < 0.85) {
+                                    shouldShield = true;
+                                    parryDuration = 5;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // B. Opponent Melee Slash Reaction
-        if (!shouldShield && opponent.isAttacking && !opponent.isShooting) {
-            const opponentReach = opponent.attackReach || 80;
-            if (dist <= opponentReach + bot.radius + 12) {
-                if (this.difficulty === 'impossible') {
-                    // Frame-perfect melee parry -> Stuns opponent for 0.9s!
-                    shouldShield = true;
-                    parryDuration = 4;
-                } else if (this.difficulty === 'master' && Math.random() < 0.80) {
-                    shouldShield = true;
-                    parryDuration = 5;
-                } else if (this.difficulty === 'normal' && Math.random() < 0.40) {
-                    shouldShield = true;
-                    parryDuration = 8;
-                } else if (this.difficulty === 'easy' && Math.random() < 0.10) {
-                    shouldShield = true;
-                    parryDuration = 15;
+            // B. Opponent Melee Slash Reaction
+            if (!shouldShield && opponent.isAttacking && !opponent.isShooting) {
+                const opponentReach = opponent.attackReach || 80;
+                if (dist <= opponentReach + bot.radius + 12) {
+                    if (this.difficulty === 'impossible') {
+                        // Frame-perfect melee parry -> Stuns opponent for 0.9s!
+                        shouldShield = true;
+                        parryDuration = 4;
+                    } else if (this.difficulty === 'master' && Math.random() < 0.80) {
+                        shouldShield = true;
+                        parryDuration = 5;
+                    }
                 }
             }
         }
@@ -149,7 +134,6 @@ export class BotController {
         }
 
         bot.setAimAngle(targetAimAngle);
-        bot.setStrafing(true); // Maintain aim towards opponent while maneuvering
 
         // -------------------------------------------------------------
         // 3. ZERO-G MOVEMENT & KITING BEHAVIOR
@@ -374,7 +358,7 @@ export class BotController {
             if (this.difficulty === 'impossible' || this.difficulty === 'master') {
                 // Use boost dash if opponent is stunned to close distance instantly, or to escape corner
                 if (opponent.isStunned && dist > 140 && isMelee) {
-                    bot.activateUltimateOrDash();
+                    bot.dash();
                 }
             }
         }

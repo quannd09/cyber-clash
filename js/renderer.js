@@ -1,6 +1,6 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=63';
-import { assets } from './assets.js?v=63';
+import { WEAPONS } from './combat.js?v=69';
+import { assets } from './assets.js?v=69';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -126,7 +126,8 @@ export class GameRenderer {
 
         // 2. Character State & Active Pose
         let pose = 'idle';
-        if (c.isStunned) pose = 'hurt';
+        if (c.isDead || c.hp <= 0) pose = 'dead';
+        else if (c.isStunned) pose = 'hurt';
         else if (c.isUsingUltimate) pose = 'ultimate';
         else if (c.isUsingSkill) pose = 'attack_heavy';
         else if (c.isShielding) pose = 'shield';
@@ -194,7 +195,93 @@ export class GameRenderer {
             ctx.translate(0, pivotY);
 
             // Dynamic Action Transformations on the SINGLE image
-            if (pose === 'attack_light') {
+            if (pose === 'dead') {
+                const dt = c.deathTimer || 0;
+
+                // 1. Phim hoạt họa cái chết nhiều giai đoạn (Multi-phase anime KO animation)
+                if (dt < 22) {
+                    // Giai đoạn 1 (frames 0 - 22): Cú đánh kết liễu - giật lùi dữ dội, ngửa cổ ra sau, rung lắc chấn động
+                    const reelProgress = dt / 22;
+                    const reelAngle = -0.55 * Math.sin(reelProgress * Math.PI / 2);
+                    ctx.rotate(reelAngle);
+                    ctx.scale(1.15, 0.85); // Kéo biến dạng va đập
+                    ctx.translate(-25 * reelProgress, -12 * Math.sin(reelProgress * Math.PI));
+                    ctx.filter = 'drop-shadow(0 0 25px rgba(239, 68, 68, 0.95)) sepia(100%) hue-rotate(-50deg) saturate(450%) contrast(150%)';
+                } else if (dt < 65) {
+                    // Giai đoạn 2 (frames 22 - 65): Lộn ngược trong môi trường không trọng lực (Zero-G spin) & gục ngã dần xuống sàn
+                    const fallProgress = (dt - 22) / 43;
+                    const baseRot = -0.55;
+                    const targetRot = -Math.PI / 2; // Nằm ngang 90 độ
+                    const currentRot = baseRot + (targetRot - baseRot) * Math.sin(fallProgress * Math.PI / 2);
+
+                    ctx.rotate(currentRot);
+                    ctx.translate(-25 + fallProgress * 15, fallProgress * 20);
+
+                    // Nhấp nháy hologram lỗi kết nối (glitch flickering)
+                    const flicker = Math.sin(dt * 1.2) > 0 ? 0.95 : 0.65;
+                    ctx.globalAlpha = flicker;
+                    ctx.filter = `drop-shadow(0 0 15px ${c.color}) grayscale(${Math.round(fallProgress * 70)}%) brightness(90%)`;
+                } else {
+                    // Giai đoạn 3 (frames 65+): Đã ngã gục hoàn toàn (Defeated / Offline)
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.scale(1.18, 0.72); // Bị ép phẳng xuống sàn
+                    ctx.translate(-10, 22);
+
+                    // Tông màu xám kim loại mất điện (depleted power)
+                    ctx.globalAlpha = 0.65;
+                    ctx.filter = 'grayscale(100%) brightness(40%) drop-shadow(0 0 8px rgba(0, 0, 0, 0.8))';
+                }
+
+                // Digital Scanline Glitch Slices (Vỡ ảnh kỹ thuật số khi trúng đòn tử trận)
+                if (dt < 55) {
+                    const slices = 4;
+                    const sliceH = targetH / slices;
+                    for (let s = 0; s < slices; s++) {
+                        const glitchOffset = (Math.sin(dt * 0.8 + s * 1.7) > 0.3) ? (Math.sin(s * 99) * 12) : 0;
+                        ctx.drawImage(
+                            customSprite,
+                            0, s * (customSprite.naturalHeight / slices),
+                            customSprite.naturalWidth, customSprite.naturalHeight / slices,
+                            -targetW / 2 + glitchOffset, -targetH + s * sliceH,
+                            targetW, sliceH
+                        );
+                    }
+                } else {
+                    ctx.drawImage(customSprite, -targetW / 2, -targetH, targetW, targetH);
+                }
+
+                // Holographic Defeated HUD Emblem (Huy hiệu K.O. OFFLINE nổi trên người)
+                if (dt > 25) {
+                    ctx.save();
+                    ctx.rotate(Math.PI / 2); // Xoay ngược lại thẳng đứng
+                    ctx.translate(-targetH * 0.45, -targetW * 0.6);
+
+                    const hudAlpha = Math.min(1, (dt - 25) / 25);
+                    ctx.globalAlpha = hudAlpha * (0.85 + Math.sin(dt * 0.15) * 0.15);
+
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 1.5;
+                    ctx.shadowColor = '#ef4444';
+                    ctx.shadowBlur = 12;
+
+                    const boxW = 110;
+                    const boxH = 22;
+                    ctx.fillRect(-boxW / 2, -boxH / 2, boxW, boxH);
+                    ctx.strokeRect(-boxW / 2, -boxH / 2, boxW, boxH);
+
+                    ctx.fillStyle = '#f8fafc';
+                    ctx.font = "900 11px 'Orbitron', monospace";
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('💀 K.O. - OFFLINE', 0, 0);
+                    ctx.restore();
+                }
+
+                ctx.restore();
+                ctx.restore();
+                return;
+            } else if (pose === 'attack_light') {
                 // Lao tới, nghiêng người và kéo giãn tạo cảm giác chém nhanh
                 ctx.rotate(0.35); 
                 ctx.scale(1.15, 0.9); // Kéo dài theo trục X, ép trục Y
@@ -277,7 +364,11 @@ export class GameRenderer {
             ctx.save();
             const isYanagi = c.characterId === 'yanagi';
 
-            if (pose === 'attack_light') ctx.translate(20, 0);
+            if (pose === 'dead') {
+                ctx.rotate(-Math.PI / 2);
+                ctx.translate(-15, 25);
+                ctx.filter = 'grayscale(100%) brightness(50%)';
+            } else if (pose === 'attack_light') ctx.translate(20, 0);
             else if (pose === 'attack_heavy') ctx.translate(32, 0);
             else if (pose === 'hurt') ctx.translate(-16, 0);
             else ctx.translate(0, Math.sin(Date.now() * 0.005 + c.index * 2) * 2);

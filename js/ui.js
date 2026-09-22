@@ -1,6 +1,6 @@
-import { assets } from './assets.js?v=63';
-import { network } from './network.js?v=63';
-import { input } from './input.js?v=63';
+import { assets } from './assets.js?v=69';
+import { network } from './network.js?v=69';
+import { input } from './input.js?v=69';
 
 const SKILL_DATA = {
     yanagi: {
@@ -256,10 +256,37 @@ export class UIManager {
         // Rematch Button
         const rematchBtn = document.getElementById('rematch-btn');
         if (rematchBtn) {
-            rematchBtn.addEventListener('click', () => {
+            const handleRematch = (e) => {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                if (this.gameMode === 'ONLINE') {
+                    network.send({ type: 'ONLINE_REMATCH' });
+                }
                 this.hideVictory();
+                if (this.onRematch) this.onRematch();
                 this.showLoadout();
-            });
+            };
+            rematchBtn.addEventListener('click', handleRematch);
+            rematchBtn.addEventListener('touchend', handleRematch, { passive: false });
+        }
+
+        // Return to Lobby / Main Menu Exit Button from Victory Screen
+        const victoryExitBtn = document.getElementById('btn-victory-lobby');
+        if (victoryExitBtn) {
+            const handleVictoryExit = (e) => {
+                if (e) { e.preventDefault(); e.stopPropagation(); }
+                if (this.gameMode === 'ONLINE') {
+                    network.send({ type: 'PLAYER_LEFT' });
+                    network.disconnect();
+                    if (this.switchToLocal) {
+                        this.switchToLocal();
+                    }
+                }
+                this.hideVictory();
+                if (this.onRematch) this.onRematch();
+                this.showLoadout();
+            };
+            victoryExitBtn.addEventListener('click', handleVictoryExit);
+            victoryExitBtn.addEventListener('touchend', handleVictoryExit, { passive: false });
         }
 
         // Help Modal Toggle & Close Handlers
@@ -369,6 +396,7 @@ export class UIManager {
             this.restoreLocalFighterPermissions();
             if (this.onNetworkModeChange) this.onNetworkModeChange('LOCAL');
         };
+        this.switchToLocal = switchToLocal;
 
         const switchToBot = () => {
             this.gameMode = 'BOT';
@@ -687,6 +715,18 @@ export class UIManager {
         } else if (data.type === 'MATCH_START') {
             this.hideLoadout();
             this.onStartMatch(data.p1Char, data.p2Char);
+        } else if (data.type === 'ONLINE_REMATCH') {
+            this.hideVictory();
+            if (this.onRematch) this.onRematch();
+            this.showLoadout();
+        } else if (data.type === 'PLAYER_LEFT') {
+            this.hideVictory();
+            network.disconnect();
+            if (this.switchToLocal) this.switchToLocal();
+            const modal = document.getElementById('disconnect-modal');
+            const msg = document.getElementById('disconnect-msg');
+            if (msg) msg.textContent = 'Đối thủ đã rời khỏi phòng hoặc thoát về menu chính.';
+            if (modal) modal.classList.remove('hidden');
         } else if (this.onNetworkGameData) {
             this.onNetworkGameData(data);
         }
@@ -761,7 +801,7 @@ export class UIManager {
             { id: 'lightAttack', label: 'Normal Attack' },
             { id: 'shield', label: 'Shield / Parry' },
             { id: 'skill', label: 'Special Skill' },
-            { id: 'strafe', label: 'Strafe Lock' },
+            { id: 'dash', label: 'Dash / Boost' },
             { id: 'ultimate', label: 'Ultimate Overdrive' }
         ];
 
@@ -910,14 +950,16 @@ export class UIManager {
     }
 
     requestFullscreen() {
+        if (typeof window !== 'undefined' && window.game && typeof window.game.requestFullscreen === 'function') {
+            window.game.requestFullscreen();
+            return;
+        }
         try {
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                const el = document.documentElement;
-                if (el.requestFullscreen) {
-                    el.requestFullscreen().catch(() => {});
-                } else if (el.webkitRequestFullscreen) {
-                    el.webkitRequestFullscreen();
-                }
+            const container = document.getElementById('game-container') || document.documentElement;
+            if (container.requestFullscreen) {
+                container.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+            } else if (container.webkitRequestFullscreen) {
+                container.webkitRequestFullscreen();
             }
         } catch (err) {}
     }

@@ -333,6 +333,52 @@ export class SoundEngine {
         osc.stop(now + 1.31);
     }
 
+    playDeath(pan = 0) {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+
+        // 1. Deep sub-bass boom
+        this.playKO();
+
+        // 2. High-frequency digital glass / shield shatter
+        try {
+            const bufferSize = Math.floor(this.ctx.sampleRate * 0.45);
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(1800, now);
+            filter.frequency.exponentialRampToValueAtTime(300, now + 0.45);
+            const noiseGain = this.ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.5, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+            noise.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(this.sfxGain);
+            noise.start(now);
+        } catch (e) {}
+
+        // 3. Descending cyber overload power-down tone
+        try {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(35, now + 0.9);
+            gain.gain.setValueAtTime(0.35, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+            osc.start(now);
+            osc.stop(now + 0.92);
+        } catch (e) {}
+    }
+
     // --- CYBERPUNK SYNTHWAVE PROCEDURAL BGM ---
 
     startBGM() {

@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=63';
-import { fx } from './particles.js?v=63';
-import { physics } from './physics.js?v=63';
+import { sound } from './audio.js?v=69';
+import { fx } from './particles.js?v=69';
+import { physics } from './physics.js?v=69';
 
 export const WEAPONS = {
     YANAGI: {
@@ -16,7 +16,7 @@ export const WEAPONS = {
     VELINA: {
         id: 'VELINA',
         name: 'Photonic Flora',
-        attackDmg: 23,
+        attackDmg: 21, // Nerfed 10% (from 23)
         attackRange: 580,
         attackDuration: 24,
         attackCooldown: 28,
@@ -26,7 +26,7 @@ export const WEAPONS = {
     NICOLE: {
         id: 'NICOLE',
         name: 'Briefcase Cannon',
-        attackDmg: 26,
+        attackDmg: 23, // Nerfed 10% (from 26)
         attackRange: 520,
         attackDuration: 22,
         attackCooldown: 27,
@@ -36,7 +36,7 @@ export const WEAPONS = {
     TRIGGER: {
         id: 'TRIGGER',
         name: 'Electromagnetic Sniper',
-        attackDmg: 38,
+        attackDmg: 34, // Nerfed 10% (from 38)
         attackRange: 720,
         attackDuration: 26,
         attackCooldown: 38,
@@ -46,7 +46,7 @@ export const WEAPONS = {
     VIVIAN: {
         id: 'VIVIAN',
         name: 'Ether Feathers',
-        attackDmg: 21,
+        attackDmg: 19, // Nerfed 10% (from 21)
         attackRange: 500,
         attackDuration: 20,
         attackCooldown: 24,
@@ -127,7 +127,7 @@ export const WEAPONS = {
 
 export const SKILLS = {
     YANAGI_SKILL: { id: 'PHASE_BLINK', name: 'Phase Blink', cooldown: 180, icon: '⚡' },
-    VERINA_SKILL: { id: 'EMP_BLAST', name: 'EMP Blast', cooldown: 210, icon: '🌸' },
+    VERINA_SKILL: { id: 'PHOTOSYNTHESIS', name: 'Photosynthesis', cooldown: 210, icon: '🌸' },
     NICOLE_SKILL: { id: 'SUGAR_SLIDE', name: 'Sugar Slide', cooldown: 190, icon: '💼' },
     TRIGGER_SKILL: { id: 'SNIPER_STANCE', name: 'Sniper Stance', cooldown: 230, icon: '🎯' },
     VIVIAN_SKILL: { id: 'ABLOOM_BURST', name: 'Abloom Burst', cooldown: 150, icon: '🔮' },
@@ -432,7 +432,7 @@ export class CombatResolver {
             }
 
             // Direct unshielded hit!
-            defender.takeDamage(baseDmg);
+            defender.takeDamage(baseDmg, false, attacker.x, attacker.y);
             attacker.overdrive = Math.min(100, attacker.overdrive + 14 * (attacker.overdriveChargeRate || 1.0));
             defender.applyStun(20);
             physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 10);
@@ -495,7 +495,7 @@ export class CombatResolver {
                 }
 
                 // Direct hit!
-                defender.takeDamage(proj.damage);
+                defender.takeDamage(proj.damage, false, proj.x, proj.y);
                 attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
                 defender.applyStun(16);
                 physics.applyKnockback(defender, proj.vx * 0.3, proj.vy * 0.3, 6);
@@ -530,7 +530,7 @@ export class CombatResolver {
                     // 2. Nằm trong chiều dài tia (<= 1500px)
                     // 3. Khoảng cách vuông góc tới tia phải nhỏ hơn bán kính tia + bán kính nhân vật
                     if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(8);
                         physics.applyKnockback(target, facingDir, 0, 1.5);
                         fx.spawnHitSparks(target.x, target.y, user.color, 4);
@@ -541,7 +541,7 @@ export class CombatResolver {
                     const stormRadius = 80 + user.ultimateTimer * 5;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + stormRadius) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(8);
                         const angleToTarget = Math.atan2(target.y - user.y, target.x - user.x);
                         physics.applyKnockback(target, Math.cos(angleToTarget), Math.sin(angleToTarget), 1.5);
@@ -559,7 +559,7 @@ export class CombatResolver {
                         // Sucking pull force towards black hole
                         const pullAngle = Math.atan2(hY - target.y, hX - target.x);
                         physics.applyKnockback(target, Math.cos(pullAngle), Math.sin(pullAngle), 2.2);
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(10);
                         fx.spawnHitSparks(target.x, target.y, '#ec4899', 3);
                         triggerScreenShake(2, 4);
@@ -573,7 +573,7 @@ export class CombatResolver {
                     const halfThickness = 18; // Bán kính đường đạn xuyên phá chuẩn xác
 
                     if (forwardDist >= 35 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(12);
                         physics.applyKnockback(target, facingDir, 0, 2.5);
                         fx.spawnHitSparks(target.x, target.y, '#38bdf8', 5);
@@ -584,7 +584,7 @@ export class CombatResolver {
                     const stormRadius = 460;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + stormRadius) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(8);
                         target.vx *= 0.7; // Ether slow
                         target.vy *= 0.7;
@@ -599,7 +599,7 @@ export class CombatResolver {
                     // Rush close to target if within range
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < 220) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         physics.applyKnockback(target, Math.cos(user.aimAngle), Math.sin(user.aimAngle), 1.8);
                         fx.spawnHitSparks(target.x, target.y, '#6366f1', 6);
                         triggerScreenShake(4, 7);
@@ -614,7 +614,7 @@ export class CombatResolver {
 
                     // Chỉ dính dame khi đối thủ thực sự nằm trong luồng sóng Kamehameha phía trước
                     if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(10);
                         physics.applyKnockback(target, facingDir, 0, 2.0);
                         fx.spawnHitSparks(target.x, target.y, '#fbbf24', 6);
@@ -627,23 +627,37 @@ export class CombatResolver {
                     target.vy *= 0.2;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < 240) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         const angle = Math.atan2(target.y - user.y, target.x - user.x);
                         physics.applyKnockback(target, Math.cos(angle), Math.sin(angle), 1.6);
                         fx.spawnHitSparks(target.x, target.y, '#eab308', 5);
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'naoya') {
-                    // NAOYA: TỐC ĐỘ MACH 3 LIÊN HOÀN TRẢM (PROJECTION SORCERY 24 FPS)
-                    const barrageRadius = 340;
+                    // NAOYA: TỐC ĐỘ MACH 3 LIÊN HOÀN TRẢM (PROJECTION SORCERY 10 FPS)
+                    // 1. Tăng dame x1.25 lần: tổng dame = (normalDmg * 3.5) * 1.25
+                    // 2. Giảm lag xuống 10 FPS: chỉ đánh theo nhịp 10 FPS (1 hit mỗi 5 frames = 10 hits trọn vẹn trong 50 frames ult)
+                    const barrageRadius = 350;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
-                    if (dist < target.radius + barrageRadius) {
-                        target.takeDamage(ultDmgPerFrame);
-                        target.applyFrameFreeze(12);
-                        const dashAngle = user.ultimateTimer * 0.8;
-                        physics.applyKnockback(target, Math.cos(dashAngle), Math.sin(dashAngle), 2.2);
-                        fx.spawnHitSparks(target.x, target.y, '#a3e635', 5);
-                        triggerScreenShake(3, 5);
+                    const hitIndex = Math.floor((user.ultimateTimer - 15) / 5); // 0 đến 9 tương ứng 10 hits
+                    if (hitIndex >= 0 && hitIndex < 10 && hitIndex > (user.lastNaoyaHitIndex ?? -1)) {
+                        user.lastNaoyaHitIndex = hitIndex;
+                        if (dist < target.radius + barrageRadius) {
+                            // Chia đều tổng dame x1.25 qua 10 hits -> nhận trọn vẹn 100% dame x1.25
+                            const totalNaoyaUltDmg = (normalDmg * 3.5) * 1.25;
+                            const perHitDmg = totalNaoyaUltDmg / 10;
+                            target.takeDamage(perHitDmg, true, user.x, user.y);
+                            target.applyStun(10);
+                            target.frameFrozenTimer = 10;
+                            const dashAngle = user.ultimateTimer * 0.8;
+                            physics.applyKnockback(target, Math.cos(dashAngle), Math.sin(dashAngle), 2.0);
+                            fx.spawnHitSparks(target.x, target.y, '#a3e635', 6);
+                            sound.playSlash(true);
+                            triggerScreenShake(2, 3);
+                            if (hitIndex === 1) {
+                                fx.addText(target.x, target.y - 45, '🎞️ 10 FPS FRAME FREEZE! 🎞️', '#a3e635', 24, 45);
+                            }
+                        }
                     }
                 } else if (user.characterId === 'luffy') {
                     // LUFFY: GOMU GOMU NO BAJRANG GUN (NẮM ĐẤM HAKI HÓA THẦN NIKA KHỔNG LỒ)
@@ -652,7 +666,7 @@ export class CombatResolver {
                     const strikeY = user.y;
                     const dist = Math.hypot(target.x - strikeX, target.y - strikeY);
                     if (dist < target.radius + 320) {
-                        target.takeDamage(ultDmgPerFrame * 1.35); // Buffed damage for Bajrang Gun
+                        target.takeDamage(ultDmgPerFrame * 1.35, true, user.x, user.y); // Buffed damage for Bajrang Gun
                         target.applyStun(14);
                         physics.applyKnockback(target, facingDir * 0.8, 1.2, 3.2); // Downward & forward slam
                         fx.spawnHitSparks(target.x, target.y, '#ef4444', 6);
@@ -663,7 +677,7 @@ export class CombatResolver {
                     const domainRadius = 450;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + domainRadius) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(22);
                         target.vx *= 0.1;
                         target.vy *= 0.1;
@@ -675,7 +689,7 @@ export class CombatResolver {
                     const shrineRadius = 420;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + shrineRadius) {
-                        target.takeDamage(ultDmgPerFrame);
+                        target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(10);
                         const sliceAngle = (user.ultimateTimer * 0.7) % (Math.PI * 2);
                         physics.applyKnockback(target, Math.cos(sliceAngle), Math.sin(sliceAngle), 1.8);

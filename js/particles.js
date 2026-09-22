@@ -51,6 +51,9 @@ export class Particle {
             ctx.beginPath();
             ctx.arc(0, 0, this.size * (1.5 - progress * 0.5), 0, Math.PI * 2);
             ctx.stroke();
+        } else if (this.shape === 'box') {
+            const s = this.size * progress;
+            ctx.fillRect(-s, -s, s * 2, s * 2);
         }
 
         ctx.restore();
@@ -147,6 +150,53 @@ export class ParticleSystem {
             const vy = Math.sin(baseAngle + spread) * speed;
             this.particles.push(new Particle(x, y, vx, vy, '#ffffff', 3, 16, 'spark'));
         }
+    }
+
+    spawnDeathBurst(x, y, color = '#ef4444') {
+        // Massive energy shockwave rings
+        this.particles.push(new Particle(x, y, 0, 0, '#ffffff', 55, 28, 'ring', 1.0));
+        this.particles.push(new Particle(x, y, 0, 0, color, 85, 36, 'ring', 0.9));
+        this.particles.push(new Particle(x, y, 0, 0, '#ff0055', 115, 42, 'ring', 0.8));
+
+        // 35 flying cyber debris fragments & sparks
+        for (let i = 0; i < 35; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 3 + Math.random() * 9;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed - 2.5; // Biased upwards
+            const pColor = Math.random() > 0.4 ? color : (Math.random() > 0.5 ? '#ffffff' : '#f43f5e');
+            const shape = Math.random() > 0.5 ? 'box' : 'spark';
+            const size = 3 + Math.random() * 4;
+            const life = 35 + Math.random() * 30;
+            this.particles.push(new Particle(x, y, vx, vy, pColor, size, life, shape, 0.95));
+        }
+
+        // Heavy floating K.O. text with neon outline
+        this.addText(x, y - 45, '⚡ K. O. ⚡', '#ef4444', 38, 75);
+    }
+
+    spawnDeathSparks(x, y, color = '#00f0ff') {
+        for (let i = 0; i < 4; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1.5 + Math.random() * 4;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            this.particles.push(new Particle(
+                x + (Math.random() - 0.5) * 32,
+                y + (Math.random() - 0.5) * 44,
+                vx, vy, color, 2 + Math.random() * 2, 12 + Math.random() * 10, 'spark', 0.9
+            ));
+        }
+    }
+
+    spawnDeathSmoke(x, y) {
+        const vx = (Math.random() - 0.5) * 0.8;
+        const vy = -1.2 - Math.random() * 1.0;
+        this.particles.push(new Particle(
+            x + (Math.random() - 0.5) * 24,
+            y + 10 + (Math.random() - 0.5) * 10,
+            vx, vy, 'rgba(100, 116, 139, 0.6)', 6 + Math.random() * 6, 40 + Math.random() * 20, 'circle', 0.6
+        ));
     }
 
     addText(x, y, text, color = '#ffff00', size = 22, life = 45) {

@@ -7,7 +7,7 @@ export const DEFAULT_P1_BINDINGS = {
     heavyAttack: [],
     shield: ['KeyH', 'keyh'],
     skill: ['KeyR', 'keyr'],
-    strafe: ['ShiftLeft'],
+    dash: ['ShiftLeft', 'KeyC', 'keyc'],
     ultimate: ['Space', ' ', 'Spacebar']
 };
 
@@ -20,7 +20,7 @@ export const DEFAULT_P2_BINDINGS = {
     heavyAttack: [],
     shield: ['Numpad3', 'KeyL', 'keyl'],
     skill: ['Numpad5', 'KeyI', 'keyi'],
-    strafe: ['Numpad0', 'KeyU', 'keyu', 'ControlRight'],
+    dash: ['Numpad0', 'KeyU', 'keyu', 'ControlRight', 'NumpadPeriod'],
     ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo']
 };
 
@@ -59,14 +59,14 @@ export class InputManager {
             lightAttack: false,
             shield: false,
             skill: false,
-            strafe: false,
+            dash: false,
             ultimate: false
         };
         this.touchActionsJust = {
             lightAttack: false,
             shield: false,
             skill: false,
-            strafe: false,
+            dash: false,
             ultimate: false
         };
         this.joystickTouchId = null;
@@ -291,7 +291,7 @@ export class InputManager {
             case 'skill': // A / Cross
                 down = buttons[0] && buttons[0].pressed;
                 break;
-            case 'strafe': // Left Trigger / L1
+            case 'dash': // Left Bumper / L1
                 down = (buttons[4] && buttons[4].pressed) || (buttons[6] && buttons[6].pressed);
                 break;
             case 'ultimate': // Right Trigger / R1
@@ -478,7 +478,7 @@ export class InputManager {
                 e.preventDefault();
                 e.stopPropagation();
                 btn.classList.add('touch-active');
-                const isInstant = (action === 'lightAttack' || action === 'skill' || action === 'ultimate');
+                const isInstant = (action === 'lightAttack' || action === 'skill' || action === 'ultimate' || action === 'dash');
                 this.setTouchAction(action, true, isInstant);
             };
 
@@ -512,6 +512,21 @@ export class InputManager {
             if (s2) {
                 const parsed2 = JSON.parse(s2);
                 this.p2Bindings = { ...this.p2Bindings, ...parsed2 };
+            }
+            // Purge obsolete strafe lock from saved bindings
+            delete this.p1Bindings.strafe;
+            delete this.p2Bindings.strafe;
+
+            if (!this.p1Bindings.dash || this.p1Bindings.dash.length === 0) {
+                this.p1Bindings.dash = JSON.parse(JSON.stringify(DEFAULT_P1_BINDINGS.dash));
+            } else if (!this.p1Bindings.dash.includes('KeyC') && !this.p1Bindings.dash.includes('keyc')) {
+                this.p1Bindings.dash.push('KeyC', 'keyc');
+            }
+
+            if (!this.p2Bindings.dash || this.p2Bindings.dash.length === 0) {
+                this.p2Bindings.dash = JSON.parse(JSON.stringify(DEFAULT_P2_BINDINGS.dash));
+            } else if (!this.p2Bindings.dash.includes('Numpad0')) {
+                this.p2Bindings.dash.push('Numpad0', 'ControlRight');
             }
         } catch (err) {
             console.warn('[InputManager] Could not load saved bindings:', err);

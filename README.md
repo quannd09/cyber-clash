@@ -34,8 +34,8 @@
 | **Normal Attack** | `F` | `Num 1` or `J` | X / Square |
 | **Shield / Parry** | `H` | `Num 3` or `L` | B / Circle |
 | **Special Skill** | `R` | `Num 5` or `I` | A / Cross |
-| **Strafe Lock** | `Left Shift` | `Num 0` or `U` | Left Trigger (LT / L1) |
-| **Ultimate Ability** | `Space` | `Enter` or `O` | Right Trigger (RT / R1) |
+| **Dash / Boost** | `Left Shift` or `C` | `Num 0`, `U` or `R-Ctrl` | Left Bumper (LB / L1) |
+| **Ultimate Overdrive** | `Space` (Requires 100% Overdrive) | `Enter` or `O` (Requires 100% Overdrive) | Right Trigger (RT / R1) |
 
 ### Online Mode (WebRTC)
 - **Host (Player 1):** Click `CREATE ROOM` $\rightarrow$ Share room code $\rightarrow$ Controls: `WASD + F / H / R / Space`.

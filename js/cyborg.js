@@ -1,8 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=63';
-import { fx } from './particles.js?v=63';
-import { physics } from './physics.js?v=63';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=63';
+import { sound } from './audio.js?v=69';
+import { fx } from './particles.js?v=69';
+import { physics } from './physics.js?v=69';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=69';
+import { input } from './input.js?v=69';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -108,9 +109,15 @@ export class Cyborg {
         this.isUsingUltimate = false;
         this.ultimateTimer = 0;
 
-        // Anti-spam Attack Mechanism (Chỉ tính nếu spam 6 đòn trong ~2s)
+        // Anti-spam Attack Mechanism
         this.recentAttackTimes = [];
         this.spamDelayTimer = 0;
+        this.attackBufferTimer = 0;
+
+        // Death / KO Animation
+        this.isDead = false;
+        this.deathTimer = 0;
+        this.deathFallAngle = 0;
 
         // Loadout selection
         this.loadout = {
@@ -149,21 +156,59 @@ export class Cyborg {
         this.hasClashed = false;
         this.recentAttackTimes = [];
         this.spamDelayTimer = 0;
+        this.attackBufferTimer = 0;
         this.naoyaHitCount = 0;
         this.frameFrozenTimer = 0;
         this.afterimages = [];
+        this.isDead = false;
+        this.deathTimer = 0;
+        this.deathFallAngle = 0;
+        this.lastNaoyaHitIndex = -1;
     }
 
     update(dt = 1, arenaBounds) {
+        // Death / KO State Physics & Effects
+        if (this.isDead) {
+            this.deathTimer += dt;
+
+            // Zero-G decaying drift with slow falling gravity
+            this.vy += 0.22 * dt;
+            this.vx *= Math.pow(0.95, dt);
+            this.vy *= Math.pow(0.96, dt);
+            this.x += this.vx * dt;
+            this.y += this.vy * dt;
+
+            // Boundary clamping & soft collision with floor / arena bounds
+            if (arenaBounds) {
+                if (this.y > arenaBounds.maxY - 25) {
+                    this.y = arenaBounds.maxY - 25;
+                    if (Math.abs(this.vy) > 0.5) {
+                        this.vy = -this.vy * 0.22;
+                        fx.spawnDeathSparks(this.x, this.y, this.color);
+                    } else {
+                        this.vy = 0;
+                    }
+                    this.vx *= 0.85;
+                }
+                if (this.x < arenaBounds.minX + 25) { this.x = arenaBounds.minX + 25; this.vx = -this.vx * 0.3; }
+                if (this.x > arenaBounds.maxX - 25) { this.x = arenaBounds.maxX - 25; this.vx = -this.vx * 0.3; }
+                if (this.y < arenaBounds.minY + 25) { this.y = arenaBounds.minY + 25; this.vy = 0; }
+            }
+
+            // Continuous death effects: electrical overload sparks and smoke
+            if (this.deathTimer < 70 && Math.random() < 0.45) {
+                fx.spawnDeathSparks(this.x, this.y, this.color);
+            }
+            if (this.deathTimer > 25 && Math.random() < 0.25) {
+                fx.spawnDeathSmoke(this.x, this.y);
+            }
+
+            return; // Skip normal combat abilities while dead
+        }
+
         // Regenerate Energy slowly
         if (!this.isShielding && this.energy < this.maxEnergy) {
             this.energy = Math.min(this.maxEnergy, this.energy + 0.35 * dt);
-        }
-
-        // Tự động hồi nộ chiêu cuối (Overdrive) theo thời gian (Vivian hồi nộ nhanh hơn, Gojo/Sukuna chậm hơn 1.75 lần)
-        if (!this.isUsingUltimate && this.overdrive < 100) {
-            const passiveGain = (this.characterId === 'vivian' ? 0.13 : 0.08) * this.overdriveChargeRate;
-            this.overdrive = Math.min(100, this.overdrive + passiveGain * dt);
         }
 
         // Energy drain if shielding
@@ -208,6 +253,15 @@ export class Cyborg {
         }
         if (this.spamDelayTimer > 0) {
             this.spamDelayTimer -= dt;
+        }
+
+        // Buffer attack execution for ultra-responsive controls (especially on mobile)
+        if (this.attackBufferTimer > 0) {
+            this.attackBufferTimer -= dt;
+            if (this.canAttack()) {
+                this.attack();
+                this.attackBufferTimer = 0;
+            }
         }
 
         if (this.isAttacking) {
@@ -259,13 +313,11 @@ export class Cyborg {
         this.ax += dirX * thrustPower;
         this.ay += dirY * thrustPower;
 
-        // Update facing and aim angle if NOT strafing
+        // Update facing and aim angle
         if (Math.hypot(dirX, dirY) > 0.1) {
             const moveAngle = Math.atan2(dirY, dirX);
             this.facingAngle = moveAngle;
-            if (!this.isStrafing) {
-                this.aimAngle = moveAngle;
-            }
+            this.aimAngle = moveAngle;
         }
 
         // Spawn thruster particle flame
@@ -284,23 +336,29 @@ export class Cyborg {
         }
     }
 
-    setStrafing(isStrafing) {
-        this.isStrafing = isStrafing;
-    }
-
     setAimAngle(angle) {
         this.aimAngle = angle;
         this.facingAngle = angle;
     }
 
+    canAttack() {
+        return !this.isStunned && !this.isShielding && !this.isAttacking && this.attackCooldown <= 0 && !this.isUsingUltimate && this.spamDelayTimer <= 0;
+    }
+
     attack() {
-        if (this.isStunned || this.isShielding || this.isAttacking || this.attackCooldown > 0 || this.isUsingUltimate || this.spamDelayTimer > 0) return;
+        if (!this.canAttack()) return;
 
         const weapon = WEAPONS[this.characterId.toUpperCase()];
         const now = performance.now();
+        const isTouchPlayer = (this.index === 0 && ((typeof input !== 'undefined' && input.touchEnabled) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)));
 
-        // Lọc các đòn đánh trong khoảng thời gian 3 giây gần nhất (3000ms)
-        const spamWindowMs = Math.max(3000, (weapon.attackCooldown || 25) * 5.5 * (1000 / 60));
+        // Giới hạn spam đòn đánh:
+        // Với tướng cận chiến: cửa sổ 3.75s (3750ms) cho 6 hits để hạn chế spam
+        // Với tướng tầm xa: cửa sổ 3.0s (3000ms)
+        const spamWindowMs = this.combatStyle === 'melee'
+            ? 3750
+            : Math.max(3000, (weapon.attackCooldown || 25) * 5.5 * (1000 / 60));
+
         this.recentAttackTimes = (this.recentAttackTimes || []).filter(t => now - t <= spamWindowMs);
         this.recentAttackTimes.push(now);
 
@@ -313,13 +371,19 @@ export class Cyborg {
         this.attackHitRegistered = false;
         this.hasClashed = false;
 
-        // Chỉ phạt delay nếu spam 6 đòn liên tiếp trong 3 giây
+        // Giảm độ trễ đánh thường trên điện thoại:
+        // Giảm 20% cooldown hồi đòn đánh thường trên mobile để phản hồi nhạy bén và mượt mà
+        const baseCooldown = isTouchPlayer
+            ? Math.max(12, Math.round(weapon.attackCooldown * 0.8))
+            : weapon.attackCooldown;
+
+        // Phạt delay nếu đạt limit 6 đòn trong cửa sổ spam (3.75s cho cận chiến, 3s cho tầm xa)
         if (this.recentAttackTimes.length >= 6) {
             this.spamDelayTimer = weapon.attackDuration + 60; // Khóa đánh trọn vẹn 1s (60 frames) sau khi đòn thứ 6 kết thúc
             this.attackCooldown = weapon.attackDuration + 60; // Thêm delay 1s sau đòn thứ 6
             this.recentAttackTimes = []; // Reset sau khi kích hoạt phạt
         } else {
-            this.attackCooldown = weapon.attackCooldown;
+            this.attackCooldown = baseCooldown;
         }
 
         if (this.combatStyle === 'ranged') {
@@ -611,29 +675,33 @@ export class Cyborg {
         }
     }
 
-    activateUltimateOrDash() {
+    dash(dirX = null, dirY = null) {
         if (this.isStunned || this.isUsingUltimate) return;
 
-        if (this.overdrive >= 100) {
-            this.activateUltimate();
-        } else {
-            // Quick Thruster Boost Dash when not at 100% overdrive
-            if (this.energy >= 15) {
-                this.energy -= 15;
-                this.isBoosted = true;
-                this.boostTimer = 26;
-                physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 14.5);
-                sound.playWallBounce();
-                fx.spawnThrusterFlame(this.x, this.y, this.aimAngle, '#ffffff');
-                fx.addText(this.x, this.y - 30, `💨 DASH! (Meter: ${Math.floor(this.overdrive)}%)`, this.color, 20);
-            } else {
-                fx.addText(this.x, this.y - 30, 'NEED ENERGY!', '#ff0055', 18);
+        if (this.energy >= 15) {
+            this.energy -= 15;
+            this.isBoosted = true;
+            this.boostTimer = 26;
+            let dashAngle = this.aimAngle;
+            if (dirX !== null && dirY !== null && Math.hypot(dirX, dirY) > 0.1) {
+                dashAngle = Math.atan2(dirY, dirX);
             }
+            physics.applyKnockback(this, Math.cos(dashAngle), Math.sin(dashAngle), 14.5);
+            sound.playWallBounce();
+            fx.spawnThrusterFlame(this.x, this.y, dashAngle, '#ffffff');
+            fx.addText(this.x, this.y - 30, '💨 DASH!', this.color, 20);
+        } else {
+            fx.addText(this.x, this.y - 30, 'NEED ENERGY!', '#ff0055', 18);
         }
     }
 
     activateUltimate() {
-        if (this.overdrive < 100 || this.isStunned || this.isUsingUltimate) return;
+        if (this.isStunned || this.isUsingUltimate) return;
+
+        if (this.overdrive < 100) {
+            fx.addText(this.x, this.y - 30, 'NEED 100% OVERDRIVE!', '#ff0055', 18);
+            return;
+        }
 
         this.overdrive = 0;
         this.isUsingUltimate = true;
@@ -662,13 +730,52 @@ export class Cyborg {
         fx.addText(this.x, this.y - 45, shout, this.color, 28, 60);
     }
 
-    takeDamage(amount) {
+    takeDamage(amount, isFromUltimate = false, sourceX = null, sourceY = null) {
+        if (this.isDead) return;
         this.hp = Math.max(0, this.hp - amount);
-        // Giảm thêm thời gian hồi ulti khi chịu sát thương (tăng mạnh nộ Overdrive tích lũy khi bị đánh)
-        if (!this.isUsingUltimate && this.overdrive < 100) {
+
+        // Failsafe: Kiểm tra xem đối thủ có đang tung chiêu cuối hay không
+        let isAnyOpponentUltActive = false;
+        if (typeof window !== 'undefined' && window.game) {
+            const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
+            if (opp && opp.isUsingUltimate) isAnyOpponentUltActive = true;
+        }
+
+        // Chỉ giảm thời gian hồi ulti (tăng nộ Overdrive) khi nhận đòn từ đòn đánh thường/skill, KHÔNG nhận từ ulti đối thủ
+        if (!isFromUltimate && !this.isUsingUltimate && !isAnyOpponentUltActive && this.overdrive < 100) {
             const damageOdGain = (amount * 0.48 + 3.0) * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + damageOdGain);
         }
+        if (this.hp <= 0) {
+            this.triggerDeath(sourceX, sourceY);
+        }
+    }
+
+    triggerDeath(killerX = null, killerY = null) {
+        if (this.isDead) return;
+        this.isDead = true;
+        this.deathTimer = 0;
+        this.hp = 0;
+        this.isAttacking = false;
+        this.isShielding = false;
+        this.isUsingSkill = false;
+        this.isUsingUltimate = false;
+        this.isBoosted = false;
+        this.attackBufferTimer = 0;
+
+        // Determine knockback blow vector
+        let dx = (killerX !== null && killerX !== undefined) ? (this.x - killerX) : (this.index === 0 ? -1 : 1);
+        let dy = (killerY !== null && killerY !== undefined) ? (this.y - killerY) : -0.5;
+        const dist = Math.hypot(dx, dy) || 1;
+        const dirX = dx / dist;
+        const dirY = dy / dist;
+
+        this.vx = dirX * 11;
+        this.vy = Math.min(-5.5, dirY * 10 - 4); // Blast upward and back
+        this.deathFallAngle = dirX >= 0 ? -Math.PI / 2 : Math.PI / 2;
+
+        fx.spawnDeathBurst(this.x, this.y, this.color);
+        sound.playDeath(this.x > 640 ? 0.3 : -0.3);
     }
 
     applyStun(frames) {
