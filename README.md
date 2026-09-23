@@ -11,7 +11,7 @@
   - **Gravity Platformer Mode (2v2):** Realistic gravity, double jump, platform collision, and drop-through soft platforms (`Down`).
 - **15 Unique Fighters:**
   - **Saitama (One Punch Man):** Massive 535 HP, Serious Consecutive Punches, Serious Punch Death Ultimate with screen shake & sonic boom.
-  - **Megumi Fushiguro (Jujutsu Kaisen):** Ten Shadows Technique, Divine Dog shadow projectile, and Mahoraga Cleave Ultimate.
+  - **Megumi Fushiguro (Jujutsu Kaisen):** Ten Shadows Technique, Homing Divine Dog Totality (active tracking pursuit, stun & damage), and Mahoraga Cleave Ultimate.
   - **Kuriyama Mirai (Kyoukai no Kanata):** Blood manipulation, Blood Crescent projectile with lifesteal, and Blood Cataclysm Giant Sword Ultimate.
   - **Original & Anime Legends:** Tsukishiro Yanagi, Verina Airgid, Nicole Demara, Trigger, Vivian Banshee, Jotaro Kujo, Son Goku, Giorno Giovanna, Naoya Zen'in, Monkey D. Luffy, Satoru Gojo, Ryomen Sukuna.
 - **2v2 Brawl Mode & Dedicated Maps:**

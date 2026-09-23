@@ -754,20 +754,32 @@ export class Cyborg {
                 sound.playHit(true);
             }
         } else if (skill.id === 'DIVINE_DOG') {
-            // MEGUMI: SHIKIGAMI DIVINE DOG 🐺
-            sound.playSlash(false);
-            fx.addText(this.x, this.y - 35, '🐺 DIVINE DOG: LUNGE!', '#38bdf8', 24);
+            // MEGUMI: SHIKIGAMI DIVINE DOG TOTALITY (HOMING SHADOW WOLF) 🐺
+            if (sound.playHowl) sound.playHowl();
+            else sound.playSlash(true);
+
+            fx.spawnDash(this.x, this.y + 12, '#0284c7');
+            fx.spawnHitSparks(this.x, this.y, '#38bdf8', 16);
+            fx.addText(this.x, this.y - 35, '🐺 DIVINE DOG: HUNT!', '#38bdf8', 24);
+
+            let launchAngle = this.aimAngle;
+            if (opponent && !opponent.isDead) {
+                // Initial launch oriented towards target center
+                launchAngle = Math.atan2((opponent.y - 15) - this.y, opponent.x - this.x);
+            }
+
             const proj = new Projectile(
                 this.index,
-                this.x + Math.cos(this.aimAngle) * 35,
-                this.y + Math.sin(this.aimAngle) * 35,
-                Math.cos(this.aimAngle) * 19,
-                Math.sin(this.aimAngle) * 19,
+                this.x + Math.cos(launchAngle) * 35,
+                this.y + Math.sin(launchAngle) * 35,
+                Math.cos(launchAngle) * 18,
+                Math.sin(launchAngle) * 18,
                 skillDmg,
                 '#38bdf8',
-                20,
+                22,
                 'shadow_dog'
             );
+            proj.life = 220;
             combat.addProjectile(proj);
         } else if (skill.id === 'BLOOD_CRESCENT') {
             // MIRAI: BLOOD CRESCENT WAVE 🩸

@@ -293,6 +293,42 @@ export class SoundEngine {
         osc.stop(now + 0.86);
     }
 
+    playHowl(pan = 0) {
+        if (!this.ctx || this.isMuted) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        // Wolf howl pitch sweep
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(580, now + 0.18);
+        osc.frequency.exponentialRampToValueAtTime(320, now + 0.45);
+
+        // Filter to make it throaty shadow beast howl
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, now);
+        filter.frequency.linearRampToValueAtTime(1400, now + 0.2);
+        filter.frequency.exponentialRampToValueAtTime(400, now + 0.45);
+
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.46);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.sfxGain);
+
+        osc.start(now);
+        osc.stop(now + 0.47);
+    }
+
+    playWolfBite(pan = 0) {
+        if (!this.ctx || this.isMuted) return;
+        this.playHit(true, pan);
+        this.playSlash(true, pan);
+    }
+
     playRoundStart() {
         if (!this.ctx || this.isMuted) return;
         const now = this.ctx.currentTime;

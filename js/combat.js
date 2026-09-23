@@ -169,7 +169,7 @@ export const SKILLS = {
     GOJO_SKILL: { id: 'LAPSE_BLUE', name: 'Lapse Blue', cooldown: 210, icon: '🌀' },
     SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' },
     SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 210, icon: '🥊' },
-    MEGUMI_SKILL: { id: 'DIVINE_DOG', name: 'Divine Dog Lunge', cooldown: 220, icon: '🐺' },
+    MEGUMI_SKILL: { id: 'DIVINE_DOG', name: 'Divine Dog: Totality', cooldown: 220, icon: '🐺' },
     MIRAI_SKILL: { id: 'BLOOD_CRESCENT', name: 'Blood Crescent Wave', cooldown: 200, icon: '🩸' }
 };
 
@@ -183,13 +183,64 @@ export class Projectile {
         this.damage = damage;
         this.color = color;
         this.radius = radius;
-        this.life = 160;
+        this.life = type === 'shadow_dog' ? 220 : 160;
         this.isReflected = false;
-        this.type = type; // 'standard', 'hollow_purple', 'fire_orb'
+        this.type = type; // 'standard', 'hollow_purple', 'fire_orb', 'shadow_dog', 'blood_crescent'
         this.animTimer = 0;
     }
 
-    update(dt = 1) {
+    update(dt = 1, players = []) {
+        // Divine Dog: Totality - Active homing & pursuit steering
+        if (this.type === 'shadow_dog') {
+            const owner = players.find(pl => pl && pl.index === this.ownerIndex);
+
+            // Find closest living enemy target
+            let bestTarget = null;
+            let bestDist = Infinity;
+            for (const pl of players) {
+                if (!pl || pl.isDead) continue;
+                if (pl.index === this.ownerIndex) continue;
+                // In 2v2: do not target teammates
+                if (owner && owner.teamId !== undefined && pl.teamId !== undefined && owner.teamId === pl.teamId) continue;
+                const d = Math.hypot(pl.x - this.x, (pl.y - 15) - this.y);
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestTarget = pl;
+                }
+            }
+
+            if (bestTarget) {
+                const targetY = bestTarget.y - 15;
+                const dx = bestTarget.x - this.x;
+                const dy = targetY - this.y;
+                const desiredAngle = Math.atan2(dy, dx);
+                let currentAngle = Math.atan2(this.vy, this.vx);
+                if (isNaN(currentAngle)) currentAngle = desiredAngle;
+
+                let diffAngle = desiredAngle - currentAngle;
+                while (diffAngle < -Math.PI) diffAngle += Math.PI * 2;
+                while (diffAngle > Math.PI) diffAngle -= Math.PI * 2;
+
+                // Agile tracking: rapid turn rate so the wolf actively chases and curves
+                const turnRate = 0.16 * dt;
+                const step = Math.sign(diffAngle) * Math.min(Math.abs(diffAngle), turnRate);
+                const newAngle = currentAngle + step;
+
+                // Aggressive chase speed, surge during pounce range
+                const speed = bestDist < 140 ? 21 : 18;
+                this.vx = Math.cos(newAngle) * speed;
+                this.vy = Math.sin(newAngle) * speed;
+            }
+
+            // Shadow aura and dark smoke particles
+            if (Math.random() < 0.6) {
+                fx.spawnHitSparks(this.x, this.y, '#38bdf8', 1);
+            }
+            if (Math.random() < 0.3) {
+                fx.spawnDash(this.x, this.y, '#0284c7');
+            }
+        }
+
         this.x += this.vx * dt;
         this.y += this.vy * dt;
         this.life -= dt;
@@ -208,7 +259,7 @@ export class Projectile {
                 const flameColor = Math.random() < 0.6 ? '#dc2626' : '#f97316';
                 fx.spawnHitSparks(this.x, this.y, flameColor, 2);
             }
-        } else {
+        } else if (this.type !== 'shadow_dog') {
             // Standard Spark tail
             if (Math.random() < 0.4) {
                 fx.spawnHitSparks(this.x, this.y, this.color, 1);
@@ -316,43 +367,108 @@ export class Projectile {
             ctx.stroke();
 
         } else if (this.type === 'shadow_dog') {
-            // MEGUMI: SHADOW DIVINE DOG 🐺
+            // MEGUMI: SHADOW DIVINE DOG TOTALITY (玉犬・渾) 🐺
             const angle = Math.atan2(this.vy, this.vx);
+            const pulse = Math.sin(this.animTimer * 0.3) * 2;
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(angle);
             ctx.shadowColor = '#38bdf8';
-            ctx.shadowBlur = 25;
+            ctx.shadowBlur = 24;
 
-            // Dark shadow wolf head & jaws
-            ctx.fillStyle = '#0f172a';
+            // 1. Dark Shadow Fur & Smoke Billowing Behind
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+            ctx.beginPath();
+            ctx.moveTo(-12, -12);
+            ctx.quadraticCurveTo(-28, -16 + pulse, -44, -6);
+            ctx.quadraticCurveTo(-34, 0, -44, 6);
+            ctx.quadraticCurveTo(-28, 16 - pulse, -12, 12);
+            ctx.closePath();
+            ctx.fill();
+
+            // 2. Trailing Cursed Energy Wisps
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(-10, -6);
+            ctx.quadraticCurveTo(-26, -10, -40, -4);
+            ctx.moveTo(-10, 6);
+            ctx.quadraticCurveTo(-26, 10, -40, 4);
+            ctx.stroke();
+
+            // 3. Main Muscular Wolf Head & Body (Dark Obsidian Shadow)
+            ctx.fillStyle = '#090d16';
             ctx.strokeStyle = '#38bdf8';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.moveTo(22, 0);       // snout
-            ctx.lineTo(0, -14);      // left ear
-            ctx.lineTo(-12, -8);     // neck top
-            ctx.lineTo(-24, 0);      // back
-            ctx.lineTo(-12, 8);      // neck bottom
-            ctx.lineTo(0, 14);       // right ear
+            ctx.moveTo(26, -2);       // Upper snout
+            ctx.lineTo(16, -9);       // Upper brow
+            ctx.lineTo(2, -16);       // Left ear base
+            ctx.lineTo(-4, -26);      // Left ear tip (spiked)
+            ctx.lineTo(-10, -14);     // Back of left ear
+            ctx.lineTo(-24, -6);      // Neck top
+            ctx.lineTo(-24, 6);       // Neck bottom
+            ctx.lineTo(-10, 14);      // Back of right ear
+            ctx.lineTo(-4, 26);       // Right ear tip (spiked)
+            ctx.lineTo(2, 16);        // Right ear base
+            ctx.lineTo(16, 9);        // Lower brow
+            ctx.lineTo(24, 4);        // Lower jaw
+            ctx.lineTo(14, 0);        // Snarl mouth interior
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
 
-            // Glowing cyan eyes
-            ctx.fillStyle = '#38bdf8';
+            // 4. White Crest Marking on Forehead (Divine Dog Totality iconic symbol)
+            ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(6, -5, 2.5, 0, Math.PI * 2);
-            ctx.arc(6, 5, 2.5, 0, Math.PI * 2);
+            ctx.moveTo(12, 0);
+            ctx.lineTo(2, -4);
+            ctx.lineTo(5, 0);
+            ctx.lineTo(2, 4);
+            ctx.closePath();
             ctx.fill();
 
-            // Shadow smoke trail
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
-            ctx.lineWidth = 14;
+            // 5. Razor Fangs (Snarl)
+            ctx.fillStyle = '#f8fafc';
             ctx.beginPath();
-            ctx.moveTo(-10, 0);
-            ctx.lineTo(-38, 0);
+            ctx.moveTo(23, -2);
+            ctx.lineTo(21, 2);
+            ctx.lineTo(19, -1);
+            ctx.closePath();
+            ctx.fill();
+
+            // 6. Glowing Predatory Cyan Eyes
+            ctx.fillStyle = '#38bdf8';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(8, -6, 2.8, 0, Math.PI * 2);
+            ctx.arc(8, 6, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eye specular highlight
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(9, -6, 1.2, 0, Math.PI * 2);
+            ctx.arc(9, 6, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 7. Pouncing Shadow Claws Extending Forward
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            // Left claw swipe
+            ctx.beginPath();
+            ctx.moveTo(4, -18);
+            ctx.lineTo(18, -20);
+            ctx.lineTo(24, -18);
             ctx.stroke();
+            // Right claw swipe
+            ctx.beginPath();
+            ctx.moveTo(4, 18);
+            ctx.lineTo(18, 20);
+            ctx.lineTo(24, 18);
+            ctx.stroke();
+
             ctx.restore();
 
         } else if (this.type === 'blood_crescent') {
@@ -450,13 +566,25 @@ export class CombatResolver {
                 }
             }
 
-            p.update(dt);
+            p.update(dt, players);
 
             // Bounds check
-            if (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
-                p.y < arenaBounds.minY || p.y > arenaBounds.maxY || p.life <= 0) {
-                fx.spawnHitSparks(p.x, p.y, p.color, 8);
-                this.projectiles.splice(i, 1);
+            if (p.type === 'shadow_dog' && arenaBounds) {
+                // Shadow wolf ricochets off boundary walls to stay hunting in the arena
+                if (p.x < arenaBounds.minX + 25) { p.x = arenaBounds.minX + 25; p.vx = Math.abs(p.vx); }
+                if (p.x > arenaBounds.maxX - 25) { p.x = arenaBounds.maxX - 25; p.vx = -Math.abs(p.vx); }
+                if (p.y < arenaBounds.minY + 25) { p.y = arenaBounds.minY + 25; p.vy = Math.abs(p.vy); }
+                if (p.y > arenaBounds.maxY - 25) { p.y = arenaBounds.maxY - 25; p.vy = -Math.abs(p.vy); }
+                if (p.life <= 0) {
+                    fx.spawnHitSparks(p.x, p.y, p.color, 8);
+                    this.projectiles.splice(i, 1);
+                }
+            } else {
+                if (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
+                    p.y < arenaBounds.minY || p.y > arenaBounds.maxY || p.life <= 0) {
+                    fx.spawnHitSparks(p.x, p.y, p.color, 8);
+                    this.projectiles.splice(i, 1);
+                }
             }
         }
     }
@@ -794,8 +922,13 @@ export class CombatResolver {
                             fx.addText(attacker.x, attacker.y - 25, `+${Math.round(healAmount)} HP`, '#ef4444', 20);
                         }
                     } else if (proj.type === 'shadow_dog') {
-                        defender.applyStun(45);
-                        fx.addText(defender.x, targetY - 45, '🐺 PINNED BY DIVINE DOG!', '#38bdf8', 24);
+                        defender.applyStun(55); // 0.95s Stun lock
+                        fx.addText(defender.x, targetY - 45, '🐺 SHADOW POUNCE & PIN!', '#38bdf8', 26);
+                        fx.spawnHitSparks(defender.x, targetY, '#38bdf8', 28);
+                        fx.spawnHitSparks(defender.x, targetY, '#ffffff', 12);
+                        if (sound.playWolfBite) sound.playWolfBite();
+                        else sound.playHit(true);
+                        if (typeof triggerScreenShake === 'function') triggerScreenShake(9);
                     }
 
                     // Ranged Signature 3-hit passives

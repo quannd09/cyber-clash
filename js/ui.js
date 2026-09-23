@@ -190,12 +190,12 @@ const SKILL_DATA = {
         color: '#6366f1',
         p1: [
             { key: 'Left Click / F (Melee)', name: 'Toad Shadow Grab (3-Hit: Ten Shadows)', desc: '' },
-            { key: 'R (Skill)', name: 'Divine Dog: Totality 🐺 (Shadow Wolf Stun Pounce)', desc: '' },
+            { key: 'R (Skill)', name: 'Divine Dog: Totality 🐺 (Homing Shadow Wolf • Stun Pounce)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Eight-Handled Sword: Mahoraga ⛩️', desc: '' }
         ],
         p2: [
             { key: 'J (Melee)', name: 'Toad Shadow Grab (3-Hit: Ten Shadows)', desc: '' },
-            { key: 'I (Skill)', name: 'Divine Dog: Totality 🐺 (Shadow Wolf Stun Pounce)', desc: '' },
+            { key: 'I (Skill)', name: 'Divine Dog: Totality 🐺 (Homing Shadow Wolf • Stun Pounce)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Eight-Handled Sword: Mahoraga ⛩️', desc: '' }
         ]
     },
