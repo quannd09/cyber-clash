@@ -8,6 +8,8 @@ import { GameRenderer } from './renderer.js?v=75';
 import { UIManager } from './ui.js?v=75';
 import { network } from './network.js?v=75';
 import { BotController } from './bot.js?v=75';
+import { physics } from './physics.js?v=75';
+import { mapManager, MAPS } from './maps.js?v=75';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -44,12 +46,20 @@ class CyberClashGame {
         this.roundMessage = '';
 
         // Game Modes & AI Bot
-        this.gameMode = 'LOCAL'; // 'LOCAL' | 'BOT' | 'ONLINE'
+        this.gameMode = 'LOCAL'; // 'LOCAL' | 'BOT' | 'ONLINE' | '2V2'
         this.bot = new BotController('normal');
         this.networkRole = null; // 'HOST' | 'CLIENT' | null
         this.latestClientInputs = null;
         this.clientInputBuffer = null;
+        this.clientInputBuffers = {};
         this.latestSnapshot = null;
+
+        // 2v2 Mode State
+        this.is2v2Mode = false;
+        this.players2v2 = [];
+        this.bots2v2 = [];
+        this.slots2v2 = [];
+        this.teamWins = { blue: 0, red: 0 };
 
         this.ui = new UIManager(
             (p1Loadout, p2Loadout) => this.startMatch(p1Loadout, p2Loadout),
@@ -57,7 +67,8 @@ class CyberClashGame {
             (mode) => this.setGameMode(mode),
             (role, code) => { this.networkRole = role; },
             (data) => this.handleNetworkGameData(data),
-            (diff) => { this.bot.setDifficulty(diff); }
+            (diff) => { this.bot.setDifficulty(diff); },
+            (map, slots, bans) => this.startMatch2v2(map, slots, bans)
         );
 
         this.setGameMode('LOCAL');
@@ -292,6 +303,11 @@ class CyberClashGame {
 
     startMatch(p1Char, p2Char) {
         this.requestFullscreen();
+        this.is2v2Mode = false;
+        physics.gravityEnabled = false;
+        this.players2v2 = [];
+        this.bounds = { minX: 70, maxX: 1210, minY: 90, maxY: 690 };
+
         const charNames = {
             yanagi: 'TSUKISHIRO YANAGI',
             velina: 'VERINA AIRGID',
@@ -304,7 +320,10 @@ class CyberClashGame {
             naoya: "NAOYA ZEN'IN",
             luffy: 'MONKEY D. LUFFY',
             gojo: 'SATORU GOJO',
-            sukuna: 'RYOMEN SUKUNA'
+            sukuna: 'RYOMEN SUKUNA',
+            saitama: 'SAITAMA',
+            megumi: 'FUSHIGURO MEGUMI',
+            mirai: 'KURIYAMA MIRAI'
         };
         const charColors = {
             yanagi: '#a78bfa',
@@ -318,7 +337,10 @@ class CyberClashGame {
             naoya: '#a3e635',
             luffy: '#ef4444',
             gojo: '#0284c7',
-            sukuna: '#f43f5e'
+            sukuna: '#f43f5e',
+            saitama: '#facc15',
+            megumi: '#38bdf8',
+            mirai: '#ef4444'
         };
 
         const p1Name = charNames[p1Char] || 'TSUKISHIRO YANAGI';
@@ -352,13 +374,122 @@ class CyberClashGame {
         this.startRound();
     }
 
-    resetMatch() {
-        this.state = STATE_LOADOUT;
-        this.p1.roundsWon = 0;
-        this.p2.roundsWon = 0;
+    startMatch2v2(mapId, slots, bans) {
+        this.requestFullscreen();
+        this.is2v2Mode = true;
+        mapManager.setMap(mapId || 'brawlhaven');
+        physics.gravityEnabled = true;
+
+        const currentMap = mapManager.currentMap;
+        if (currentMap && currentMap.bounds) {
+            this.bounds = { ...currentMap.bounds };
+        }
+
+        const charNames = {
+            yanagi: 'TSUKISHIRO YANAGI',
+            velina: 'VERINA AIRGID',
+            nicole: 'NICOLE DEMARA',
+            trigger: 'TRIGGER',
+            vivian: 'VIVIAN BANSHEE',
+            jotaro: 'JOTARO KUJO',
+            goku: 'SON GOKU',
+            giorno: 'GIORNO GIOVANNA',
+            naoya: "NAOYA ZEN'IN",
+            luffy: 'MONKEY D. LUFFY',
+            gojo: 'SATORU GOJO',
+            sukuna: 'RYOMEN SUKUNA',
+            saitama: 'SAITAMA',
+            megumi: 'FUSHIGURO MEGUMI',
+            mirai: 'KURIYAMA MIRAI'
+        };
+        const charColors = {
+            yanagi: '#a78bfa',
+            velina: '#34d399',
+            nicole: '#f472b6',
+            trigger: '#38bdf8',
+            vivian: '#c084fc',
+            jotaro: '#818cf8',
+            goku: '#fbbf24',
+            giorno: '#facc15',
+            naoya: '#a3e635',
+            luffy: '#ef4444',
+            gojo: '#0284c7',
+            sukuna: '#f43f5e',
+            saitama: '#facc15',
+            megumi: '#38bdf8',
+            mirai: '#ef4444'
+        };
+
+        this.slots2v2 = slots || [
+            { slotIndex: 0, char: 'yanagi', isBot: false, name: 'P1 (HOST)' },
+            { slotIndex: 1, char: 'velina', isBot: true, name: 'P2 (BOT)' },
+            { slotIndex: 2, char: 'saitama', isBot: true, name: 'P3 (BOT)' },
+            { slotIndex: 3, char: 'sukuna', isBot: true, name: 'P4 (BOT)' }
+        ];
+
+        const spawns = mapManager.getSpawns();
+        this.players2v2 = [];
+        this.bots2v2 = [];
+
+        for (let i = 0; i < 4; i++) {
+            const slot = this.slots2v2[i] || { char: 'yanagi', isBot: true };
+            const charId = slot.char || 'yanagi';
+            const spawn = spawns[i] || { x: 300 + i * 200, y: 470, facing: 0 };
+            const teamId = (i < 2) ? 0 : 1; // 0: Team Blue, 1: Team Red
+            const baseColor = charColors[charId] || '#38bdf8';
+            let name = slot.name || (charNames[charId] || charId.toUpperCase());
+            if (slot.isBot && !name.includes('[BOT]')) {
+                name = `[BOT] ${name}`;
+            }
+
+            const cyborg = new Cyborg(i, spawn.x, spawn.y, baseColor, name, charId);
+            cyborg.teamId = teamId;
+            cyborg.gravityEnabled = true;
+            cyborg.facingAngle = spawn.facing || 0;
+            cyborg.teamRoundsWon = 0;
+            this.players2v2.push(cyborg);
+
+            if (slot.isBot) {
+                const diff = (this.bot && this.bot.difficulty) ? this.bot.difficulty : 'normal';
+                this.bots2v2.push(new BotController(diff));
+            } else {
+                this.bots2v2.push(null);
+            }
+        }
+
+        this.p1 = this.players2v2[0];
+        this.p2 = this.players2v2[2];
+
+        this.teamWins = { blue: 0, red: 0 };
         this.round = 1;
         this.latestClientInputs = null;
         this.clientInputBuffer = null;
+        this.clientInputBuffers = {};
+        this.latestSnapshot = null;
+
+        if (document.activeElement && document.activeElement.blur) {
+            document.activeElement.blur();
+        }
+        window.focus();
+
+        sound.startBGM();
+        this.startRound();
+    }
+
+    resetMatch() {
+        this.state = STATE_LOADOUT;
+        this.is2v2Mode = false;
+        physics.gravityEnabled = false;
+        this.players2v2 = [];
+        this.bots2v2 = [];
+        this.bounds = { minX: 70, maxX: 1210, minY: 90, maxY: 690 };
+
+        if (this.p1) this.p1.roundsWon = 0;
+        if (this.p2) this.p2.roundsWon = 0;
+        this.round = 1;
+        this.latestClientInputs = null;
+        this.clientInputBuffer = null;
+        this.clientInputBuffers = {};
         this.latestSnapshot = null;
         this.ui.showLoadout();
         this.updateTouchControlsVisibility();
@@ -370,8 +501,21 @@ class CyberClashGame {
         this.matchTimer = 90;
         this.roundMessage = `ROUND ${this.round}`;
 
-        this.p1.reset(240, 390, 0);
-        this.p2.reset(1040, 390, Math.PI);
+        if (this.is2v2Mode && this.players2v2.length === 4) {
+            const spawns = mapManager.getSpawns();
+            for (let i = 0; i < 4; i++) {
+                const spawn = spawns[i] || { x: 300 + i * 200, y: 470, facing: 0 };
+                const p = this.players2v2[i];
+                p.reset(spawn.x, spawn.y, spawn.facing || 0);
+                p.teamId = (i < 2) ? 0 : 1;
+                p.gravityEnabled = true;
+                p.teamRoundsWon = (p.teamId === 0) ? this.teamWins.blue : this.teamWins.red;
+            }
+        } else {
+            this.p1.reset(240, 390, 0);
+            this.p2.reset(1040, 390, Math.PI);
+        }
+
         combat.reset();
         fx.clear();
 
@@ -498,12 +642,13 @@ class CyberClashGame {
         // CLIENT IN ONLINE MODE:
         if (this.isOnlineClient) {
             if (this.state !== STATE_LOADOUT) {
+                const clientChar = this.is2v2Mode ? (this.players2v2[network.slotIndex] || this.p1) : this.p2;
                 if (input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
-                    if (input.mouse && typeof input.mouse.x === 'number' && this.p2) {
-                        const dx = input.mouse.x - this.p2.x;
-                        const dy = input.mouse.y - this.p2.y;
+                    if (input.mouse && typeof input.mouse.x === 'number' && clientChar) {
+                        const dx = input.mouse.x - clientChar.x;
+                        const dy = input.mouse.y - clientChar.y;
                         if (Math.hypot(dx, dy) > 10) {
-                            this.p2.setAimAngle(Math.atan2(dy, dx));
+                            clientChar.setAimAngle(Math.atan2(dy, dx));
                         }
                     }
                 }
@@ -531,7 +676,36 @@ class CyberClashGame {
 
         if (this.state === STATE_FIGHT) {
             try {
-                if (this.gameMode === 'LOCAL') {
+                if (this.is2v2Mode) {
+                    for (let i = 0; i < 4; i++) {
+                        const p = this.players2v2[i];
+                        if (!p || p.isDead || p.hp <= 0) continue;
+
+                        const opp = this.getNearestLivingOpponent(p, this.players2v2);
+                        const isBot = this.slots2v2[i] && this.slots2v2[i].isBot;
+
+                        if (isBot && this.bots2v2[i]) {
+                            if (opp) {
+                                this.bots2v2[i].update(p, opp, dt, this.bounds);
+                            }
+                        } else if (this.isOnlineHost) {
+                            if (i === 0) {
+                                this.processPlayerInputs(p, 0, opp);
+                            } else {
+                                const clientBuf = this.clientInputBuffers && this.clientInputBuffers[i];
+                                if (clientBuf) {
+                                    this.applyClientInputs(p, clientBuf, opp);
+                                }
+                            }
+                        } else {
+                            if (i === 0) {
+                                this.processPlayerInputs(p, 0, opp);
+                            } else {
+                                this.processPlayerInputs(p, 1, opp);
+                            }
+                        }
+                    }
+                } else if (this.gameMode === 'LOCAL') {
                     this.processPlayerInputs(this.p1, 0, this.p2);
                     this.processPlayerInputs(this.p2, 1, this.p1);
                 } else if (this.gameMode === 'BOT') {
@@ -548,15 +722,32 @@ class CyberClashGame {
             }
 
             try {
-                this.p1.update(dt, this.bounds);
-                this.p2.update(dt, this.bounds);
+                if (this.is2v2Mode) {
+                    const platforms = mapManager.getPlatforms();
+                    for (const p of this.players2v2) {
+                        if (p) {
+                            p.update(dt, this.bounds);
+                            if (physics.gravityEnabled) {
+                                physics.resolvePlatforms(p, platforms);
+                            }
+                        }
+                    }
+                } else {
+                    this.p1.update(dt, this.bounds);
+                    this.p2.update(dt, this.bounds);
+                }
             } catch (err) {
                 console.error('[Cyborg Update Error]', err);
             }
 
             try {
-                combat.updateProjectiles(dt, this.bounds, this.p1, this.p2);
-                combat.resolve(this.p1, this.p2, (intensity, dur) => this.renderer.triggerShake(intensity, dur));
+                if (this.is2v2Mode) {
+                    combat.updateProjectiles(dt, this.bounds, ...this.players2v2);
+                    combat.resolve(this.players2v2, (intensity, dur) => this.renderer.triggerShake(intensity, dur));
+                } else {
+                    combat.updateProjectiles(dt, this.bounds, this.p1, this.p2);
+                    combat.resolve(this.p1, this.p2, (intensity, dur) => this.renderer.triggerShake(intensity, dur));
+                }
             } catch (err) {
                 console.error('[Combat Resolve Error]', err);
             }
@@ -565,10 +756,21 @@ class CyberClashGame {
             this.matchTimer -= (dt / 60);
 
             // Check KO / Time-over
-            if (this.p1.hp <= 0 || this.p2.hp <= 0 || this.matchTimer <= 0) {
-                if (this.p1.hp <= 0 && !this.p1.isDead) this.p1.triggerDeath(this.p2.x, this.p2.y);
-                if (this.p2.hp <= 0 && !this.p2.isDead) this.p2.triggerDeath(this.p1.x, this.p1.y);
-                this.triggerRoundEnd();
+            if (this.is2v2Mode) {
+                const blueAlive = (this.players2v2[0] && this.players2v2[0].hp > 0) ||
+                                  (this.players2v2[1] && this.players2v2[1].hp > 0);
+                const redAlive  = (this.players2v2[2] && this.players2v2[2].hp > 0) ||
+                                  (this.players2v2[3] && this.players2v2[3].hp > 0);
+
+                if (!blueAlive || !redAlive || this.matchTimer <= 0) {
+                    this.triggerRoundEnd();
+                }
+            } else {
+                if (this.p1.hp <= 0 || this.p2.hp <= 0 || this.matchTimer <= 0) {
+                    if (this.p1.hp <= 0 && !this.p1.isDead) this.p1.triggerDeath(this.p2.x, this.p2.y);
+                    if (this.p2.hp <= 0 && !this.p2.isDead) this.p2.triggerDeath(this.p1.x, this.p1.y);
+                    this.triggerRoundEnd();
+                }
             }
 
             if (this.isOnlineHost) {
@@ -578,10 +780,22 @@ class CyberClashGame {
 
         if (this.state === STATE_ROUND_OVER) {
             this.roundOverTimer -= dt;
-            // Still update physics & particles during slow-mo
-            this.p1.update(dt * 0.4, this.bounds);
-            this.p2.update(dt * 0.4, this.bounds);
-            combat.updateProjectiles(dt * 0.4, this.bounds, this.p1, this.p2);
+            if (this.is2v2Mode) {
+                const platforms = mapManager.getPlatforms();
+                for (const p of this.players2v2) {
+                    if (p) {
+                        p.update(dt * 0.4, this.bounds);
+                        if (physics.gravityEnabled) {
+                            physics.resolvePlatforms(p, platforms);
+                        }
+                    }
+                }
+                combat.updateProjectiles(dt * 0.4, this.bounds, ...this.players2v2);
+            } else {
+                this.p1.update(dt * 0.4, this.bounds);
+                this.p2.update(dt * 0.4, this.bounds);
+                combat.updateProjectiles(dt * 0.4, this.bounds, this.p1, this.p2);
+            }
 
             if (this.isOnlineHost) {
                 this.broadcastStateSnapshot();
@@ -593,13 +807,49 @@ class CyberClashGame {
         }
     }
 
+    getNearestLivingOpponent(player, allPlayers) {
+        if (!player || !allPlayers) return null;
+        let nearest = null;
+        let minDist = Infinity;
+        for (const other of allPlayers) {
+            if (other && other !== player && other.teamId !== player.teamId && !other.isDead && other.hp > 0) {
+                const dist = Math.hypot(other.x - player.x, other.y - player.y);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = other;
+                }
+            }
+        }
+        return nearest;
+    }
+
     processPlayerInputs(player, index, opponent) {
         if (!player) return;
 
         // 1. Movement
         const move = input.getMovementVector(index);
         if (move && (move.x !== 0 || move.y !== 0)) {
-            player.thrust(move.x, move.y);
+            if (physics.gravityEnabled || player.gravityEnabled) {
+                if (move.x !== 0) {
+                    player.thrust(move.x, 0);
+                }
+            } else {
+                player.thrust(move.x, move.y);
+            }
+        }
+
+        // Gravity Platformer Jump & Drop
+        if (physics.gravityEnabled || player.gravityEnabled) {
+            const upAction = input.getActionState(index, 'up');
+            const touchJump = (index === 0 && input.touchMove && input.touchMove.y < -0.55);
+            if ((upAction && upAction.justDown) || touchJump) {
+                physics.executeJump(player);
+            }
+            const downAction = input.getActionState(index, 'down');
+            const touchDrop = (index === 0 && input.touchMove && input.touchMove.y > 0.55);
+            if ((downAction && downAction.isDown) || touchDrop) {
+                physics.dropThrough(player);
+            }
         }
 
         // 2b. Mouse & Touch Aiming for Player 1 (Only in BOT or ONLINE mode, NEVER in LOCAL 2-player mode)
@@ -665,21 +915,26 @@ class CyberClashGame {
         const p2Move = input.getMovementVector(1); // Arrows on client machine
         const move = (p1Move.x !== 0 || p1Move.y !== 0) ? p1Move : p2Move;
 
+        const mySlot = this.is2v2Mode ? (network.slotIndex || 1) : 1;
+        const myPlayer = this.is2v2Mode ? (this.players2v2[mySlot] || this.p1) : this.p2;
+
         let aimAngle = null;
         if (input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
-            if (input.mouse && typeof input.mouse.x === 'number' && this.p2) {
-                const dx = input.mouse.x - this.p2.x;
-                const dy = input.mouse.y - this.p2.y;
+            if (input.mouse && typeof input.mouse.x === 'number' && myPlayer) {
+                const dx = input.mouse.x - myPlayer.x;
+                const dy = input.mouse.y - myPlayer.y;
                 if (Math.hypot(dx, dy) > 10) {
                     aimAngle = Math.atan2(dy, dx);
                 }
             }
-        } else if (input && input.touchEnabled && this.p1 && this.p2 && (!move || (move.x === 0 && move.y === 0))) {
-            // Auto-aim towards opponent on mobile when idle/attacking
-            const dx = this.p1.x - this.p2.x;
-            const dy = this.p1.y - this.p2.y;
-            if (Math.hypot(dx, dy) > 10) {
-                aimAngle = Math.atan2(dy, dx);
+        } else if (input && input.touchEnabled && myPlayer && (!move || (move.x === 0 && move.y === 0))) {
+            const opp = this.is2v2Mode ? this.getNearestLivingOpponent(myPlayer, this.players2v2) : this.p1;
+            if (opp) {
+                const dx = opp.x - myPlayer.x;
+                const dy = opp.y - myPlayer.y;
+                if (Math.hypot(dx, dy) > 10) {
+                    aimAngle = Math.atan2(dy, dx);
+                }
             }
         }
 
@@ -705,15 +960,26 @@ class CyberClashGame {
         const p2Ult = input.getActionState(1, 'ultimate');
         const ultimate = Boolean((p1Ult && p1Ult.justDown) || (p2Ult && p2Ult.justDown));
 
+        const p1Up = input.getActionState(0, 'up');
+        const p2Up = input.getActionState(1, 'up');
+        const jump = Boolean((p1Up && p1Up.justDown) || (p2Up && p2Up.justDown) || (input.touchMove && input.touchMove.y < -0.55));
+
+        const p1Down = input.getActionState(0, 'down');
+        const p2Down = input.getActionState(1, 'down');
+        const drop = Boolean((p1Down && p1Down.isDown) || (p2Down && p2Down.isDown) || (input.touchMove && input.touchMove.y > 0.55));
+
         network.send({
             type: 'CLIENT_INPUT',
+            slotIndex: mySlot,
             move: move,
             aimAngle: aimAngle,
             dash: dash,
             ultimate: ultimate,
             attack: attack,
             shield: shield,
-            skill: skill
+            skill: skill,
+            jump: jump,
+            drop: drop
         });
     }
 
@@ -724,7 +990,23 @@ class CyberClashGame {
         const mx = inputs.move ? inputs.move.x : 0;
         const my = inputs.move ? inputs.move.y : 0;
         if (mx !== 0 || my !== 0) {
-            player.thrust(mx, my);
+            if (physics.gravityEnabled || player.gravityEnabled) {
+                if (mx !== 0) player.thrust(mx, 0);
+            } else {
+                player.thrust(mx, my);
+            }
+        }
+
+        // Gravity Platformer Jump & Drop from Client
+        if (physics.gravityEnabled || player.gravityEnabled) {
+            if (inputs.jump) {
+                physics.executeJump(player);
+                inputs.jump = false;
+            }
+            if (inputs.drop) {
+                physics.dropThrough(player);
+                inputs.drop = false;
+            }
         }
 
         // 1b. Aim Angle from client
@@ -773,8 +1055,37 @@ class CyberClashGame {
     }
 
     broadcastStateSnapshot() {
+        if (this.is2v2Mode) {
+            network.send({
+                type: 'GAME_SNAPSHOT',
+                is2v2: true,
+                state: this.state,
+                round: this.round,
+                matchTimer: this.matchTimer,
+                countdownTimer: this.countdownTimer,
+                roundOverTimer: this.roundOverTimer,
+                roundMessage: this.roundMessage,
+                teamWins: this.teamWins,
+                players: this.players2v2.map(p => this.packCyborg(p)),
+                projectiles: combat.projectiles.map(p => ({
+                    ownerIndex: p.ownerIndex,
+                    x: p.x,
+                    y: p.y,
+                    vx: p.vx,
+                    vy: p.vy,
+                    damage: p.damage,
+                    color: p.color,
+                    radius: p.radius,
+                    isReflected: p.isReflected,
+                    type: p.type
+                }))
+            });
+            return;
+        }
+
         network.send({
             type: 'GAME_SNAPSHOT',
+            is2v2: false,
             state: this.state,
             round: this.round,
             matchTimer: this.matchTimer,
@@ -794,7 +1105,8 @@ class CyberClashGame {
                 damage: p.damage,
                 color: p.color,
                 radius: p.radius,
-                isReflected: p.isReflected
+                isReflected: p.isReflected,
+                type: p.type
             }))
         });
     }
@@ -802,8 +1114,10 @@ class CyberClashGame {
     handleNetworkGameData(data) {
         if (!data) return;
         if (data.type === 'CLIENT_INPUT') {
-            if (!this.clientInputBuffer) {
-                this.clientInputBuffer = {
+            const slot = (typeof data.slotIndex === 'number') ? data.slotIndex : 1;
+            if (!this.clientInputBuffers) this.clientInputBuffers = {};
+            if (!this.clientInputBuffers[slot]) {
+                this.clientInputBuffers[slot] = {
                     move: { x: 0, y: 0 },
                     aimAngle: null,
                     shield: false,
@@ -811,32 +1125,43 @@ class CyberClashGame {
                     dashMove: null,
                     ultimate: false,
                     attack: false,
-                    skill: false
+                    skill: false,
+                    jump: false,
+                    drop: false
                 };
             }
+            const buf = this.clientInputBuffers[slot];
             if (data.move) {
-                this.clientInputBuffer.move = data.move;
+                buf.move = data.move;
             }
             if (data.aimAngle !== null && data.aimAngle !== undefined) {
-                this.clientInputBuffer.aimAngle = data.aimAngle;
+                buf.aimAngle = data.aimAngle;
             }
-            this.clientInputBuffer.shield = Boolean(data.shield);
+            buf.shield = Boolean(data.shield);
 
             // One-shot edge actions: Latch to true so no intermediate/idle packets overwrite them!
             if (data.dash) {
-                this.clientInputBuffer.dash = true;
-                this.clientInputBuffer.dashMove = data.move ? { x: data.move.x, y: data.move.y } : null;
+                buf.dash = true;
+                buf.dashMove = data.move ? { x: data.move.x, y: data.move.y } : null;
             }
             if (data.ultimate) {
-                this.clientInputBuffer.ultimate = true;
+                buf.ultimate = true;
             }
             if (data.attack) {
-                this.clientInputBuffer.attack = true;
+                buf.attack = true;
             }
             if (data.skill) {
-                this.clientInputBuffer.skill = true;
+                buf.skill = true;
             }
-            this.latestClientInputs = this.clientInputBuffer;
+            if (data.jump) {
+                buf.jump = true;
+            }
+            if (data.drop) {
+                buf.drop = true;
+            }
+            this.latestClientInputs = buf;
+        } else if (data.type === '2V2_MATCH_START') {
+            this.startMatch2v2(data.map, data.slots, data.bans);
         } else if (data.type === 'GAME_SNAPSHOT') {
             this.latestSnapshot = data;
             if (this.isOnlineClient) {
@@ -944,6 +1269,45 @@ class CyberClashGame {
         }
 
         const wasVictory = (this.state === STATE_VICTORY);
+
+        if (snap.is2v2) {
+            if (!this.is2v2Mode) {
+                this.is2v2Mode = true;
+                physics.gravityEnabled = true;
+            }
+            this.state = snap.state;
+            this.round = snap.round;
+            this.matchTimer = snap.matchTimer;
+            this.countdownTimer = snap.countdownTimer;
+            this.roundOverTimer = snap.roundOverTimer;
+            this.roundMessage = snap.roundMessage;
+            if (snap.teamWins) this.teamWins = snap.teamWins;
+
+            if (snap.players && Array.isArray(snap.players)) {
+                for (let i = 0; i < snap.players.length; i++) {
+                    if (!this.players2v2[i]) {
+                        const pData = snap.players[i];
+                        const charId = (this.slots2v2[i] && this.slots2v2[i].char) || 'yanagi';
+                        const cyborg = new Cyborg(i, pData.x || 300, pData.y || 450, '#38bdf8', `P${i + 1}`, charId);
+                        cyborg.teamId = (i < 2) ? 0 : 1;
+                        cyborg.gravityEnabled = true;
+                        this.players2v2[i] = cyborg;
+                    }
+                    this.unpackCyborg(this.players2v2[i], snap.players[i]);
+                    this.players2v2[i].teamRoundsWon = (this.players2v2[i].teamId === 0) ? this.teamWins.blue : this.teamWins.red;
+                }
+            }
+            this.syncProjectiles(snap.projectiles);
+
+            if (this.state === STATE_VICTORY && !wasVictory) {
+                const winnerText = this.teamWins.blue >= 2 ? 'TEAM BLUE' : 'TEAM RED';
+                const winnerColor = this.teamWins.blue >= 2 ? '#38bdf8' : '#f43f5e';
+                this.ui.showVictory(winnerText, winnerColor);
+                this.updateTouchControlsVisibility();
+            }
+            return;
+        }
+
         const prevP1Hp = this.p1 ? this.p1.hp : 0;
         const prevP2Hp = this.p2 ? this.p2.hp : 0;
         const prevP1Ult = this.p1 ? this.p1.isUsingUltimate : false;
@@ -1039,7 +1403,10 @@ class CyberClashGame {
             naoya: '⚡ PROJECTION: MACH 3 BARRAGE! ⚡',
             luffy: '🍖 GOMU GOMU NO BAJRANG GUN! 🍖',
             gojo: '🌌 DOMAIN EXPANSION: UNLIMITED VOID! 🌌',
-            sukuna: '⛩️ DOMAIN EXPANSION: MALEVOLENT SHRINE! ⛩️'
+            sukuna: '⛩️ DOMAIN EXPANSION: MALEVOLENT SHRINE! ⛩️',
+            saitama: '👊 SERIOUS PUNCH: DEATH! 👊',
+            megumi: '🐺 EIGHT-HANDLED SWORD DIVERGENT SILA MAHORAGA! 🐺',
+            mirai: '🩸 BLOOD WEAPON INFUSION: DISPERSE! 🩸'
         };
         return ultShouts[charId] || '🔥 OVERDRIVE ULTIMATE! 🔥';
     }
@@ -1050,32 +1417,78 @@ class CyberClashGame {
         this.renderer.triggerShake(20, 32);
         this.renderer.triggerFlash('#ffffff', 0.9);
 
-        // Trigger death animation on defeated fighter
-        if (this.p1.hp <= 0 && !this.p1.isDead) {
-            this.p1.triggerDeath(this.p2.x, this.p2.y);
-        }
-        if (this.p2.hp <= 0 && !this.p2.isDead) {
-            this.p2.triggerDeath(this.p1.x, this.p1.y);
-        }
+        if (this.is2v2Mode) {
+            for (const p of this.players2v2) {
+                if (p && p.hp <= 0 && !p.isDead) {
+                    const opp = this.getNearestLivingOpponent(p, this.players2v2);
+                    p.triggerDeath(opp ? opp.x : null, opp ? opp.y : null);
+                }
+            }
 
-        let winner = null;
-        if (this.p1.hp > this.p2.hp) {
-            winner = this.p1;
-            this.p1.roundsWon++;
-            this.roundMessage = 'PLAYER 1 WINS ROUND!';
-            if (!this.p2.isDead) this.p2.triggerDeath(this.p1.x, this.p1.y);
-        } else if (this.p2.hp > this.p1.hp) {
-            winner = this.p2;
-            this.p2.roundsWon++;
-            this.roundMessage = 'PLAYER 2 WINS ROUND!';
-            if (!this.p1.isDead) this.p1.triggerDeath(this.p2.x, this.p2.y);
+            const blueHp = (this.players2v2[0] ? Math.max(0, this.players2v2[0].hp) : 0) +
+                           (this.players2v2[1] ? Math.max(0, this.players2v2[1].hp) : 0);
+            const redHp  = (this.players2v2[2] ? Math.max(0, this.players2v2[2].hp) : 0) +
+                           (this.players2v2[3] ? Math.max(0, this.players2v2[3].hp) : 0);
+
+            if (blueHp > redHp) {
+                this.teamWins.blue++;
+                this.roundMessage = 'TEAM BLUE WINS ROUND!';
+            } else if (redHp > blueHp) {
+                this.teamWins.red++;
+                this.roundMessage = 'TEAM RED WINS ROUND!';
+            } else {
+                this.roundMessage = 'DRAW ROUND!';
+            }
+
+            for (const p of this.players2v2) {
+                if (p) p.teamRoundsWon = (p.teamId === 0) ? this.teamWins.blue : this.teamWins.red;
+            }
         } else {
-            this.roundMessage = 'DRAW ROUND!';
+            // Trigger death animation on defeated fighter
+            if (this.p1.hp <= 0 && !this.p1.isDead) {
+                this.p1.triggerDeath(this.p2.x, this.p2.y);
+            }
+            if (this.p2.hp <= 0 && !this.p2.isDead) {
+                this.p2.triggerDeath(this.p1.x, this.p1.y);
+            }
+
+            let winner = null;
+            if (this.p1.hp > this.p2.hp) {
+                winner = this.p1;
+                this.p1.roundsWon++;
+                this.roundMessage = 'PLAYER 1 WINS ROUND!';
+                if (!this.p2.isDead) this.p2.triggerDeath(this.p1.x, this.p1.y);
+            } else if (this.p2.hp > this.p1.hp) {
+                winner = this.p2;
+                this.p2.roundsWon++;
+                this.roundMessage = 'PLAYER 2 WINS ROUND!';
+                if (!this.p1.isDead) this.p1.triggerDeath(this.p2.x, this.p2.y);
+            } else {
+                this.roundMessage = 'DRAW ROUND!';
+            }
         }
         this.updateTouchControlsVisibility();
     }
 
     resolveNextPhase() {
+        if (this.is2v2Mode) {
+            if (this.teamWins.blue >= 2) {
+                this.state = STATE_VICTORY;
+                this.ui.showVictory('TEAM BLUE', '#38bdf8');
+                this.updateTouchControlsVisibility();
+                if (this.isOnlineHost) this.broadcastStateSnapshot();
+            } else if (this.teamWins.red >= 2) {
+                this.state = STATE_VICTORY;
+                this.ui.showVictory('TEAM RED', '#f43f5e');
+                this.updateTouchControlsVisibility();
+                if (this.isOnlineHost) this.broadcastStateSnapshot();
+            } else {
+                this.round++;
+                this.startRound();
+            }
+            return;
+        }
+
         // Check Match Victory (Best of 3 -> first to 2 rounds)
         if (this.p1.roundsWon >= 2) {
             this.state = STATE_VICTORY;
@@ -1099,17 +1512,23 @@ class CyberClashGame {
     }
 
     render() {
-        this.renderer.drawArena(this.bounds);
+        this.renderer.drawArena(this.bounds, this.is2v2Mode ? mapManager.currentMap : null);
 
         if (this.state !== STATE_LOADOUT) {
             combat.drawProjectiles(this.ctx);
 
-            this.renderer.drawCyborg(this.p1);
-            this.renderer.drawCyborg(this.p2);
-
-            fx.draw(this.ctx);
-
-            this.renderer.drawHUD(this.p1, this.p2, this.matchTimer, this.roundMessage);
+            if (this.is2v2Mode && this.players2v2.length > 0) {
+                for (const p of this.players2v2) {
+                    if (p) this.renderer.drawCyborg(p);
+                }
+                fx.draw(this.ctx);
+                this.renderer.drawHUD(this.players2v2, this.matchTimer, this.roundMessage);
+            } else {
+                this.renderer.drawCyborg(this.p1);
+                this.renderer.drawCyborg(this.p2);
+                fx.draw(this.ctx);
+                this.renderer.drawHUD(this.p1, this.p2, this.matchTimer, this.roundMessage);
+            }
         }
     }
 }

@@ -135,7 +135,7 @@ wss.on('connection', (ws, req) => {
             case 'CREATE_ROOM': {
                 const code = (packet.roomCode || '').toUpperCase().trim();
                 if (!code) {
-                    safeSend(ws, { type: 'ERROR', message: 'Mã phòng không hợp lệ!' });
+                    safeSend(ws, { type: 'ERROR', message: 'Invalid room code!' });
                     return;
                 }
 
@@ -143,65 +143,107 @@ wss.on('connection', (ws, req) => {
                 if (rooms.has(code)) {
                     const existing = rooms.get(code);
                     if (existing.host && existing.host !== ws) {
-                        safeSend(existing.host, { type: 'ERROR', message: 'Phòng đã được tạo lại từ thiết bị khác!' });
+                        safeSend(existing.host, { type: 'ERROR', message: 'Room recreated from another device!' });
                     }
                 }
 
+                const mode = packet.mode || '1v1';
+                const maxPlayers = mode === '2v2' ? 4 : 2;
+
                 ws.roomCode = code;
                 ws.role = 'HOST';
+                ws.slotIndex = 0;
                 rooms.set(code, {
                     host: ws,
                     client: null,
+                    members: [ws],
+                    mode: mode,
+                    maxPlayers: maxPlayers,
                     createdAt: Date.now(),
                     lastActive: Date.now()
                 });
 
-                console.log(`[Room Created] ${code} by ${clientIp}`);
-                safeSend(ws, { type: 'ROOM_CREATED', roomCode: code });
+                console.log(`[Room Created] ${code} (Mode: ${mode}) by ${clientIp}`);
+                safeSend(ws, { type: 'ROOM_CREATED', roomCode: code, slotIndex: 0, mode: mode });
                 break;
             }
 
             case 'JOIN_ROOM': {
                 const code = (packet.roomCode || '').toUpperCase().trim();
                 if (!code || !rooms.has(code)) {
-                    safeSend(ws, { type: 'ERROR', message: `Phòng [${code}] không tồn tại hoặc đã hết hạn!` });
+                    safeSend(ws, { type: 'ERROR', message: `Room [${code}] does not exist or has expired!` });
                     return;
                 }
 
                 const room = rooms.get(code);
-                if (room.client && room.client !== ws && room.client.readyState === WebSocket.OPEN) {
-                    safeSend(ws, { type: 'ERROR', message: `Phòng [${code}] đã đủ 2 người chơi!` });
+                const currentCount = (room.members && room.members.length) || (room.client ? 2 : 1);
+                const maxLimit = room.maxPlayers || 2;
+
+                if (currentCount >= maxLimit) {
+                    safeSend(ws, { type: 'ERROR', message: `Room [${code}] is full (${maxLimit} players max)!` });
                     return;
                 }
 
+                if (!room.members) {
+                    room.members = [room.host];
+                }
+
+                const slotIndex = room.members.length;
                 ws.roomCode = code;
                 ws.role = 'CLIENT';
-                room.client = ws;
+                ws.slotIndex = slotIndex;
+                room.members.push(ws);
+                if (slotIndex === 1) {
+                    room.client = ws;
+                }
                 room.lastActive = Date.now();
 
-                console.log(`[Player Joined] ${code} Client: ${clientIp}`);
+                console.log(`[Player Joined] ${code} Slot: ${slotIndex} Client: ${clientIp}`);
 
                 // Notify client they successfully joined
-                safeSend(ws, { type: 'ROOM_JOINED', roomCode: code, role: 'CLIENT' });
+                safeSend(ws, { type: 'ROOM_JOINED', roomCode: code, role: 'CLIENT', slotIndex: slotIndex, mode: room.mode });
 
-                // Notify host that opponent has connected
+                // Notify host that player has connected (for 1v1 compat)
                 if (room.host && room.host.readyState === WebSocket.OPEN) {
-                    safeSend(room.host, { type: 'OPPONENT_JOINED', role: 'HOST', roomCode: code });
+                    safeSend(room.host, { type: 'OPPONENT_JOINED', role: 'HOST', roomCode: code, slotIndex: slotIndex });
+                }
+
+                // Broadcast room members update
+                const membersPayload = {
+                    type: 'ROOM_MEMBERS_UPDATE',
+                    playerCount: room.members.length,
+                    maxPlayers: room.maxPlayers,
+                    mode: room.mode,
+                    slots: room.members.map((m, idx) => ({ slotIndex: idx, role: m.role }))
+                };
+                for (const m of room.members) {
+                    if (m && m.readyState === WebSocket.OPEN) {
+                        safeSend(m, membersPayload);
+                    }
                 }
                 break;
             }
 
             case 'RELAY': {
-                // High-speed forwarding of game payload to opponent
+                // High-speed forwarding of game payload to other players in room
                 const code = ws.roomCode;
                 if (!code || !rooms.has(code)) return;
 
                 const room = rooms.get(code);
                 room.lastActive = Date.now();
 
-                const target = (ws.role === 'HOST') ? room.client : room.host;
-                if (target && target.readyState === WebSocket.OPEN) {
-                    safeSend(target, { type: 'RELAY', data: packet.data });
+                const senderSlot = ws.slotIndex !== undefined ? ws.slotIndex : (ws.role === 'HOST' ? 0 : 1);
+                if (room.members && room.members.length > 0) {
+                    for (const target of room.members) {
+                        if (target !== ws && target.readyState === WebSocket.OPEN) {
+                            safeSend(target, { type: 'RELAY', data: packet.data, senderSlot: senderSlot });
+                        }
+                    }
+                } else {
+                    const target = (ws.role === 'HOST') ? room.client : room.host;
+                    if (target && target.readyState === WebSocket.OPEN) {
+                        safeSend(target, { type: 'RELAY', data: packet.data, senderSlot: senderSlot });
+                    }
                 }
                 break;
             }
@@ -233,19 +275,48 @@ function cleanupClient(ws) {
     const room = rooms.get(code);
 
     if (ws.role === 'HOST') {
-        // Host left -> inform client and destroy room
-        if (room.client && room.client.readyState === WebSocket.OPEN) {
-            safeSend(room.client, { type: 'OPPONENT_LEFT', message: 'Chủ phòng (Host) đã thoát!' });
+        // Host left -> inform all clients and destroy room
+        if (room.members) {
+            for (const m of room.members) {
+                if (m !== ws && m.readyState === WebSocket.OPEN) {
+                    safeSend(m, { type: 'OPPONENT_LEFT', message: 'Host has left the room!' });
+                }
+            }
+        } else if (room.client && room.client.readyState === WebSocket.OPEN) {
+            safeSend(room.client, { type: 'OPPONENT_LEFT', message: 'Host has left the room!' });
         }
         rooms.delete(code);
         console.log(`[Room Closed] Host left room ${code}`);
     } else if (ws.role === 'CLIENT') {
-        // Client left -> inform host and reset client slot
-        if (room.host && room.host.readyState === WebSocket.OPEN) {
-            safeSend(room.host, { type: 'OPPONENT_LEFT', message: 'Đối thủ đã ngắt kết nối!' });
+        // Client left -> inform host and remove from room members
+        if (room.members) {
+            const idx = room.members.indexOf(ws);
+            if (idx !== -1) {
+                room.members.splice(idx, 1);
+            }
+            if (room.client === ws) {
+                room.client = null;
+            }
+            const membersPayload = {
+                type: 'ROOM_MEMBERS_UPDATE',
+                playerCount: room.members.length,
+                maxPlayers: room.maxPlayers,
+                mode: room.mode,
+                slots: room.members.map((m, i) => ({ slotIndex: i, role: m.role }))
+            };
+            for (const m of room.members) {
+                if (m && m.readyState === WebSocket.OPEN) {
+                    safeSend(m, { type: 'OPPONENT_LEFT', message: 'A player has left the room!' });
+                    safeSend(m, membersPayload);
+                }
+            }
+        } else {
+            if (room.host && room.host.readyState === WebSocket.OPEN) {
+                safeSend(room.host, { type: 'OPPONENT_LEFT', message: 'Opponent has disconnected!' });
+            }
+            room.client = null;
         }
-        room.client = null;
-        console.log(`[Client Disconnected] Room ${code} waiting for new player`);
+        console.log(`[Client Disconnected] Room ${code} player left`);
     }
 
     ws.roomCode = null;

@@ -1,6 +1,7 @@
 // Cyberpunk Neon Glow Canvas Renderer
 import { WEAPONS } from './combat.js?v=75';
 import { assets } from './assets.js?v=75';
+import { mapManager } from './maps.js?v=75';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -44,7 +45,7 @@ export class GameRenderer {
     }
 
     // --- ARENA DRAWING (VIBRANT SCENIC BRAWLHALLA-STYLE STAGE) ---
-    drawArena(bounds) {
+    drawArena(bounds, activeMap = null) {
         const ctx = this.ctx;
         const w = this.canvas.width;
         const h = this.canvas.height;
@@ -62,12 +63,25 @@ export class GameRenderer {
         const arenaH = bounds.maxY - bounds.minY;
 
         // 1. Draw Full-Screen Scenic Background Art
-        const bgImg = assets.getImage('background');
+        const map = activeMap || (window.game && window.game.is2v2Mode ? mapManager.currentMap : null);
+        let bgImg = null;
+        if (map && map.bgKey) {
+            bgImg = assets.getImage(map.bgKey);
+        }
+        if (!bgImg) {
+            bgImg = assets.getImage('background');
+        }
+
         if (bgImg) {
             ctx.drawImage(bgImg, 0, 0, w, h);
         } else {
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, w, h);
+        }
+
+        // Draw terrain platforms if in a map with platforms
+        if (map && map.platforms) {
+            this.drawPlatforms(map.platforms);
         }
 
         // 2. Subtle Stage Combat Area Boundary Line (Clean dashed border)
@@ -93,6 +107,73 @@ export class GameRenderer {
         });
 
         ctx.restore();
+    }
+
+    drawPlatforms(platforms) {
+        const ctx = this.ctx;
+        for (const plat of platforms) {
+            ctx.save();
+            if (plat.type === 'solid') {
+                // High-tech Solid Floating Island / Floor
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 10;
+
+                const grad = ctx.createLinearGradient(plat.x, plat.y, plat.x, plat.y + plat.height);
+                grad.addColorStop(0, '#1e293b');
+                grad.addColorStop(0.25, '#0f172a');
+                grad.addColorStop(1, '#020617');
+                ctx.fillStyle = grad;
+                ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+
+                // Glowing neon top surface
+                ctx.shadowColor = plat.color || '#38bdf8';
+                ctx.shadowBlur = 14;
+                ctx.fillStyle = plat.color || '#38bdf8';
+                ctx.fillRect(plat.x, plat.y, plat.width, 4);
+
+                // Tech outline
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+                ctx.lineWidth = 1.2;
+                ctx.strokeRect(plat.x, plat.y, plat.width, plat.height);
+
+                // Platform label / LED indicator
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+                ctx.font = "900 10px 'Orbitron', monospace";
+                ctx.fillText(`▰▰ ${plat.label || 'SOLID PLATFORM'} ▰▰`, plat.x + 16, plat.y + 20);
+
+            } else if (plat.type === 'soft') {
+                // One-way Soft Energy Rail
+                const pulse = Math.sin(Date.now() * 0.005) * 0.2 + 0.8;
+                ctx.shadowColor = '#67e8f9';
+                ctx.shadowBlur = 14;
+
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+                ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+
+                // Glowing dual neon rails
+                ctx.strokeStyle = `rgba(103, 232, 249, ${pulse})`;
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(plat.x, plat.y);
+                ctx.lineTo(plat.x + plat.width, plat.y);
+                ctx.moveTo(plat.x, plat.y + plat.height);
+                ctx.lineTo(plat.x + plat.width, plat.y + plat.height);
+                ctx.stroke();
+
+                // Chevron pass-through indicators
+                ctx.strokeStyle = 'rgba(103, 232, 249, 0.55)';
+                ctx.lineWidth = 1.5;
+                for (let cx = plat.x + 30; cx < plat.x + plat.width - 20; cx += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(cx, plat.y + 11);
+                    ctx.lineTo(cx + 6, plat.y + 4);
+                    ctx.lineTo(cx + 12, plat.y + 11);
+                    ctx.stroke();
+                }
+            }
+            ctx.restore();
+        }
     }
 
     // --- CYBORG / CHARACTER DRAWING ---
@@ -1134,26 +1215,171 @@ export class GameRenderer {
                 }
 
                 ctx.restore();
+
+            } else if (c.characterId === 'saitama') {
+                // SAITAMA: SERIOUS SERIES - SERIOUS PUNCH! 👊
+                ctx.save();
+                const beamLen = 1600;
+                ctx.lineCap = 'round';
+
+                // Golden Punch Atmospheric Shockwave Cone
+                ctx.shadowColor = '#f59e0b';
+                ctx.shadowBlur = 50;
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 120 + pulse * 2;
+                ctx.globalAlpha = 0.45;
+                ctx.beginPath();
+                ctx.moveTo(50, 0);
+                ctx.lineTo(beamLen, 0);
+                ctx.stroke();
+
+                // Core Blazing White/Gold Compression Tunnel
+                ctx.shadowBlur = 20;
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 60 + pulse;
+                ctx.globalAlpha = 0.85;
+                ctx.beginPath();
+                ctx.moveTo(50, 0);
+                ctx.lineTo(beamLen, 0);
+                ctx.stroke();
+
+                // Pure White Central Shockwave
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 26;
+                ctx.globalAlpha = 1.0;
+                ctx.beginPath();
+                ctx.moveTo(50, 0);
+                ctx.lineTo(beamLen, 0);
+                ctx.stroke();
+
+                // Atmospheric Compression Rings
+                for (let r = 80; r <= 800; r += 120) {
+                    const expand = ((c.ultimateTimer * 8 + r) % 800);
+                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.7)';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.ellipse(expand, 0, 30, 75, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+
+            } else if (c.characterId === 'megumi') {
+                // MEGUMI: EIGHT-HANDLED SWORD MAHORAGA CLEAVE ⚔️
+                ctx.save();
+                // 1. Dharmachakra (Eight-spoked wheel floating behind Megumi)
+                ctx.save();
+                ctx.translate(-40, -50);
+                ctx.rotate(c.ultimateTimer * 0.1);
+                ctx.strokeStyle = '#38bdf8';
+                ctx.shadowColor = '#0284c7';
+                ctx.shadowBlur = 35;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(0, 0, 50, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // 8 spokes
+                for (let k = 0; k < 8; k++) {
+                    const angle = k * (Math.PI / 4);
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(angle) * 50, Math.sin(angle) * 50);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // 2. Colossal Divine Blade Slash sweeping forward
+                const slashProgress = Math.min(1, (c.ultimateTimer - 10) / 25);
+                const slashAngle = -Math.PI * 0.4 + slashProgress * Math.PI * 0.8;
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 40;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 14;
+                ctx.beginPath();
+                ctx.arc(60, 0, 280, slashAngle - 0.5, slashAngle + 0.5);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+                ctx.lineWidth = 32;
+                ctx.beginPath();
+                ctx.arc(60, 0, 280, slashAngle - 0.5, slashAngle + 0.5);
+                ctx.stroke();
+
+                ctx.restore();
+
+            } else if (c.characterId === 'mirai') {
+                // MIRAI: BLOOD CATACLYSM STRIKE (CỰ ĐẠI HUYẾT KIẾM) 🩸
+                ctx.save();
+                const slamProgress = Math.min(1, (c.ultimateTimer - 12) / 22);
+                const swordY = -220 + slamProgress * 220;
+
+                // Ground blood shockwave ring
+                ctx.shadowColor = '#dc2626';
+                ctx.shadowBlur = 40;
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 8;
+                ctx.beginPath();
+                ctx.ellipse(0, 35, 180 + pulse * 12, 45 + pulse * 4, 0, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Giant Blood Sword Blade
+                ctx.fillStyle = '#991b1b';
+                ctx.strokeStyle = '#fca5a5';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(0, swordY + 80);        // Sword tip crashing down
+                ctx.lineTo(-30, swordY - 180);     // Left guard
+                ctx.lineTo(-45, swordY - 210);
+                ctx.lineTo(0, swordY - 250);       // Pommel
+                ctx.lineTo(45, swordY - 210);
+                ctx.lineTo(30, swordY - 180);      // Right guard
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Blood crystal facets & inner crimson glow
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
+                ctx.beginPath();
+                ctx.moveTo(0, swordY + 70);
+                ctx.lineTo(-14, swordY - 170);
+                ctx.lineTo(14, swordY - 170);
+                ctx.closePath();
+                ctx.fill();
+
+                // Crimson blood erupting spikes
+                for (let s = -3; s <= 3; s++) {
+                    if (s === 0) continue;
+                    const spX = s * 45;
+                    const spH = (4 - Math.abs(s)) * 28 + Math.random() * 15;
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(spX, 35);
+                    ctx.lineTo(spX + s * 10, 35 - spH);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
             }
 
             ctx.restore();
         }
 
-        // 7. Overhead Player Indicator Tag (P1 / P2)
+        // 7. Overhead Player Indicator Tag (P1 / P2 / P3 / P4)
         if (!c.isDead && c.hp > 0) {
             ctx.save();
-            // Counteract facingDir so text and badge are never flipped horizontally
             ctx.scale(facingDir, 1);
 
-            const isP1 = c.index === 0;
-            const tagText = isP1 ? 'P1' : 'P2';
-            const tagColor = isP1 ? '#00f0ff' : '#f43f5e';
+            const tagText = `P${c.index + 1}`;
+            const tagColor = c.teamId === 0 
+                ? (c.index === 0 ? '#00f0ff' : '#60a5fa') 
+                : (c.index === 2 ? '#f43f5e' : '#fb7185');
             const tagY = -94;
 
             ctx.shadowColor = tagColor;
             ctx.shadowBlur = 8;
 
-            // Badge pill background
             const pillW = 28;
             const pillH = 14;
             ctx.fillStyle = 'rgba(11, 15, 25, 0.88)';
@@ -1169,7 +1395,6 @@ export class GameRenderer {
             ctx.fill();
             ctx.stroke();
 
-            // Tiny downward pointing indicator triangle
             ctx.fillStyle = tagColor;
             ctx.beginPath();
             ctx.moveTo(-3.5, tagY + pillH / 2);
@@ -1178,7 +1403,6 @@ export class GameRenderer {
             ctx.closePath();
             ctx.fill();
 
-            // P1 / P2 Text
             ctx.fillStyle = '#ffffff';
             ctx.font = "900 9px 'Orbitron', sans-serif";
             ctx.textAlign = 'center';
@@ -1193,6 +1417,11 @@ export class GameRenderer {
 
     // --- HUD & HEALTH BARS (CLEAN, ELEGANT & MODERN) ---
     drawHUD(p1, p2, matchTimer, roundText = null) {
+        if (Array.isArray(p1)) {
+            this.drawHUD2v2(p1, matchTimer, roundText);
+            return;
+        }
+
         const ctx = this.ctx;
         const w = this.canvas.width;
 
@@ -1238,14 +1467,119 @@ export class GameRenderer {
             ctx.font = `900 44px 'Orbitron', sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 20;
             ctx.fillText(roundText, w / 2, this.canvas.height / 2 - 35);
         }
 
-        // Screen Flash Overlay
-        if (this.flashAlpha > 0) {
-            ctx.fillStyle = this.flashColor;
-            ctx.globalAlpha = this.flashAlpha;
-            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.restore();
+    }
+
+    // --- 2V2 HUD (DUAL STACKED HEALTH BARS PER TEAM) ---
+    drawHUD2v2(players, matchTimer, roundText = null) {
+        const ctx = this.ctx;
+        const w = this.canvas.width;
+        ctx.save();
+
+        const [p1, p2, p3, p4] = players;
+
+        // Team Blue (Left): P1 at y=18, P2 at y=52
+        if (p1) this.drawPlayerStatsCompact(p1, 25, 16, false, 'TEAM BLUE (P1)', '#38bdf8');
+        if (p2) this.drawPlayerStatsCompact(p2, 25, 52, false, 'TEAM BLUE (P2)', '#60a5fa');
+
+        // Team Red (Right): P3 at y=18, P4 at y=52
+        if (p3) this.drawPlayerStatsCompact(p3, w - 25, 16, true, 'TEAM RED (P3)', '#f43f5e');
+        if (p4) this.drawPlayerStatsCompact(p4, w - 25, 52, true, 'TEAM RED (P4)', '#fb7185');
+
+        // Center Timer Badge
+        const timerText = Math.ceil(matchTimer).toString().padStart(2, '0');
+        const badgeW = 68;
+        const badgeH = 40;
+        const badgeX = w / 2 - badgeW / 2;
+        const badgeY = 16;
+
+        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = '#0284c7';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 6);
+        else ctx.rect(badgeX, badgeY, badgeW, badgeH);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = `700 22px 'Orbitron', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(timerText, w / 2, badgeY + badgeH / 2);
+
+        // Round score pips
+        const blueWins = (p1 && p1.teamRoundsWon) || 0;
+        const redWins = (p3 && p3.teamRoundsWon) || 0;
+        this.drawRoundPips(blueWins, w / 2 - 62, 36, '#38bdf8');
+        this.drawRoundPips(redWins, w / 2 + 62, 36, '#f43f5e');
+
+        // Announcement text
+        if (roundText) {
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.fillRect(0, this.canvas.height / 2 - 80, w, 90);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = `900 44px 'Orbitron', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 20;
+            ctx.fillText(roundText, w / 2, this.canvas.height / 2 - 35);
+        }
+
+        ctx.restore();
+    }
+
+    drawPlayerStatsCompact(player, anchorX, y, isRight, tagLabel, teamColor) {
+        const ctx = this.ctx;
+        const barW = 200;
+        const barH = 14;
+        const x = isRight ? (anchorX - barW) : anchorX;
+
+        ctx.save();
+        // Background track
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        ctx.strokeStyle = teamColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y + 14, barW, barH, 3);
+        else ctx.rect(x, y + 14, barW, barH);
+        ctx.fill();
+        ctx.stroke();
+
+        // Health fill
+        const hpRatio = Math.max(0, Math.min(1, player.hp / player.maxHp));
+        const fillW = barW * hpRatio;
+        const fillX = isRight ? (x + barW - fillW) : x;
+
+        ctx.fillStyle = player.hp <= 0 ? '#475569' : (hpRatio < 0.25 ? '#ef4444' : teamColor);
+        ctx.shadowColor = teamColor;
+        ctx.shadowBlur = 8;
+        ctx.fillRect(fillX, y + 14, fillW, barH);
+
+        // Player Tag & Name
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = "700 11px 'Orbitron', sans-serif";
+        ctx.textAlign = isRight ? 'right' : 'left';
+        ctx.fillText(`${tagLabel} - ${player.name}`, isRight ? (anchorX) : x, y + 10);
+
+        // HP numbers or K.O.
+        ctx.font = "900 10px 'Orbitron', sans-serif";
+        ctx.textAlign = 'center';
+        if (player.hp <= 0 || player.isDead) {
+            ctx.fillStyle = '#ef4444';
+            ctx.fillText('⚡ K.O. OFFLINE ⚡', x + barW / 2, y + 21);
+        } else {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`${Math.round(player.hp)} / ${player.maxHp}`, x + barW / 2, y + 21);
         }
 
         ctx.restore();

@@ -170,23 +170,84 @@ const SKILL_DATA = {
             { key: 'I (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ]
+    },
+    saitama: {
+        title: '👊 SAITAMA (HERO • 535 HP)',
+        color: '#f59e0b',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Consecutive Normal Punches (Liên hoàn đấm)', desc: '' },
+            { key: 'R (Skill)', name: 'Serious Sidesteps ⚡ (Bật nhảy tàn ảnh)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Serious Punch 💥 (Cú Đấm Nghiêm Túc)', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Consecutive Normal Punches (Liên hoàn đấm)', desc: '' },
+            { key: 'I (Skill)', name: 'Serious Sidesteps ⚡ (Bật nhảy tàn ảnh)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Serious Punch 💥 (Cú Đấm Nghiêm Túc)', desc: '' }
+        ]
+    },
+    megumi: {
+        title: '🐺 MEGUMI FUSHIGURO (SHIKIGAMI • 515 HP)',
+        color: '#6366f1',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Toad Shadow Grab (3-Hit: Thập Chủng Ảnh Pháp)', desc: '' },
+            { key: 'R (Skill)', name: 'Divine Dog: Totality 🐺 (Hắc Cẩu cắn choáng)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Eight-Handled Sword: Mahoraga ⛩️', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Toad Shadow Grab (3-Hit: Thập Chủng Ảnh Pháp)', desc: '' },
+            { key: 'I (Skill)', name: 'Divine Dog: Totality 🐺 (Hắc Cẩu cắn choáng)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Eight-Handled Sword: Mahoraga ⛩️', desc: '' }
+        ]
+    },
+    mirai: {
+        title: '🩸 KURIYAMA MIRAI (SPIRIT WARRIOR • 510 HP)',
+        color: '#f43f5e',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Blood Katana (3-Hit: Huyết Kiếm Hồi HP)', desc: '' },
+            { key: 'R (Skill)', name: 'Blood Crescent Wave 🩸 (Trăng máu tiêu HP)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Blood Cataclysm ⚔️ (Đại Huyết Kiếm Trảm)', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Blood Katana (3-Hit: Huyết Kiếm Hồi HP)', desc: '' },
+            { key: 'I (Skill)', name: 'Blood Crescent Wave 🩸 (Trăng máu tiêu HP)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Blood Cataclysm ⚔️ (Đại Huyết Kiếm Trảm)', desc: '' }
+        ]
     }
 };
 
+const ALL_CHARACTERS = [
+    { id: 'yanagi', name: 'Tsukishiro Yanagi (Melee • 515 HP)' },
+    { id: 'velina', name: 'Verina Airgid (Ranged • 510 HP)' },
+    { id: 'nicole', name: 'Nicole Demara (Ranged • 510 HP)' },
+    { id: 'trigger', name: 'Trigger (Ranged • 505 HP)' },
+    { id: 'vivian', name: 'Vivian Banshee (Ranged • 520 HP)' },
+    { id: 'jotaro', name: 'Jotaro Kujo (Melee • 525 HP)' },
+    { id: 'goku', name: 'Son Goku (Melee • 520 HP)' },
+    { id: 'giorno', name: 'Giorno Giovanna (Melee • 515 HP)' },
+    { id: 'naoya', name: "Naoya Zen'in (Melee • 510 HP)" },
+    { id: 'luffy', name: 'Monkey D. Luffy (Melee • 520 HP)' },
+    { id: 'gojo', name: 'Satoru Gojo (Melee • 515 HP)' },
+    { id: 'sukuna', name: 'Ryomen Sukuna (Melee • 520 HP)' },
+    { id: 'saitama', name: 'Saitama (Hero • 535 HP)' },
+    { id: 'megumi', name: 'Megumi Fushiguro (Shadow • 515 HP)' },
+    { id: 'mirai', name: 'Kuriyama Mirai (Blood • 510 HP)' }
+];
+
 export class UIManager {
-    constructor(onStartMatch, onRematch, onNetworkModeChange, onNetworkConnected, onNetworkGameData, onBotDifficultyChange) {
+    constructor(onStartMatch, onRematch, onNetworkModeChange, onNetworkConnected, onNetworkGameData, onBotDifficultyChange, onStartMatch2v2) {
         this.onStartMatch = onStartMatch;
         this.onRematch = onRematch;
         this.onNetworkModeChange = onNetworkModeChange;
         this.onNetworkConnected = onNetworkConnected;
         this.onNetworkGameData = onNetworkGameData;
         this.onBotDifficultyChange = onBotDifficultyChange;
+        this.onStartMatch2v2 = onStartMatch2v2;
 
         this.loadoutScreen = document.getElementById('loadout-screen');
         this.victoryScreen = document.getElementById('victory-screen');
         this.controlsModal = document.getElementById('controls-modal');
 
-        this.gameMode = 'LOCAL'; // 'LOCAL' | 'BOT' | 'ONLINE'
+        this.gameMode = 'LOCAL'; // 'LOCAL' | 'BOT' | 'ONLINE' | '2V2'
         this.botDifficulty = 'normal'; // 'easy' | 'normal' | 'master' | 'impossible'
         this.networkRole = null; // 'HOST' | 'CLIENT' | null
         this.currentRoomCode = null;
@@ -197,12 +258,25 @@ export class UIManager {
         this.p1Char = 'yanagi';
         this.p2Char = 'velina';
 
+        // 2v2 state
+        this.selected2v2Map = 'brawlhaven';
+        this.is2v2Online = false;
+        this.my2v2Slot = 0;
+        this.slots2v2 = [
+            { slotIndex: 0, char: 'yanagi', isBot: false, name: 'P1 (HOST)' },
+            { slotIndex: 1, char: 'velina', isBot: true, name: 'P2 (BOT)' },
+            { slotIndex: 2, char: 'saitama', isBot: true, name: 'P3 (BOT)' },
+            { slotIndex: 3, char: 'sukuna', isBot: true, name: 'P4 (BOT)' }
+        ];
+        this.bans2v2 = { blue: 'none', red: 'none' };
+
         this.initUI();
     }
 
     initUI() {
         this.setupCharacterSelection();
         this.setupOnlineUI();
+        this.setup2v2UI();
 
         // Ready Buttons
         const p1ReadyBtn = document.getElementById('p1-ready-btn');
@@ -359,6 +433,8 @@ export class UIManager {
         const botTab = document.getElementById('mode-bot-tab');
         const online1Tab = document.getElementById('mode-online1-tab');
         const online2Tab = document.getElementById('mode-online2-tab');
+        const tab2v2 = document.getElementById('mode-2v2-tab');
+        const panel2v2 = document.getElementById('lobby-2v2-panel');
         const botDiffPanel = document.getElementById('bot-difficulty-panel');
         const lobbyPanel = document.getElementById('online-lobby-panel');
         const fightersContainer = document.getElementById('loadout-fighters-container');
@@ -400,8 +476,11 @@ export class UIManager {
             if (botTab) botTab.classList.remove('active');
             if (online1Tab) online1Tab.classList.remove('active');
             if (online2Tab) online2Tab.classList.remove('active');
+            if (tab2v2) tab2v2.classList.remove('active');
+
             if (botDiffPanel) botDiffPanel.classList.add('hidden');
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
+            if (panel2v2) panel2v2.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
             if (fightersContainer) fightersContainer.classList.remove('hidden');
             if (hostCodeBox) hostCodeBox.classList.add('hidden');
@@ -422,8 +501,11 @@ export class UIManager {
             if (botTab) botTab.classList.add('active');
             if (online1Tab) online1Tab.classList.remove('active');
             if (online2Tab) online2Tab.classList.remove('active');
+            if (tab2v2) tab2v2.classList.remove('active');
+
             if (botDiffPanel) botDiffPanel.classList.remove('hidden');
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
+            if (panel2v2) panel2v2.classList.add('hidden');
             if (matchBanner) matchBanner.classList.add('hidden');
             if (fightersContainer) fightersContainer.classList.remove('hidden');
             if (hostCodeBox) hostCodeBox.classList.add('hidden');
@@ -440,6 +522,8 @@ export class UIManager {
 
             if (localTab) localTab.classList.remove('active');
             if (botTab) botTab.classList.remove('active');
+            if (tab2v2) tab2v2.classList.remove('active');
+            if (panel2v2) panel2v2.classList.add('hidden');
             if (botDiffPanel) botDiffPanel.classList.add('hidden');
 
             if (mode === 'WEBSOCKET') {
@@ -485,10 +569,36 @@ export class UIManager {
             if (this.onNetworkModeChange) this.onNetworkModeChange('ONLINE');
         };
 
+        const switchTo2v2 = () => {
+            this.gameMode = '2V2';
+            this.networkRole = null;
+            this.currentRoomCode = null;
+            network.disconnect();
+
+            if (localTab) localTab.classList.remove('active');
+            if (botTab) botTab.classList.remove('active');
+            if (online1Tab) online1Tab.classList.remove('active');
+            if (online2Tab) online2Tab.classList.remove('active');
+            if (tab2v2) tab2v2.classList.add('active');
+
+            if (botDiffPanel) botDiffPanel.classList.add('hidden');
+            if (lobbyPanel) lobbyPanel.classList.add('hidden');
+            if (matchBanner) matchBanner.classList.add('hidden');
+            if (fightersContainer) fightersContainer.classList.add('hidden');
+            if (hostCodeBox) hostCodeBox.classList.add('hidden');
+            if (clientWaitBox) clientWaitBox.classList.add('hidden');
+
+            if (panel2v2) panel2v2.classList.remove('hidden');
+
+            if (this.onNetworkModeChange) this.onNetworkModeChange('2V2');
+        };
+        this.switchTo2v2 = switchTo2v2;
+
         if (localTab) localTab.addEventListener('click', switchToLocal);
         if (botTab) botTab.addEventListener('click', switchToBot);
         if (online1Tab) online1Tab.addEventListener('click', () => switchToOnline('WEBSOCKET'));
         if (online2Tab) online2Tab.addEventListener('click', () => switchToOnline('WEBRTC'));
+        if (tab2v2) tab2v2.addEventListener('click', switchTo2v2);
 
         // Save server URL button
         if (btnSaveServer && inputWsServer) {
@@ -608,7 +718,16 @@ export class UIManager {
         }
 
         // Network Callbacks
-        network.onRoomCreated = (code) => {
+        network.onRoomCreated = (code, slotIndex, mode) => {
+            if (mode === '2v2' || this.gameMode === '2V2') {
+                const box = document.getElementById('box-2v2-room-code');
+                const lbl = document.getElementById('lbl-2v2-room-code');
+                const status = document.getElementById('status-2v2-online');
+                if (box) box.classList.remove('hidden');
+                if (lbl) lbl.textContent = code;
+                if (status) status.textContent = `Phòng 2V2 [${code}] đã sẵn sàng! Gửi mã cho đồng đội & đối thủ.`;
+                return;
+            }
             if (hostCodeBox) hostCodeBox.classList.remove('hidden');
             if (displayRoomCode) displayRoomCode.textContent = code;
             if (globalMsg) {
@@ -625,11 +744,26 @@ export class UIManager {
             if (clientWaitMsg) {
                 clientWaitMsg.textContent = msg;
             }
+            const status2v2 = document.getElementById('status-2v2-online');
+            if (status2v2 && this.gameMode === '2V2') {
+                status2v2.textContent = msg;
+                status2v2.classList.toggle('error', !!isError);
+            }
         };
 
-        network.onConnected = (role, code) => {
+        network.onConnected = (role, code, slotIndex, roomMode) => {
             this.networkRole = role;
             this.currentRoomCode = code;
+
+            if (roomMode === '2v2' || this.gameMode === '2V2') {
+                this.my2v2Slot = slotIndex || 0;
+                const status = document.getElementById('status-2v2-online');
+                if (status) status.textContent = `✅ Đã kết nối vào phòng 2V2 [${code}] (Slot ${this.my2v2Slot + 1} - ${role})!`;
+                if (this.onNetworkConnected) {
+                    this.onNetworkConnected(role, code, slotIndex, roomMode);
+                }
+                return;
+            }
 
             if (lobbyPanel) lobbyPanel.classList.add('hidden');
             if (matchBanner) matchBanner.classList.remove('hidden');
@@ -801,7 +935,36 @@ export class UIManager {
             const modal = document.getElementById('disconnect-modal');
             const msg = document.getElementById('disconnect-msg');
             if (msg) msg.textContent = 'Đối thủ đã rời khỏi phòng hoặc thoát về menu chính.';
-            if (modal) modal.classList.remove('hidden');
+        } else if (data.type === '2V2_MATCH_START') {
+            this.hideLoadout();
+            this.selected2v2Map = data.map || 'brawlhaven';
+            this.slots2v2 = data.slots || this.slots2v2;
+            this.bans2v2 = data.bans || this.bans2v2;
+            if (this.onStartMatch2v2) {
+                this.onStartMatch2v2(data.map, data.slots, data.bans);
+            }
+        } else if (data.type === '2V2_SLOT_UPDATE') {
+            const idx = data.slotIndex;
+            if (this.slots2v2 && this.slots2v2[idx]) {
+                this.slots2v2[idx].char = data.char;
+                if (data.isBot !== undefined) this.slots2v2[idx].isBot = data.isBot;
+                const selectEl = document.getElementById(`slot-${idx}-char-select`);
+                const avatarEl = document.getElementById(`slot-${idx}-avatar`);
+                if (selectEl) selectEl.value = data.char;
+                if (avatarEl) avatarEl.src = `assets/${data.char}/avatar.png`;
+            }
+        } else if (data.type === '2V2_MAP_SELECT') {
+            this.selected2v2Map = data.map;
+            const cardBrawlhaven = document.getElementById('map-card-brawlhaven');
+            const cardGreatHall = document.getElementById('map-card-great-hall');
+            if (cardBrawlhaven) cardBrawlhaven.classList.toggle('active', data.map === 'brawlhaven');
+            if (cardGreatHall) cardGreatHall.classList.toggle('active', data.map === 'great_hall');
+        } else if (data.type === '2V2_BAN_UPDATE') {
+            this.bans2v2 = data.bans || this.bans2v2;
+            const selectBlueBan = document.getElementById('select-blue-ban');
+            const selectRedBan = document.getElementById('select-red-ban');
+            if (selectBlueBan && data.bans.blue) selectBlueBan.value = data.bans.blue;
+            if (selectRedBan && data.bans.red) selectRedBan.value = data.bans.red;
         } else if (this.onNetworkGameData) {
             this.onNetworkGameData(data);
         }
@@ -809,7 +972,7 @@ export class UIManager {
 
     updateCardSelection(player, charId) {
         document.querySelectorAll(`.char-card[data-player="${player}"]`).forEach(card => {
-            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno', 'selected-naoya', 'selected-luffy', 'selected-gojo', 'selected-sukuna');
+            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno', 'selected-naoya', 'selected-luffy', 'selected-gojo', 'selected-sukuna', 'selected-saitama', 'selected-megumi', 'selected-mirai');
             if (card.dataset.char === charId) {
                 card.classList.add('selected', `selected-${charId}`);
             }
@@ -857,6 +1020,199 @@ export class UIManager {
         });
 
         box.innerHTML = html;
+    }
+
+    setup2v2UI() {
+        const tab2v2 = document.getElementById('mode-2v2-tab');
+        const panel2v2 = document.getElementById('lobby-2v2-panel');
+        const btnLocal = document.getElementById('btn-2v2-local-mode');
+        const btnOnline = document.getElementById('btn-2v2-online-mode');
+        const onlineBar = document.getElementById('online-2v2-bar');
+        const btnCreateRoom = document.getElementById('btn-create-2v2-room');
+        const btnJoinRoom = document.getElementById('btn-join-2v2-room');
+        const inputRoomCode = document.getElementById('input-2v2-room-code');
+        const boxRoomCode = document.getElementById('box-2v2-room-code');
+        const lblRoomCode = document.getElementById('lbl-2v2-room-code');
+        const btnCopyCode = document.getElementById('btn-copy-2v2-code');
+        const statusOnline = document.getElementById('status-2v2-online');
+        const btnStart2v2 = document.getElementById('btn-start-2v2-match');
+        const selectBlueBan = document.getElementById('select-blue-ban');
+        const selectRedBan = document.getElementById('select-red-ban');
+
+        // Populate Character Selects in 4 slots
+        for (let i = 0; i < 4; i++) {
+            const selectEl = document.getElementById(`slot-${i}-char-select`);
+            const avatarEl = document.getElementById(`slot-${i}-avatar`);
+            if (selectEl) {
+                selectEl.innerHTML = ALL_CHARACTERS.map(c => `
+                    <option value="${c.id}" ${c.id === this.slots2v2[i].char ? 'selected' : ''}>${c.name}</option>
+                `).join('');
+
+                selectEl.addEventListener('change', (e) => {
+                    const charId = e.target.value;
+                    this.slots2v2[i].char = charId;
+                    if (avatarEl) avatarEl.src = `assets/${charId}/avatar.png`;
+                    if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                        network.send({ type: '2V2_SLOT_UPDATE', slotIndex: i, char: charId, isBot: this.slots2v2[i].isBot });
+                    }
+                });
+            }
+        }
+
+        // Populate Ban dropdowns
+        const banOptionsHtml = '<option value="none">-- KHÔNG CẤM (NO BAN) --</option>' +
+            ALL_CHARACTERS.map(c => `<option value="${c.id}">🚫 ${c.name}</option>`).join('');
+
+        if (selectBlueBan) {
+            selectBlueBan.innerHTML = banOptionsHtml;
+            selectBlueBan.addEventListener('change', (e) => {
+                this.bans2v2.blue = e.target.value;
+                if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                    network.send({ type: '2V2_BAN_UPDATE', bans: this.bans2v2 });
+                }
+            });
+        }
+
+        if (selectRedBan) {
+            selectRedBan.innerHTML = banOptionsHtml;
+            selectRedBan.addEventListener('change', (e) => {
+                this.bans2v2.red = e.target.value;
+                if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                    network.send({ type: '2V2_BAN_UPDATE', bans: this.bans2v2 });
+                }
+            });
+        }
+
+        // Bot toggle buttons for slots 1, 2, 3
+        [1, 2, 3].forEach(idx => {
+            const btn = document.getElementById(`btn-toggle-slot-${idx}`);
+            if (btn) {
+                btn.classList.add('is-bot');
+                btn.textContent = '🤖 BOT';
+                btn.addEventListener('click', () => {
+                    this.slots2v2[idx].isBot = !this.slots2v2[idx].isBot;
+                    btn.classList.toggle('is-bot', this.slots2v2[idx].isBot);
+                    btn.textContent = this.slots2v2[idx].isBot ? '🤖 BOT' : '👤 HUMAN';
+                    this.slots2v2[idx].name = this.slots2v2[idx].isBot ? `BOT ${idx + 1}` : `PLAYER ${idx + 1}`;
+                    if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                        network.send({ type: '2V2_SLOT_UPDATE', slotIndex: idx, char: this.slots2v2[idx].char, isBot: this.slots2v2[idx].isBot });
+                    }
+                });
+            }
+        });
+
+        // Map selection
+        const cardBrawlhaven = document.getElementById('map-card-brawlhaven');
+        const cardGreatHall = document.getElementById('map-card-great-hall');
+
+        const setMap = (mapId, broadcast = true) => {
+            this.selected2v2Map = mapId;
+            if (cardBrawlhaven) cardBrawlhaven.classList.toggle('active', mapId === 'brawlhaven');
+            if (cardGreatHall) cardGreatHall.classList.toggle('active', mapId === 'great_hall');
+            if (broadcast && this.gameMode === '2V2' && this.is2v2Online && network.isConnected && network.role === 'HOST') {
+                network.send({ type: '2V2_MAP_SELECT', map: mapId });
+            }
+        };
+
+        if (cardBrawlhaven) cardBrawlhaven.addEventListener('click', () => setMap('brawlhaven', true));
+        if (cardGreatHall) cardGreatHall.addEventListener('click', () => setMap('great_hall', true));
+
+        // Submode switch: Local vs Online
+        if (btnLocal) {
+            btnLocal.addEventListener('click', () => {
+                this.is2v2Online = false;
+                btnLocal.classList.add('active');
+                if (btnOnline) btnOnline.classList.remove('active');
+                if (onlineBar) onlineBar.classList.add('hidden');
+                network.disconnect();
+                if (statusOnline) statusOnline.textContent = '';
+            });
+        }
+
+        if (btnOnline) {
+            btnOnline.addEventListener('click', () => {
+                this.is2v2Online = true;
+                btnOnline.classList.add('active');
+                if (btnLocal) btnLocal.classList.remove('active');
+                if (onlineBar) onlineBar.classList.remove('hidden');
+                network.setMode('WEBSOCKET');
+            });
+        }
+
+        // Create Room in Online 2v2
+        if (btnCreateRoom) {
+            btnCreateRoom.addEventListener('click', () => {
+                network.createRoom('2v2');
+                if (statusOnline) statusOnline.textContent = 'Đang khởi tạo phòng 2v2...';
+            });
+        }
+
+        // Join Room in Online 2v2
+        if (btnJoinRoom && inputRoomCode) {
+            btnJoinRoom.addEventListener('click', () => {
+                const code = inputRoomCode.value.trim();
+                if (!code) {
+                    if (statusOnline) statusOnline.textContent = 'Vui lòng nhập mã phòng!';
+                    return;
+                }
+                network.joinRoom(code);
+                if (statusOnline) statusOnline.textContent = `Đang kết nối vào phòng [${code}]...`;
+            });
+        }
+
+        // Copy room code
+        if (btnCopyCode && lblRoomCode) {
+            btnCopyCode.addEventListener('click', () => {
+                navigator.clipboard.writeText(lblRoomCode.textContent).then(() => {
+                    btnCopyCode.textContent = '✔️';
+                    setTimeout(() => { btnCopyCode.textContent = '📋'; }, 2000);
+                });
+            });
+        }
+
+        // Network callbacks integration for 2v2
+        network.onMembersUpdate = (info) => {
+            if (this.gameMode !== '2V2') return;
+            if (statusOnline) {
+                statusOnline.textContent = `Phòng đã kết nối ${info.playerCount} / ${info.maxPlayers || 4} người chơi!`;
+            }
+        };
+
+        // Start 2V2 Match button
+        if (btnStart2v2) {
+            btnStart2v2.addEventListener('click', () => {
+                this.requestFullscreen();
+
+                // Ban validation
+                const blueBan = this.bans2v2.blue;
+                const redBan = this.bans2v2.red;
+                for (let i = 0; i < 4; i++) {
+                    const picked = this.slots2v2[i].char;
+                    if ((blueBan !== 'none' && picked === blueBan) || (redBan !== 'none' && picked === redBan)) {
+                        alert(`Nhân vật ${picked.toUpperCase()} đã bị cấm (Banned)! Vui lòng chọn nhân vật khác ở Slot ${i + 1}.`);
+                        return;
+                    }
+                }
+
+                if (this.is2v2Online && network.isConnected) {
+                    if (network.role !== 'HOST') {
+                        alert('Chỉ Chủ Phòng (Host) mới có quyền bấm Bắt đầu trận chiến!');
+                        return;
+                    }
+                    network.send({
+                        type: '2V2_MATCH_START',
+                        map: this.selected2v2Map,
+                        slots: this.slots2v2,
+                        bans: this.bans2v2
+                    });
+                }
+
+                this.hideLoadout();
+                if (this.onStartMatch2v2) {
+                    this.onStartMatch2v2(this.selected2v2Map, this.slots2v2, this.bans2v2);
+                }
+            });
+        }
     }
 
     setupKeybindsModal() {
@@ -1004,6 +1360,13 @@ export class UIManager {
 
         this.loadoutScreen.classList.remove('hidden');
         this.victoryScreen.classList.add('hidden');
+
+        if (this.gameMode === '2V2') {
+            const panel2v2 = document.getElementById('lobby-2v2-panel');
+            const fightersContainer = document.getElementById('loadout-fighters-container');
+            if (panel2v2) panel2v2.classList.remove('hidden');
+            if (fightersContainer) fightersContainer.classList.add('hidden');
+        }
     }
 
     hideLoadout() {

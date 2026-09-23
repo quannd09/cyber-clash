@@ -1,45 +1,51 @@
-# CYBER CLASH: ZERO-G ARENA ⚡
-> **Fast-Paced 2D Cyberpunk Fighter in Zero-Gravity**  
-> *Supports Local 2-Player on a single machine & Online 1v1 via WebRTC P2P (Zero Backend).*
+# CYBER CLASH: ZERO-G & 2V2 ARENA ⚡
+> **Fast-Paced 2D Cyberpunk Fighter in Zero-Gravity and 2v2 Gravity Platformer**  
+> *Supports Local 2-Player, 2v2 Bot Practice, and 4-Player Online Rooms (WebSocket Relay & WebRTC P2P).*
 
 ---
 
 ## 🌟 Key Features
 
-- **Zero-G Physics & Momentum:** Omni-directional thrusters, inertia drifting, and **Wall Bounce Boost** for high-speed counterattacks.
-- **Diverse Roster of Unique Fighters:** Multiple distinct anime & cyberpunk characters, featuring specialized combat archetypes (Melee & Ranged), unique skill kits, and devastating Ultimates.
+- **Zero-G & Gravity Platformer Physics:**
+  - **Zero-G Mode (1v1):** Omni-directional thrusters, inertia drifting, and **Wall Bounce Boost** for high-speed counterattacks.
+  - **Gravity Platformer Mode (2v2):** Realistic gravity, double jump, platform collision, and drop-through soft platforms (`Down`).
+- **15 Unique Fighters:**
+  - **Saitama (One Punch Man):** Massive 535 HP, Serious Consecutive Punches, Serious Punch Death Ultimate with screen shake & sonic boom.
+  - **Megumi Fushiguro (Jujutsu Kaisen):** Ten Shadows Technique, Divine Dog shadow projectile, and Mahoraga Cleave Ultimate.
+  - **Kuriyama Mirai (Kyoukai no Kanata):** Blood manipulation, Blood Crescent projectile with lifesteal, and Blood Cataclysm Giant Sword Ultimate.
+  - **Original & Anime Legends:** Tsukishiro Yanagi, Verina Airgid, Nicole Demara, Trigger, Vivian Banshee, Jotaro Kujo, Son Goku, Giorno Giovanna, Naoya Zen'in, Monkey D. Luffy, Satoru Gojo, Ryomen Sukuna.
+- **2v2 Brawl Mode & Dedicated Maps:**
+  - **Brawlhaven:** Sky island fortress with floating high-tier platforms.
+  - **Great Hall:** Multi-tier citadel throne room with left/right balconies and high throne spire.
+  - **Team Play:** Friendly fire is disabled between teammates (`Team Blue` vs `Team Red`).
+  - **Ban & Pick Phase:** Choose characters for all 4 slots, toggle AI Bots, and set team bans.
 - **Deep Combat Mechanics:**
   - **Perfect Parry:** Block right before impact to stun melee foes or reflect plasma shots back at x1.3 speed.
   - **Blade Clash:** Simultaneous melee strikes nullify damage and trigger a concussive shockwave.
-  - **Anti-Spam Penalty:** Excessive inputs (over 6 attacks within 3 seconds) trigger a brief 1-second cooldown.
+  - **Anti-Spam Penalty:** Excessive inputs trigger a brief cooldown.
 - **Game Modes:**
-  - **Single-Player (VS Bot):** Battle an intelligent AI with 4 distinct difficulty levels:
-    - `Easy`: Relaxed training bot with slower reflexes.
-    - `Normal`: Balanced fighter with basic kiting and defensive reactions.
-    - `Master`: Highly skilled opponent using predictive aim, spacing, wall-bounces, and combo chains.
-    - `🔥 Impossible (God AI)`: Unforgiving frame-perfect reflexes, 99.5% parry accuracy, zero-latency projectile reflection, optimal anti-spam attack pacing, and lethal combo execution.
-  - **Local 2-Player:** 2 players on a single keyboard or dual gamepads.
-  - **Online 1v1:** Direct WebRTC P2P connection via 4-character room codes (`CLASH-XXXX`). No external server required.
-  - **Background Ticker:** Powered by a Web Worker to maintain smooth 60 FPS physics calculation across background tabs.
+  - **Single-Player (VS Bot):** 4 difficulty levels: `Easy`, `Normal`, `Master`, `🔥 Impossible (God AI)`.
+  - **Local 2-Player (1v1):** 2 players on a single keyboard or dual gamepads.
+  - **2v2 Arena:** Local practice with bots or 4-player online matches.
+  - **Online 1 (WebSocket Relay Server):** 100% English backend relay supporting up to 4 players per room (`server/server.js`).
+  - **Online 2 (WebRTC P2P):** Direct peer-to-peer room connections.
 
 ---
 
 ## 🕹️ Controls
 
-### Local Mode (2 Players) & VS Bot Mode
+### Local Mode (1v1 & 2v2 Practice)
 
-| Action | Player 1 (Cyan / You) | Player 2 (Magenta / CPU) | Gamepad |
+| Action | Player 1 (Team Blue) | Player 2 / Slot 2 | Gamepad |
 | :--- | :--- | :--- | :--- |
-| **Thrust / Move** | `W`, `A`, `S`, `D` | `↑`, `←`, `↓`, `→` | Left Analog / D-Pad |
+| **Move / Thrust** | `W`, `A`, `S`, `D` | `↑`, `←`, `↓`, `→` | Left Analog / D-Pad |
+| **Jump / Double Jump (2v2)** | `W` (or `Up`) | `↑` (or `Up`) | A / Cross |
+| **Drop Platform (2v2)** | `S` (or `Down`) | `↓` (or `Down`) | Down + Jump |
 | **Normal Attack** | `F` | `Num 1` or `J` | X / Square |
 | **Shield / Parry** | `H` | `Num 3` or `L` | B / Circle |
-| **Special Skill** | `R` | `Num 5` or `I` | A / Cross |
+| **Special Skill** | `R` | `Num 5` or `I` | Y / Triangle |
 | **Dash / Boost** | `Left Shift` or `C` | `Num 0`, `U` or `R-Ctrl` | Left Bumper (LB / L1) |
-| **Ultimate Overdrive** | `Space` (Requires 100% Overdrive) | `Enter` or `O` (Requires 100% Overdrive) | Right Trigger (RT / R1) |
-
-### Online Mode (WebRTC)
-- **Host (Player 1):** Click `CREATE ROOM` $\rightarrow$ Share room code $\rightarrow$ Controls: `WASD + F / H / R / Space`.
-- **Client (Player 2):** Enter room code $\rightarrow$ Click `JOIN` $\rightarrow$ Controls: Can use either `WASD` or `Arrow Keys`.
+| **Ultimate Overdrive** | `Space` (100% Overdrive) | `Enter` or `O` (100% Overdrive) | Right Trigger (RT / R1) |
 
 ---
 
@@ -54,30 +60,45 @@ py -m http.server 8000
 ```
 Open `http://localhost:8000` in your web browser.
 
+### Option 3: WebSocket Relay Server (Online 1)
+```bash
+cd server
+npm install
+npm start
+```
+Default server port is `3000`. Connect clients via `ws://localhost:3000` or deployed URL on Render.
+
 ---
 
 ## 📁 Project Structure
 
 ```
 cyber-clash/
-├── assets/            # Character sprites, avatars, and audio effects
+├── assets/            # Character sprites, avatars, backgrounds, audio effects
+│   ├── saitama/       # Saitama avatar & idle sprite
+│   ├── megumi/        # Megumi avatar & idle sprite
+│   ├── mirai/         # Kuriyama Mirai avatar & idle sprite
+│   ├── brawlhaven.png # Brawlhaven arena background
+│   └── great_hall.png # Great Hall arena background
 ├── js/
-│   ├── assets.js      # Asset preloading
+│   ├── assets.js      # Asset preloading (sprites, avatars, arena maps)
 │   ├── audio.js       # Web Audio API sound synthesizer
-│   ├── bot.js         # AI Bot Controller (Easy, Normal, Master, Impossible)
-│   ├── combat.js      # Damage calculation, projectiles & capsule hitboxes
-│   ├── cyborg.js      # Fighter stats, abilities & anti-spam logic
+│   ├── bot.js         # AI Bot Controller with gravity jump & platform drop-through
+│   ├── combat.js      # Multi-player combat resolver, friendly fire filter, projectiles
+│   ├── cyborg.js      # 15 fighters stats, passives, skills & ultimates
 │   ├── input.js       # Anti-ghosting keyboard & Gamepad API handler
-│   ├── main.js        # Main 60 FPS loop & Web Worker ticker
-│   ├── network.js     # WebRTC PeerJS P2P room networking
+│   ├── main.js        # Main 60 FPS loop, 1v1 and 2v2 game state management
+│   ├── maps.js        # 2v2 Map & Terrain Platform system (Brawlhaven & Great Hall)
+│   ├── network.js     # Dual-engine multiplayer networking (WebSocket & WebRTC)
 │   ├── particles.js   # VFX particle systems
 │   ├── peerjs.min.js  # Bundled PeerJS library
-│   ├── physics.js     # Zero-G momentum, drag & wall bouncing
-│   ├── renderer.js    # Canvas rendering, neon arena grid & HUD
-│   └── ui.js          # Selection UI, moves display & online lobby
-├── index.html         # Main HTML document & font imports
+│   ├── physics.js     # Zero-G inertia & Gravity Platformer physics
+│   ├── renderer.js    # Canvas rendering, 1v1 and 2v2 HUD, ultimate VFX
+│   └── ui.js          # Selection UI, 2v2 lobby panel, ban-pick phase
+├── server/
+│   ├── package.json   # Server dependencies (ws)
+│   └── server.js      # 100% English WebSocket relay server for 1v1 & 2v2
+├── index.html         # Main HTML document & UI modals
 ├── style.css          # Cyberpunk neon glassmorphism UI styles
-├── vercel.json        # Routing and cache configuration for static hosting
-├── open_game.bat      # Windows one-click local launcher
 └── README.md          # Game documentation
 ```

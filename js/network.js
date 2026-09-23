@@ -48,6 +48,8 @@ export class WebSocketNetworkProvider {
         this.manager = manager;
         this.ws = null;
         this.role = null; // 'HOST' | 'CLIENT' | null
+        this.slotIndex = 0;
+        this.roomMode = '1v1';
         this.roomCode = null;
         this.isConnected = false;
         this.heartbeatTimer = null;
@@ -131,25 +133,30 @@ export class WebSocketNetworkProvider {
 
             if (type === 'ROOM_CREATED') {
                 this.role = 'HOST';
+                this.slotIndex = packet.slotIndex || 0;
+                this.roomMode = packet.mode || '1v1';
                 this.roomCode = packet.roomCode;
-                this.manager.notifyRoomCreated(this.roomCode);
+                this.manager.notifyRoomCreated(this.roomCode, this.slotIndex, this.roomMode);
                 this.manager.notifyStatus(`[Online 1] Phòng [${this.roomCode}] đã sẵn sàng! Đang chờ đối thủ...`);
             } else if (type === 'ROOM_JOINED') {
                 this.role = 'CLIENT';
+                this.slotIndex = packet.slotIndex !== undefined ? packet.slotIndex : 1;
+                this.roomMode = packet.mode || '1v1';
                 this.roomCode = packet.roomCode;
                 this.isConnected = true;
-                this.manager.notifyStatus(`[Online 1] ✅ Đã kết nối vào phòng [${this.roomCode}]!`);
-                this.manager.notifyConnected(this.role, this.roomCode);
+                this.manager.notifyStatus(`[Online 1] ✅ Đã kết nối vào phòng [${this.roomCode}]! (Slot ${this.slotIndex + 1})`);
+                this.manager.notifyConnected(this.role, this.roomCode, this.slotIndex, this.roomMode);
             } else if (type === 'OPPONENT_JOINED') {
-                // Host receives this when Client joins
+                // Host receives this when a client joins
                 this.isConnected = true;
-                this.manager.notifyStatus(`[Online 1] ✅ Đối thủ đã vào phòng! Đang khởi tạo trận đấu...`);
-                this.manager.notifyConnected(this.role, this.roomCode);
+                this.manager.notifyStatus(`[Online 1] ✅ Người chơi mới đã vào phòng!`);
+                this.manager.notifyConnected(this.role, this.roomCode, this.slotIndex, this.roomMode);
+            } else if (type === 'ROOM_MEMBERS_UPDATE') {
+                this.manager.notifyMembersUpdate(packet);
             } else if (type === 'RELAY') {
-                this.manager.notifyData(packet.data);
+                this.manager.notifyData(packet.data, packet.senderSlot);
             } else if (type === 'OPPONENT_LEFT') {
-                this.isConnected = false;
-                this.manager.notifyStatus(`[Online 1] ⚠️ ${packet.message || 'Đối thủ đã thoát phòng!'}`, true);
+                this.manager.notifyStatus(`[Online 1] ⚠️ ${packet.message || 'Người chơi đã thoát phòng!'}`, true);
                 this.manager.notifyDisconnected();
             } else if (type === 'ERROR') {
                 this.manager.notifyStatus(`[Online 1] ❌ ${packet.message}`, true);
@@ -186,16 +193,18 @@ export class WebSocketNetworkProvider {
         }
     }
 
-    createRoom() {
+    createRoom(mode = '1v1') {
         this.disconnect();
         this.roomCode = generateRoomCode();
+        this.roomMode = mode;
         this.pendingAction = 'CREATE';
 
         this.connectSocket(() => {
             if (this.ws && this.ws.readyState === WebSocket.OPEN) {
                 this.ws.send(JSON.stringify({
                     type: 'CREATE_ROOM',
-                    roomCode: this.roomCode
+                    roomCode: this.roomCode,
+                    mode: mode
                 }));
             }
         });
@@ -532,6 +541,14 @@ export class NetworkManager {
         this.activeProvider.role = r;
     }
 
+    get slotIndex() {
+        return this.activeProvider.slotIndex || 0;
+    }
+
+    get roomMode() {
+        return this.activeProvider.roomMode || '1v1';
+    }
+
     get isConnected() {
         return this.activeProvider.isConnected;
     }
@@ -548,8 +565,8 @@ export class NetworkManager {
         return this.wsProvider.getServerUrl();
     }
 
-    createRoom() {
-        return this.activeProvider.createRoom();
+    createRoom(mode = '1v1') {
+        return this.activeProvider.createRoom(mode);
     }
 
     joinRoom(code) {
@@ -571,9 +588,15 @@ export class NetworkManager {
         }
     }
 
-    notifyConnected(role, roomCode) {
+    notifyConnected(role, roomCode, slotIndex, roomMode) {
         if (this.onConnected) {
-            this.onConnected(role, roomCode);
+            this.onConnected(role, roomCode, slotIndex, roomMode);
+        }
+    }
+
+    notifyMembersUpdate(info) {
+        if (this.onMembersUpdate) {
+            this.onMembersUpdate(info);
         }
     }
 
@@ -583,15 +606,15 @@ export class NetworkManager {
         }
     }
 
-    notifyData(data) {
+    notifyData(data, senderSlot) {
         if (this.onData) {
-            this.onData(data);
+            this.onData(data, senderSlot);
         }
     }
 
-    notifyRoomCreated(code) {
+    notifyRoomCreated(code, slotIndex, mode) {
         if (this.onRoomCreated) {
-            this.onRoomCreated(code);
+            this.onRoomCreated(code, slotIndex, mode);
         }
     }
 }

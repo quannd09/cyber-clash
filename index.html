@@ -25,7 +25,7 @@
                 <button id="mode-bot-tab" class="mode-tab">VS BOT</button>
                 <button id="mode-online1-tab" class="mode-tab mode-online1">🌐 ONLINE 1</button>
                 <button id="mode-online2-tab" class="mode-tab mode-online2">📡 ONLINE 2</button>
-                <a href="cyber_clash_test.html" class="mode-tab" style="text-decoration: none; display: flex; align-items: center; gap: 6px; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe;">🤖 BOT VS BOT (TEST)</a>
+                <button id="mode-2v2-tab" class="mode-tab mode-2v2">⚔️ 2V2 BRAWL</button>
             </div>
 
             <!-- BOT DIFFICULTY SELECTOR -->
@@ -103,6 +103,163 @@
                 </p>
             </div>
 
+            <!-- 2V2 ARENA LOBBY PANEL -->
+            <div id="lobby-2v2-panel" class="lobby-2v2-panel hidden">
+                <div class="lobby-2v2-header">
+                    <div class="lobby-mode-title" style="color: #f59e0b; text-shadow: 0 0 16px rgba(245, 158, 11, 0.6); font-size: 18px;">
+                        ⚔️ 2V2 BRAWL ARENA (GRAVITY &amp; TERRAIN)
+                    </div>
+                    <div class="lobby-mode-sub" style="color: #94a3b8; font-size: 12px; margin-top: 2px;">
+                        Chiến đấu đồng đội 4 người • Vật lý trọng lực &amp; Nhảy đúp • Địa hình Brawlhaven / Great Hall • Thể thức Bo3
+                    </div>
+                </div>
+
+                <!-- 2V2 SUBMODE BUTTONS: LOCAL BOTS vs ONLINE ROOM -->
+                <div class="submode-switch-row">
+                    <button id="btn-2v2-local-mode" class="submode-switch-btn active">🤖 LOCAL / BOT PRACTICE</button>
+                    <button id="btn-2v2-online-mode" class="submode-switch-btn">🌐 4-PLAYER ONLINE ROOM</button>
+                </div>
+
+                <!-- ONLINE 2V2 ROOM BAR (Hidden in local practice) -->
+                <div id="online-2v2-bar" class="online-2v2-bar hidden">
+                    <div class="online-2v2-room-controls">
+                        <button id="btn-create-2v2-room" class="lobby-btn host-action-btn" style="padding: 6px 14px; font-size: 12px;">⚡ TẠO PHÒNG 2V2</button>
+                        <div id="box-2v2-room-code" class="code-pill hidden">
+                            MÃ: <strong id="lbl-2v2-room-code" style="color: #f59e0b;">CLASH-XXXX</strong>
+                            <button id="btn-copy-2v2-code" class="copy-btn" style="margin-left: 6px; padding: 2px 6px;">📋</button>
+                        </div>
+                        <div class="join-inline-row">
+                            <input type="text" id="input-2v2-room-code" class="room-input" placeholder="Mã phòng..." maxlength="12" style="width: 130px; padding: 5px 8px; font-size: 12px;">
+                            <button id="btn-join-2v2-room" class="lobby-btn client-action-btn" style="padding: 6px 12px; font-size: 12px;">🚀 VÀO</button>
+                        </div>
+                    </div>
+                    <div id="status-2v2-online" class="lobby-status-msg" style="margin-top: 4px; font-size: 12px;"></div>
+                </div>
+
+                <!-- MAP SELECTION ROW -->
+                <div class="map-selection-section">
+                    <div class="map-section-label">
+                        🗺️ CHỌN BẢN ĐỒ CHIẾN ĐẤU (TERRAIN &amp; GRAVITY MAP)
+                    </div>
+                    <div class="map-cards-row">
+                        <div class="map-card active" data-map="brawlhaven" id="map-card-brawlhaven">
+                            <img src="assets/brawlhaven.png?v=10" class="map-thumb" alt="Brawlhaven">
+                            <div class="map-info">
+                                <div class="map-name" style="color: #38bdf8;">BRAWLHAVEN</div>
+                                <div class="map-desc">Đảo bay lơ lửng • Sàn chính rộng + 2 bục mềm đối xứng</div>
+                            </div>
+                        </div>
+                        <div class="map-card" data-map="great_hall" id="map-card-great-hall">
+                            <img src="assets/great_hall.png?v=10" class="map-thumb" alt="Great Hall">
+                            <div class="map-info">
+                                <div class="map-name" style="color: #f59e0b;">GREAT HALL</div>
+                                <div class="map-desc">Đại sảnh hoàng gia • 3 tầng địa hình tháp bục cao thấp</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2V2 ROSTER: 4 SLOTS (BLUE TEAM vs RED TEAM) -->
+                <div class="roster-2v2-container">
+                    <!-- TEAM BLUE (P1 + P2) -->
+                    <div class="team-col team-blue-col">
+                        <div class="team-title-banner blue-banner">
+                            <span>🛡️ TEAM BLUE (XANH DƯƠNG)</span>
+                            <span class="team-meta">[Team 1]</span>
+                        </div>
+                        <div class="slot-cards-group">
+                            <!-- Slot 0: P1 -->
+                            <div class="slot-card" id="slot-card-0" data-slot="0">
+                                <div class="slot-header">
+                                    <span class="slot-badge blue-badge">P1 (HOST / BẠN)</span>
+                                    <span class="slot-status" id="slot-0-status">SẴN SÀNG</span>
+                                </div>
+                                <div class="slot-body">
+                                    <img src="assets/yanagi/avatar.png" id="slot-0-avatar" class="slot-avatar" alt="P1">
+                                    <div class="slot-info">
+                                        <select class="char-picker-select" id="slot-0-char-select"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slot 1: P2 -->
+                            <div class="slot-card" id="slot-card-1" data-slot="1">
+                                <div class="slot-header">
+                                    <span class="slot-badge blue-badge">P2 (ĐỒNG ĐỘI)</span>
+                                    <button class="bot-toggle-btn" id="btn-toggle-slot-1">🤖 BOT</button>
+                                </div>
+                                <div class="slot-body">
+                                    <img src="assets/velina/avatar.png" id="slot-1-avatar" class="slot-avatar" alt="P2">
+                                    <div class="slot-info">
+                                        <select class="char-picker-select" id="slot-1-char-select"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vs-divider-2v2">
+                        <span class="vs-text">VS</span>
+                    </div>
+
+                    <!-- TEAM RED (P3 + P4) -->
+                    <div class="team-col team-red-col">
+                        <div class="team-title-banner red-banner">
+                            <span>⚔️ TEAM RED (ĐỎ HỒNG)</span>
+                            <span class="team-meta">[Team 2]</span>
+                        </div>
+                        <div class="slot-cards-group">
+                            <!-- Slot 2: P3 -->
+                            <div class="slot-card" id="slot-card-2" data-slot="2">
+                                <div class="slot-header">
+                                    <span class="slot-badge red-badge">P3 (ĐỐI THỦ 1)</span>
+                                    <button class="bot-toggle-btn" id="btn-toggle-slot-2">🤖 BOT</button>
+                                </div>
+                                <div class="slot-body">
+                                    <img src="assets/saitama/avatar.png" id="slot-2-avatar" class="slot-avatar" alt="P3">
+                                    <div class="slot-info">
+                                        <select class="char-picker-select" id="slot-2-char-select"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Slot 3: P4 -->
+                            <div class="slot-card" id="slot-card-3" data-slot="3">
+                                <div class="slot-header">
+                                    <span class="slot-badge red-badge">P4 (ĐỐI THỦ 2)</span>
+                                    <button class="bot-toggle-btn" id="btn-toggle-slot-3">🤖 BOT</button>
+                                </div>
+                                <div class="slot-body">
+                                    <img src="assets/sukuna/avatar.png" id="slot-3-avatar" class="slot-avatar" alt="P4">
+                                    <div class="slot-info">
+                                        <select class="char-picker-select" id="slot-3-char-select"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAN PHASE SECTION -->
+                <div class="ban-phase-row">
+                    <div class="ban-box blue-ban">
+                        <span class="ban-label">🛡️ TEAM BLUE BAN:</span>
+                        <select id="select-blue-ban" class="ban-select">
+                            <option value="none">-- KHÔNG CẤM (NO BAN) --</option>
+                        </select>
+                    </div>
+                    <div class="ban-box red-ban">
+                        <span class="ban-label">⚔️ TEAM RED BAN:</span>
+                        <select id="select-red-ban" class="ban-select">
+                            <option value="none">-- KHÔNG CẤM (NO BAN) --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- START 2V2 BUTTON -->
+                <div class="start-2v2-row">
+                    <button id="btn-start-2v2-match" class="ready-btn start-2v2-btn">⚔️ BẮT ĐẦU TRẬN CHIẾN 2V2 (START BRAWL)</button>
+                </div>
+            </div>
+
             <div id="loadout-fighters-container" class="loadout-container">
                 <!-- PLAYER 1 LOADOUT -->
                 <div class="player-box p1-border">
@@ -172,6 +329,21 @@
                             <img src="assets/sukuna/avatar.png?v=55" class="char-avatar" alt="Sukuna">
                             <div class="char-title">Sukuna</div>
                             <span class="char-type type-sukuna">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="saitama">
+                            <img src="assets/saitama/avatar.png?v=75" class="char-avatar" alt="Saitama">
+                            <div class="char-title">Saitama</div>
+                            <span class="char-type type-saitama">👊 MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="megumi">
+                            <img src="assets/megumi/avatar.png?v=75" class="char-avatar" alt="Megumi">
+                            <div class="char-title">Megumi</div>
+                            <span class="char-type type-megumi">🐺 MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p1" data-char="mirai">
+                            <img src="assets/mirai/avatar.png?v=75" class="char-avatar" alt="Mirai">
+                            <div class="char-title">Mirai</div>
+                            <span class="char-type type-mirai">🩸 MELEE</span>
                         </div>
                     </div>
 
@@ -269,6 +441,21 @@
                             <img src="assets/sukuna/avatar.png?v=55" class="char-avatar" alt="Sukuna">
                             <div class="char-title">Sukuna</div>
                             <span class="char-type type-sukuna">⚔️ MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="saitama">
+                            <img src="assets/saitama/avatar.png?v=75" class="char-avatar" alt="Saitama">
+                            <div class="char-title">Saitama</div>
+                            <span class="char-type type-saitama">👊 MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="megumi">
+                            <img src="assets/megumi/avatar.png?v=75" class="char-avatar" alt="Megumi">
+                            <div class="char-title">Megumi</div>
+                            <span class="char-type type-megumi">🐺 MELEE</span>
+                        </div>
+                        <div class="char-card" data-player="p2" data-char="mirai">
+                            <img src="assets/mirai/avatar.png?v=75" class="char-avatar" alt="Mirai">
+                            <div class="char-title">Mirai</div>
+                            <span class="char-type type-mirai">🩸 MELEE</span>
                         </div>
                     </div>
 

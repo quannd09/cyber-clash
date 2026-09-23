@@ -1,6 +1,7 @@
 // AI Bot Controller for Cyber Clash: Zero-G Arena
 // Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
 import { WEAPONS, combat } from './combat.js?v=75';
+import { physics } from './physics.js?v=75';
 
 export class BotController {
     constructor(difficulty = 'normal') {
@@ -194,6 +195,17 @@ export class BotController {
         // Apply thrust (updateAim = false so thrust movement never clobbers bot's aim angle!)
         if (Math.hypot(thrustX, thrustY) > 0.1) {
             bot.thrust(thrustX, thrustY, false);
+        }
+
+        // In Gravity Platformer mode, leap or drop between platforms
+        if (physics && (physics.gravityEnabled || bot.gravityEnabled)) {
+            if (opponent.y < bot.y - 35 && (bot.isGrounded || (bot.jumpCount || 0) < 2)) {
+                if (Math.random() < 0.18) {
+                    physics.executeJump(bot);
+                }
+            } else if (opponent.y > bot.y + 60 && bot.isGrounded && Math.random() < 0.12) {
+                physics.dropThrough(bot);
+            }
         }
 
         // -------------------------------------------------------------

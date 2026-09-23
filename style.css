@@ -415,7 +415,7 @@ canvas {
    ==================================================== */
 .char-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 4px;
     margin: 2px 0;
 }
@@ -459,6 +459,9 @@ canvas {
 .char-card.selected-luffy { border-color: #ef4444 !important; background: #351414 !important; box-shadow: 0 0 14px rgba(239, 68, 68, 0.5); }
 .char-card.selected-gojo { border-color: #0284c7 !important; background: #0c2738 !important; box-shadow: 0 0 14px rgba(2, 132, 199, 0.5); }
 .char-card.selected-sukuna { border-color: #f43f5e !important; background: #38121d !important; box-shadow: 0 0 14px rgba(244, 63, 94, 0.5); }
+.char-card.selected-saitama { border-color: #f59e0b !important; background: #38240a !important; box-shadow: 0 0 14px rgba(245, 158, 11, 0.5); }
+.char-card.selected-megumi { border-color: #6366f1 !important; background: #181938 !important; box-shadow: 0 0 14px rgba(99, 102, 241, 0.5); }
+.char-card.selected-mirai { border-color: #f43f5e !important; background: #38101a !important; box-shadow: 0 0 14px rgba(244, 63, 94, 0.5); }
 
 .char-avatar {
     width: 38px !important;
@@ -513,6 +516,9 @@ canvas {
 .type-luffy { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
 .type-gojo { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }
 .type-sukuna { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
+.type-saitama { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.type-megumi { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); }
+.type-mirai { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.4); }
 
 /* SKILL POP-UP / INFO PANEL */
 .skill-info-box {
@@ -1688,6 +1694,440 @@ body.mobile-fullscreen-active {
 .server-save-btn:hover {
     background: #0369a1;
     box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+/* ====================================================
+   2V2 BRAWL ARENA (GRAVITY & TERRAIN) STYLES
+   ==================================================== */
+.mode-tab.mode-2v2 {
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fde68a;
+}
+.mode-tab.mode-2v2:hover {
+    border-color: #f59e0b;
+    color: #fef08a;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}
+.mode-tab.mode-2v2.active {
+    background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+    color: #1a0f02 !important;
+    border-color: #fcd34d !important;
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.7) !important;
+    font-weight: 900;
+}
+
+.lobby-2v2-panel {
+    width: 96%;
+    max-width: 1220px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 4px auto 14px auto;
+}
+
+.lobby-2v2-header {
+    text-align: center;
+    border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+    padding-bottom: 8px;
+}
+
+.submode-switch-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.submode-switch-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submode-switch-btn:hover {
+    color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.submode-switch-btn.active {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #0f172a;
+    border-color: #fbbf24;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.5);
+    font-weight: 900;
+}
+
+.online-2v2-bar {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.online-2v2-room-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.code-pill {
+    background: #1e293b;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+}
+
+.join-inline-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Map Selection Section */
+.map-selection-section {
+    background: rgba(9, 13, 22, 0.85);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.map-section-label {
+    text-align: center;
+    color: #fbbf24;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.map-cards-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+}
+
+.map-card {
+    flex: 1;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.map-card:hover {
+    border-color: #64748b;
+    transform: translateY(-2px);
+}
+
+.map-card.active {
+    border-color: #f59e0b !important;
+    background: #251c08 !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+}
+
+.map-thumb {
+    width: 80px;
+    height: 48px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #475569;
+}
+
+.map-info {
+    flex: 1;
+    text-align: left;
+}
+
+.map-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.map-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* 2V2 Roster: Blue vs Red */
+.roster-2v2-container {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.team-col {
+    flex: 1;
+    border-radius: 8px;
+    padding: 10px;
+    background: #0b1120;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.team-blue-col {
+    border: 2px solid #0284c7;
+    box-shadow: 0 0 14px rgba(2, 132, 199, 0.25);
+}
+
+.team-red-col {
+    border: 2px solid #e11d48;
+    box-shadow: 0 0 14px rgba(225, 29, 72, 0.25);
+}
+
+.team-title-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.blue-banner {
+    background: rgba(2, 132, 199, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(2, 132, 199, 0.4);
+}
+
+.red-banner {
+    background: rgba(225, 29, 72, 0.2);
+    color: #fb7185;
+    border: 1px solid rgba(225, 29, 72, 0.4);
+}
+
+.team-meta {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.vs-divider-2v2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+}
+
+.vs-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: #f59e0b;
+    text-shadow: 0 0 12px rgba(245, 158, 11, 0.7);
+}
+
+.slot-cards-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.slot-card {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
+
+.slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.slot-badge {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.blue-badge {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.red-badge {
+    background: rgba(251, 113, 133, 0.2);
+    color: #fb7185;
+    border: 1px solid rgba(251, 113, 133, 0.4);
+}
+
+.slot-status {
+    font-size: 10px;
+    color: #34d399;
+    font-weight: 700;
+}
+
+.bot-toggle-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: #94a3b8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bot-toggle-btn:hover {
+    color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.bot-toggle-btn.is-bot {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    color: #fcd34d;
+}
+
+.slot-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.slot-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #4b5563;
+    background: #000;
+}
+
+.slot-info {
+    flex: 1;
+}
+
+.char-picker-select {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    color: #f8fafc;
+    padding: 4px 6px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.char-picker-select:focus {
+    outline: none;
+    border-color: #f59e0b;
+}
+
+/* Ban Phase Section */
+.ban-phase-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px dashed #475569;
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+
+.ban-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ban-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.blue-ban .ban-label {
+    color: #38bdf8;
+}
+
+.red-ban .ban-label {
+    color: #fb7185;
+}
+
+.ban-select {
+    background: #090d16;
+    border: 1px solid #475569;
+    border-radius: 4px;
+    color: #f8fafc;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ban-select:focus {
+    outline: none;
+    border-color: #ef4444;
+}
+
+/* Start 2V2 Match Button */
+.start-2v2-row {
+    text-align: center;
+    margin-top: 4px;
+}
+
+.start-2v2-btn {
+    width: 100%;
+    max-width: 440px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #0f172a;
+    border: 2px solid #fbbf24;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.start-2v2-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 28px rgba(245, 158, 11, 0.9);
 }
 
 

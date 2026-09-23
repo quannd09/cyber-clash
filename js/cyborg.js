@@ -23,7 +23,10 @@ export class Cyborg {
             naoya: '#a3e635',
             luffy: '#ef4444',
             gojo: '#0284c7',
-            sukuna: '#f43f5e'
+            sukuna: '#f43f5e',
+            saitama: '#f59e0b',
+            megumi: '#38bdf8',
+            mirai: '#ef4444'
         };
         const charStyles = {
             yanagi: 'melee',
@@ -37,10 +40,19 @@ export class Cyborg {
             naoya: 'melee',
             luffy: 'melee',
             gojo: 'melee',
-            sukuna: 'melee'
+            sukuna: 'melee',
+            saitama: 'melee',
+            megumi: 'melee',
+            mirai: 'melee'
         };
         this.color = charColors[characterId] || color || '#a78bfa';
         this.combatStyle = charStyles[characterId] || 'melee';
+        this.teamId = index < 2 ? 0 : 1; // Team 0 = Blue, Team 1 = Red
+        this.gravityEnabled = false;
+        this.isGrounded = false;
+        this.jumpCount = 0;
+        this.dropCooldown = 0;
+        this.isEliminated = false;
 
         // Transform & Physics
         this.x = startX;
@@ -65,6 +77,7 @@ export class Cyborg {
 
         // Core Vitals (Balanced across archetypes)
         const charHp = {
+            saitama: 535,
             jotaro: 525,
             luffy: 520,
             sukuna: 520,
@@ -73,6 +86,8 @@ export class Cyborg {
             yanagi: 515,
             giorno: 515,
             gojo: 515,
+            megumi: 515,
+            mirai: 510,
             velina: 510,
             nicole: 510,
             naoya: 510,
@@ -718,6 +733,58 @@ export class Cyborg {
             );
             combat.addProjectile(proj);
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
+        } else if (skill.id === 'CONSECUTIVE_PUNCHES') {
+            // SAITAMA: CONSECUTIVE NORMAL PUNCHES 👊
+            sound.playHit(true);
+            physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 9);
+            fx.spawnClashShockwave(this.x, this.y);
+            fx.addText(this.x, this.y - 35, '👊 CONSECUTIVE NORMAL PUNCHES!', '#f59e0b', 24);
+            const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
+            if (dist < 180) {
+                opponent.takeDamage(skillDmg);
+                opponent.applyStun(22);
+                physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 12);
+                fx.spawnHitSparks(opponent.x, opponent.y, '#f59e0b', 25);
+                sound.playHit(true);
+            }
+        } else if (skill.id === 'DIVINE_DOG') {
+            // MEGUMI: SHIKIGAMI DIVINE DOG 🐺
+            sound.playSlash(false);
+            fx.addText(this.x, this.y - 35, '🐺 DIVINE DOG: LUNGE!', '#38bdf8', 24);
+            const proj = new Projectile(
+                this.index,
+                this.x + Math.cos(this.aimAngle) * 35,
+                this.y + Math.sin(this.aimAngle) * 35,
+                Math.cos(this.aimAngle) * 19,
+                Math.sin(this.aimAngle) * 19,
+                skillDmg,
+                '#38bdf8',
+                20,
+                'shadow_dog'
+            );
+            combat.addProjectile(proj);
+        } else if (skill.id === 'BLOOD_CRESCENT') {
+            // MIRAI: BLOOD CRESCENT WAVE (Huyết Nguyệt Trảm) 🩸
+            sound.playSlash(true);
+            // HP cost: 4% current HP (failsafe: cannot self-kill below 5% HP)
+            if (this.hp > this.maxHp * 0.05) {
+                const hpCost = Math.max(1, this.hp * 0.04);
+                this.hp -= hpCost;
+                fx.addText(this.x, this.y - 25, `-${Math.round(hpCost)} HP`, '#dc2626', 16);
+            }
+            fx.addText(this.x, this.y - 40, '🩸 BLOOD CRESCENT WAVE!', '#ef4444', 24);
+            const proj = new Projectile(
+                this.index,
+                this.x + Math.cos(this.aimAngle) * 35,
+                this.y + Math.sin(this.aimAngle) * 35,
+                Math.cos(this.aimAngle) * 17,
+                Math.sin(this.aimAngle) * 17,
+                skillDmg,
+                '#ef4444',
+                22,
+                'blood_crescent'
+            );
+            combat.addProjectile(proj);
         }
     }
 
@@ -773,7 +840,10 @@ export class Cyborg {
             naoya: '⚡ PROJECTION: MACH 3 BARRAGE! ⚡',
             luffy: '🍖 GOMU GOMU NO BAJRANG GUN! 🍖',
             gojo: '🌌 DOMAIN EXPANSION: UNLIMITED VOID! 🌌',
-            sukuna: '⛩️ DOMAIN EXPANSION: MALEVOLENT SHRINE! ⛩️'
+            sukuna: '⛩️ DOMAIN EXPANSION: MALEVOLENT SHRINE! ⛩️',
+            saitama: '👊 SERIOUS SERIES: SERIOUS PUNCH! 👊',
+            megumi: '⚔️ EIGHT-HANDLED SWORD: MAHORAGA! ⚔️',
+            mirai: '🩸 BLOOD CATACLYSM: FUYUKAI DESU! 🩸'
         };
         const shout = ultShouts[this.characterId] || '🔥 OVERDRIVE ULTIMATE! 🔥';
         fx.addText(this.x, this.y - 45, shout, this.color, 28, 60);
@@ -781,6 +851,17 @@ export class Cyborg {
 
     takeDamage(amount, isFromUltimate = false, sourceX = null, sourceY = null) {
         if (this.isDead) return;
+
+        // Saitama Passive: Superhuman Physiology (15% flat damage reduction)
+        if (this.characterId === 'saitama') {
+            amount *= 0.85;
+        }
+
+        // Megumi Passive: Tenacity Awakening (Below 30% HP, gain 25% damage reduction)
+        if (this.characterId === 'megumi' && this.hp <= this.maxHp * 0.3) {
+            amount *= 0.75;
+        }
+
         this.hp = Math.max(0, this.hp - amount);
 
         // Failsafe: Kiểm tra xem đối thủ có đang tung chiêu cuối hay không

@@ -122,6 +122,36 @@ export const WEAPONS = {
         attackCooldown: 21,
         isRanged: false,
         icon: '⛩️'
+    },
+    SAITAMA: {
+        id: 'SAITAMA',
+        name: 'Consecutive Punches',
+        attackDmg: 33,
+        attackRange: 85,
+        attackDuration: 17,
+        attackCooldown: 20,
+        isRanged: false,
+        icon: '🥊'
+    },
+    MEGUMI: {
+        id: 'MEGUMI',
+        name: 'Shadow Blade',
+        attackDmg: 31,
+        attackRange: 86,
+        attackDuration: 18,
+        attackCooldown: 20,
+        isRanged: false,
+        icon: '🐺'
+    },
+    MIRAI: {
+        id: 'MIRAI',
+        name: 'Blood Sword',
+        attackDmg: 32,
+        attackRange: 88,
+        attackDuration: 18,
+        attackCooldown: 20,
+        isRanged: false,
+        icon: '🩸'
     }
 };
 
@@ -137,7 +167,10 @@ export const SKILLS = {
     NAOYA_SKILL: { id: 'PROJECTION_DASH', name: 'Projection Step', cooldown: 200, icon: '🎞️' },
     LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
     GOJO_SKILL: { id: 'LAPSE_BLUE', name: 'Lapse Blue', cooldown: 210, icon: '🌀' },
-    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' }
+    SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' },
+    SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 210, icon: '🥊' },
+    MEGUMI_SKILL: { id: 'DIVINE_DOG', name: 'Divine Dog Lunge', cooldown: 220, icon: '🐺' },
+    MIRAI_SKILL: { id: 'BLOOD_CRESCENT', name: 'Blood Crescent Wave', cooldown: 200, icon: '🩸' }
 };
 
 export class Projectile {
@@ -282,6 +315,74 @@ export class Projectile {
             ctx.lineTo(this.x - Math.cos(angle) * 36, this.y - Math.sin(angle) * 36);
             ctx.stroke();
 
+        } else if (this.type === 'shadow_dog') {
+            // MEGUMI: SHADOW DIVINE DOG 🐺
+            const angle = Math.atan2(this.vy, this.vx);
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            ctx.shadowColor = '#38bdf8';
+            ctx.shadowBlur = 25;
+
+            // Dark shadow wolf head & jaws
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(22, 0);       // snout
+            ctx.lineTo(0, -14);      // left ear
+            ctx.lineTo(-12, -8);     // neck top
+            ctx.lineTo(-24, 0);      // back
+            ctx.lineTo(-12, 8);      // neck bottom
+            ctx.lineTo(0, 14);       // right ear
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Glowing cyan eyes
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(6, -5, 2.5, 0, Math.PI * 2);
+            ctx.arc(6, 5, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Shadow smoke trail
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+            ctx.lineWidth = 14;
+            ctx.beginPath();
+            ctx.moveTo(-10, 0);
+            ctx.lineTo(-38, 0);
+            ctx.stroke();
+            ctx.restore();
+
+        } else if (this.type === 'blood_crescent') {
+            // MIRAI: BLOOD CRESCENT WAVE (Huyết Nguyệt Trảm) 🩸
+            const angle = Math.atan2(this.vy, this.vx);
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle + Math.PI / 2);
+            ctx.shadowColor = '#ef4444';
+            ctx.shadowBlur = 30;
+
+            // Crimson blade arc
+            const r = this.radius + 6;
+            ctx.fillStyle = '#dc2626';
+            ctx.strokeStyle = '#fca5a5';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, Math.PI * 0.15, Math.PI * 0.85, false);
+            ctx.quadraticCurveTo(0, -r * 0.4, Math.cos(Math.PI * 0.15) * r, Math.sin(Math.PI * 0.15) * r);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Bloody particle glow core
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 4, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
         } else {
             // Standard Projectile
             ctx.shadowColor = this.color;
@@ -320,14 +421,24 @@ export class CombatResolver {
         this.projectiles.push(p);
     }
 
-    updateProjectiles(dt = 1, arenaBounds, p1 = null, p2 = null) {
+    updateProjectiles(dt = 1, arenaBounds, ...playerArgs) {
+        let players = [];
+        if (playerArgs.length === 1 && Array.isArray(playerArgs[0])) {
+            players = playerArgs[0];
+        } else {
+            players = playerArgs.flat().filter(Boolean);
+        }
+
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
 
-            // Satoru Gojo: Infinity Barrier (Vô Hạn Trụ) - Làm chậm đạn đạo của đối thủ trong phạm vi 150px
-            if (p1 && p2) {
-                const target = (p.ownerIndex === 0) ? p2 : p1;
-                if (target && target.characterId === 'gojo' && !target.isStunned && !target.isDead) {
+            // Satoru Gojo: Infinity Barrier (Vô Hạn Trụ) - Slow down enemy projectiles within 150px
+            for (const target of players) {
+                if (target && target.characterId === 'gojo' && target.index !== p.ownerIndex && !target.isStunned && !target.isDead) {
+                    if (target.teamId !== undefined) {
+                        const owner = players.find(pl => pl && pl.index === p.ownerIndex);
+                        if (owner && owner.teamId === target.teamId) continue; // Same team
+                    }
                     const distToGo = Math.hypot(target.x - p.x, target.y - p.y);
                     if (distToGo < 150) {
                         p.vx *= 0.70;
@@ -357,21 +468,51 @@ export class CombatResolver {
     // --- RESOLVE COMBAT TRICKS & INTERACTIONS ---
 
     resolve(p1, p2, triggerScreenShake) {
-        // 1. Check Blade Clash (Both attacking with melee active)
+        let players = [];
+        let shake = triggerScreenShake;
+        if (Array.isArray(p1)) {
+            players = p1;
+            shake = p2;
+        } else {
+            players = [p1, p2];
+        }
+
+        // Check combat between all enemy pairs (Friendly Fire OFF)
+        for (let i = 0; i < players.length; i++) {
+            for (let j = i + 1; j < players.length; j++) {
+                const pA = players[i];
+                const pB = players[j];
+                if (!pA || !pB || pA.isDead || pB.isDead) continue;
+                if (pA.teamId === pB.teamId) continue; // Teammates cannot harm each other!
+
+                // 1. Blade Clash
+                this.resolveBladeClash(pA, pB, shake);
+
+                // 2. Melee Attacks
+                this.resolveMeleeAttack(pA, pB, shake);
+                this.resolveMeleeAttack(pB, pA, shake);
+
+                // 3. Ultimates
+                this.resolveUltimates(pA, pB, shake);
+            }
+        }
+
+        // 4. Projectiles against all valid targets
+        this.resolveProjectilesAgainstPlayers(players, shake);
+    }
+
+    resolveBladeClash(p1, p2, triggerScreenShake) {
         if (p1.isAttacking && p2.isAttacking && !p1.hasClashed && !p2.hasClashed) {
             const p1Weapon = WEAPONS[p1.characterId.toUpperCase()];
             const p2Weapon = WEAPONS[p2.characterId.toUpperCase()];
 
-            // If neither is in projectile mode
-            if (!p1Weapon.isRanged && !p2Weapon.isRanged) {
-
+            if (p1Weapon && p2Weapon && !p1Weapon.isRanged && !p2Weapon.isRanged) {
                 const dx = p2.x - p1.x;
                 const dy = p2.y - p1.y;
                 const dist = Math.hypot(dx, dy);
                 const clashReach = (p1.attackReach + p2.attackReach) * 0.75;
 
                 if (dist < clashReach) {
-                    // TRICK #4: BLADE CLASH TRIGGERED!
                     p1.hasClashed = true;
                     p2.hasClashed = true;
                     p1.isAttacking = false;
@@ -380,30 +521,16 @@ export class CombatResolver {
                     const midX = (p1.x + p2.x) / 2;
                     const midY = (p1.y + p2.y) / 2;
 
-                    // Push both players backwards with massive recoil
                     physics.applyKnockback(p1, -dx, -dy, 14);
                     physics.applyKnockback(p2, dx, dy, 14);
 
                     sound.playClash();
                     fx.spawnClashShockwave(midX, midY);
                     fx.addText(midX, midY - 30, '⚡ BLADE CLASH! ⚡', '#ffff00', 26);
-                    triggerScreenShake(12, 16);
-                    return;
+                    if (triggerScreenShake) triggerScreenShake(12, 16);
                 }
             }
         }
-
-        // 2. Check P1 Melee Attack hitting P2
-        this.resolveMeleeAttack(p1, p2, triggerScreenShake);
-
-        // 3. Check P2 Melee Attack hitting P1
-        this.resolveMeleeAttack(p2, p1, triggerScreenShake);
-
-        // 4. Check Projectiles hitting Players
-        this.resolveProjectilesAgainstPlayers(p1, p2, triggerScreenShake);
-
-        // 5. Check Ultimate Overdrive Beams
-        this.resolveUltimates(p1, p2, triggerScreenShake);
     }
 
     resolveMeleeAttack(attacker, defender, triggerScreenShake) {
@@ -447,6 +574,14 @@ export class CombatResolver {
                 }
             }
 
+            // Mirai Passive: Blood Lifesteal on all melee hits
+            if (attacker.characterId === 'mirai') {
+                const healRatio = (attacker.hp < attacker.maxHp * 0.35) ? 0.35 : 0.20;
+                const healAmount = baseDmg * healRatio;
+                attacker.hp = Math.min(attacker.maxHp, attacker.hp + healAmount);
+                fx.addText(attacker.x, attacker.y - 25, `+${Math.round(healAmount)} HP`, '#ef4444', 18);
+            }
+
             // Direct unshielded hit!
             defender.takeDamage(baseDmg, false, attacker.x, attacker.y);
             attacker.overdrive = Math.min(100, attacker.overdrive + 14 * (attacker.overdriveChargeRate || 1.0));
@@ -457,7 +592,38 @@ export class CombatResolver {
             attacker.signatureHits = (attacker.signatureHits || 0) + 1;
             const hitCount = attacker.signatureHits;
 
-            if (attacker.characterId === 'naoya') {
+            if (attacker.characterId === 'saitama') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(18);
+                    defender.applyStun(20);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 18);
+                    fx.addText(defender.x, defender.y - 45, '👊 HEAVY PUNCH! -18', '#f59e0b', 26);
+                    fx.spawnHitSparks(defender.x, defender.y, '#f59e0b', 24);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `👊 PUNCH [${hitCount}/3]`, '#f59e0b', 18);
+                }
+            } else if (attacker.characterId === 'megumi') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(15);
+                    defender.applyStun(22);
+                    fx.addText(defender.x, defender.y - 45, '🐺 SHADOW MAUL! -15', '#38bdf8', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#38bdf8', 20);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🐺 SHADOW [${hitCount}/3]`, '#38bdf8', 18);
+                }
+            } else if (attacker.characterId === 'mirai') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(16);
+                    defender.bleedTimer = 60;
+                    fx.addText(defender.x, defender.y - 45, '🩸 BLOOD CURSE! -16', '#dc2626', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#ef4444', 22);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🩸 BLOOD [${hitCount}/3]`, '#ef4444', 18);
+                }
+            } else if (attacker.characterId === 'naoya') {
                 if (hitCount >= 3) {
                     defender.takeDamage(14);
                     defender.applyFrameFreeze(20);
@@ -553,101 +719,136 @@ export class CombatResolver {
     }
 
     resolveProjectilesAgainstPlayers(p1, p2, triggerScreenShake) {
+        let players = [];
+        let shake = triggerScreenShake;
+        if (Array.isArray(p1)) {
+            players = p1;
+            shake = p2;
+        } else {
+            players = [p1, p2];
+        }
+
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const proj = this.projectiles[i];
-            const defender = proj.ownerIndex === 0 ? p2 : p1;
-            const attacker = proj.ownerIndex === 0 ? p1 : p2;
+            const attacker = players.find(p => p && p.index === proj.ownerIndex) || players[proj.ownerIndex] || null;
 
-            // Hitbox dạng hình con nhộng (Capsule) bao phủ toàn bộ cơ thể nhân vật từ đầu tới chân
-            const targetY = Math.max(defender.y - 55, Math.min(defender.y + 30, proj.y));
-            const dist = Math.hypot(defender.x - proj.x, targetY - proj.y);
+            for (const defender of players) {
+                if (!defender || defender.isDead) continue;
+                // Friendly Fire OFF
+                if (attacker && defender.teamId === attacker.teamId) continue;
+                if (defender.index === proj.ownerIndex) continue;
 
-            if (dist < defender.radius + proj.radius) {
-                // Check if defender parries projectile!
-                if (defender.isShielding) {
-                    if (defender.shieldTimer <= 10 && !proj.isReflected) {
-                        // TRICK #1: REFLECTED VIA PERFECT PARRY!
-                        proj.isReflected = true;
-                        proj.ownerIndex = defender.index;
-                        proj.color = defender.color;
-                        proj.vx = -proj.vx * 1.35;
-                        proj.vy = -proj.vy * 1.35;
-                        proj.damage *= 1.3;
-                        defender.overdrive = Math.min(100, defender.overdrive + 20 * (defender.overdriveChargeRate || 1.0));
+                // Hitbox dạng hình con nhộng (Capsule) bao phủ toàn bộ cơ thể nhân vật từ đầu tới chân
+                const targetY = Math.max(defender.y - 55, Math.min(defender.y + 30, proj.y));
+                const dist = Math.hypot(defender.x - proj.x, targetY - proj.y);
 
-                        sound.playParry();
-                        fx.spawnParryBurst(proj.x, proj.y, defender.color);
-                        fx.addText(defender.x, defender.y - 35, '⚡ REFLECTED! ⚡', '#00ffcc', 24);
-                        triggerScreenShake(6, 10);
-                        continue;
-                    } else {
-                        // Absorbed by shield
-                        defender.takeDamage(proj.damage * 0.15);
-                        fx.spawnHitSparks(proj.x, proj.y, '#ffffff', 8);
-                        sound.playHit(false);
-                        this.projectiles.splice(i, 1);
-                        continue;
+                if (dist < defender.radius + proj.radius) {
+                    // Check if defender parries projectile!
+                    if (defender.isShielding) {
+                        if (defender.shieldTimer <= 10 && !proj.isReflected) {
+                            // TRICK #1: REFLECTED VIA PERFECT PARRY!
+                            proj.isReflected = true;
+                            proj.ownerIndex = defender.index;
+                            proj.color = defender.color;
+                            proj.vx = -proj.vx * 1.35;
+                            proj.vy = -proj.vy * 1.35;
+                            proj.damage *= 1.3;
+                            defender.overdrive = Math.min(100, defender.overdrive + 20 * (defender.overdriveChargeRate || 1.0));
+
+                            sound.playParry();
+                            fx.spawnParryBurst(proj.x, proj.y, defender.color);
+                            fx.addText(defender.x, defender.y - 35, '⚡ REFLECTED! ⚡', '#00ffcc', 24);
+                            if (shake) shake(6, 10);
+                            break;
+                        } else {
+                            // Absorbed by shield
+                            defender.takeDamage(proj.damage * 0.15);
+                            fx.spawnHitSparks(proj.x, proj.y, '#ffffff', 8);
+                            sound.playHit(false);
+                            this.projectiles.splice(i, 1);
+                            break;
+                        }
                     }
+
+                    // Direct hit!
+                    let dmg = proj.damage;
+                    if (attacker && attacker.hasLockOn) {
+                        dmg *= 1.4;
+                        attacker.hasLockOn = false;
+                        fx.addText(defender.x, targetY - 45, '🎯 LOCK-ON CRIT!', '#38bdf8', 22);
+                    }
+                    defender.takeDamage(dmg, false, proj.x, proj.y);
+                    if (attacker) {
+                        attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
+                    }
+                    defender.applyStun(14);
+                    physics.applyKnockback(defender, proj.vx * 0.25, proj.vy * 0.25, 5);
+
+                    // Special projectile effects
+                    if (proj.type === 'blood_crescent') {
+                        defender.bleedTimer = 60;
+                        fx.addText(defender.x, targetY - 45, '🩸 HEMORRHAGE!', '#ef4444', 22);
+                        if (attacker && attacker.characterId === 'mirai') {
+                            const healAmount = dmg * 0.45;
+                            attacker.hp = Math.min(attacker.maxHp, attacker.hp + healAmount);
+                            fx.addText(attacker.x, attacker.y - 25, `+${Math.round(healAmount)} HP`, '#ef4444', 20);
+                        }
+                    } else if (proj.type === 'shadow_dog') {
+                        defender.applyStun(45);
+                        fx.addText(defender.x, targetY - 45, '🐺 PINNED BY DIVINE DOG!', '#38bdf8', 24);
+                    }
+
+                    // Ranged Signature 3-hit passives
+                    if (attacker) {
+                        attacker.signatureHits = (attacker.signatureHits || 0) + 1;
+                        const rHitCount = attacker.signatureHits;
+
+                        if (attacker.characterId === 'velina') {
+                            if (rHitCount >= 3) {
+                                attacker.hp = Math.min(attacker.maxHp, attacker.hp + 18);
+                                defender.applyStun(16);
+                                fx.addText(attacker.x, attacker.y - 45, '🌸 BLOOM HEAL +18!', '#34d399', 24);
+                                attacker.signatureHits = 0;
+                            } else {
+                                fx.addText(attacker.x, attacker.y - 25, `🌸 FLORA [${rHitCount}/3]`, '#34d399', 18);
+                            }
+                        } else if (attacker.characterId === 'nicole') {
+                            if (rHitCount >= 3) {
+                                defender.takeDamage(14);
+                                physics.applyKnockback(defender, proj.vx * 0.4, proj.vy * 0.4, 8);
+                                fx.addText(defender.x, defender.y - 45, '💼 SUGAR BOMB! -14', '#f472b6', 24);
+                                attacker.signatureHits = 0;
+                            } else {
+                                fx.addText(attacker.x, attacker.y - 25, `💼 SUGAR [${rHitCount}/3]`, '#f472b6', 18);
+                            }
+                        } else if (attacker.characterId === 'trigger') {
+                            if (rHitCount >= 3) {
+                                attacker.hasLockOn = true;
+                                fx.addText(attacker.x, attacker.y - 45, '🎯 LOCK-ON CRIT READY!', '#38bdf8', 24);
+                                attacker.signatureHits = 0;
+                            } else {
+                                fx.addText(attacker.x, attacker.y - 25, `🎯 LOCK-ON [${rHitCount}/3]`, '#38bdf8', 18);
+                            }
+                        } else if (attacker.characterId === 'vivian') {
+                            if (rHitCount >= 3) {
+                                defender.takeDamage(14);
+                                defender.curseTimer = 90;
+                                fx.addText(defender.x, defender.y - 45, '🔮 BANSHEE CURSE! -14', '#c084fc', 24);
+                                attacker.signatureHits = 0;
+                            } else {
+                                fx.addText(attacker.x, attacker.y - 25, `🔮 FEATHER [${rHitCount}/3]`, '#c084fc', 18);
+                            }
+                        }
+                    }
+
+                    sound.playHit(true);
+                    fx.spawnHitSparks(proj.x, proj.y, proj.color, 18);
+                    const atkColor = attacker ? attacker.color : proj.color;
+                    fx.addText(defender.x, targetY - 20, `-${Math.round(dmg)}`, atkColor, 20);
+                    if (shake) shake(7, 10);
+                    this.projectiles.splice(i, 1);
+                    break;
                 }
-
-                // Direct hit!
-                let dmg = proj.damage;
-                if (attacker.hasLockOn) {
-                    dmg *= 1.4;
-                    attacker.hasLockOn = false;
-                    fx.addText(defender.x, targetY - 45, '🎯 LOCK-ON CRIT!', '#38bdf8', 22);
-                }
-                defender.takeDamage(dmg, false, proj.x, proj.y);
-                attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
-                defender.applyStun(14);
-                physics.applyKnockback(defender, proj.vx * 0.25, proj.vy * 0.25, 5);
-
-                // Ranged Signature 3-hit passives
-                attacker.signatureHits = (attacker.signatureHits || 0) + 1;
-                const rHitCount = attacker.signatureHits;
-
-                if (attacker.characterId === 'velina') {
-                    if (rHitCount >= 3) {
-                        attacker.hp = Math.min(attacker.maxHp, attacker.hp + 18);
-                        defender.applyStun(16);
-                        fx.addText(attacker.x, attacker.y - 45, '🌸 BLOOM HEAL +18!', '#34d399', 24);
-                        attacker.signatureHits = 0;
-                    } else {
-                        fx.addText(attacker.x, attacker.y - 25, `🌸 FLORA [${rHitCount}/3]`, '#34d399', 18);
-                    }
-                } else if (attacker.characterId === 'nicole') {
-                    if (rHitCount >= 3) {
-                        defender.takeDamage(14);
-                        physics.applyKnockback(defender, proj.vx * 0.4, proj.vy * 0.4, 8);
-                        fx.addText(defender.x, defender.y - 45, '💼 SUGAR BOMB! -14', '#f472b6', 24);
-                        attacker.signatureHits = 0;
-                    } else {
-                        fx.addText(attacker.x, attacker.y - 25, `💼 SUGAR [${rHitCount}/3]`, '#f472b6', 18);
-                    }
-                } else if (attacker.characterId === 'trigger') {
-                    if (rHitCount >= 3) {
-                        attacker.hasLockOn = true;
-                        fx.addText(attacker.x, attacker.y - 45, '🎯 LOCK-ON CRIT READY!', '#38bdf8', 24);
-                        attacker.signatureHits = 0;
-                    } else {
-                        fx.addText(attacker.x, attacker.y - 25, `🎯 LOCK-ON [${rHitCount}/3]`, '#38bdf8', 18);
-                    }
-                } else if (attacker.characterId === 'vivian') {
-                    if (rHitCount >= 3) {
-                        defender.takeDamage(14);
-                        defender.curseTimer = 90;
-                        fx.addText(defender.x, defender.y - 45, '🔮 BANSHEE CURSE! -14', '#c084fc', 24);
-                        attacker.signatureHits = 0;
-                    } else {
-                        fx.addText(attacker.x, attacker.y - 25, `🔮 FEATHER [${rHitCount}/3]`, '#c084fc', 18);
-                    }
-                }
-
-                sound.playHit(true);
-                fx.spawnHitSparks(proj.x, proj.y, proj.color, 18);
-                fx.addText(defender.x, targetY - 20, `-${Math.round(dmg)}`, attacker.color, 20);
-                triggerScreenShake(7, 10);
-                this.projectiles.splice(i, 1);
             }
         }
     }
@@ -838,6 +1039,45 @@ export class CombatResolver {
                         physics.applyKnockback(target, Math.cos(sliceAngle), Math.sin(sliceAngle), 1.8);
                         fx.spawnHitSparks(target.x, target.y, '#f43f5e', 6);
                         triggerScreenShake(4, 7);
+                    }
+                } else if (user.characterId === 'saitama') {
+                    // SAITAMA: SERIOUS SERIES - SERIOUS PUNCH! 👊
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const forwardDist = (target.x - user.x) * facingDir;
+                    const verticalDist = Math.abs(target.y - user.y);
+                    const beamLen = 1600;
+                    const halfThickness = 55;
+
+                    if (forwardDist >= 30 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
+                        target.takeDamage(ultDmgPerFrame * 1.25, true, user.x, user.y);
+                        target.applyStun(15);
+                        physics.applyKnockback(target, facingDir * 2.5, -0.8, 3.8);
+                        fx.spawnHitSparks(target.x, target.y, '#f59e0b', 8);
+                        triggerScreenShake(5, 9);
+                    }
+                } else if (user.characterId === 'megumi') {
+                    // MEGUMI: EIGHT-HANDLED SWORD DIVERGENT SILA MAHORAGA CLEAVE! ⚔️
+                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                    const strikeX = user.x + facingDir * 160;
+                    const dist = Math.hypot(target.x - strikeX, target.y - user.y);
+                    if (dist < target.radius + 360) {
+                        target.takeDamage(ultDmgPerFrame * 1.15, true, user.x, user.y);
+                        target.applyStun(14);
+                        physics.applyKnockback(target, facingDir * 1.5, -1.0, 3.2);
+                        fx.spawnHitSparks(target.x, target.y, '#38bdf8', 7);
+                        triggerScreenShake(4, 7);
+                    }
+                } else if (user.characterId === 'mirai') {
+                    // MIRAI: BLOOD CATACLYSM STRIKE (CỰ ĐẠI HUYẾT KIẾM) 🩸
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + 350) {
+                        target.takeDamage(ultDmgPerFrame * 1.15, true, user.x, user.y);
+                        target.applyStun(12);
+                        physics.applyKnockback(target, 0, 1.2, 3.2);
+                        fx.spawnHitSparks(target.x, target.y, '#ef4444', 8);
+                        // Lifesteal on ultimate
+                        user.hp = Math.min(user.maxHp, user.hp + (ultDmgPerFrame * 0.25));
+                        triggerScreenShake(4, 8);
                     }
                 }
             }
