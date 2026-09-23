@@ -159,98 +159,262 @@
                     </div>
                 </div>
 
-                <!-- 2V2 ROSTER: 4 SLOTS (BLUE TEAM vs RED TEAM) -->
-                <div class="roster-2v2-container">
-                    <!-- TEAM BLUE (P1 + P2) -->
-                    <div class="team-col team-blue-col">
-                        <div class="team-title-banner blue-banner">
-                            <span>🛡️ TEAM BLUE</span>
-                            <span class="team-meta">[Team 1]</span>
+                <!-- 2V2 ROSTER & BAN-PICK: BLUE TEAM vs RED TEAM -->
+                <div class="loadout-container roster-2v2-loadout">
+                    <!-- TEAM BLUE LOADOUT -->
+                    <div class="player-box team-blue-box">
+                        <div class="player-header">
+                            <span class="blue-color">🛡️ TEAM BLUE</span>
+                            <span class="section-label">[TEAM 1]</span>
                         </div>
-                        <div class="slot-cards-group">
-                            <!-- Slot 0: P1 -->
-                            <div class="slot-card" id="slot-card-0" data-slot="0">
-                                <div class="slot-header">
-                                    <span class="slot-badge blue-badge">P1 (HOST / YOU)</span>
-                                    <span class="slot-status" id="slot-0-status">READY</span>
+
+                        <!-- Slot / Ban Selector Tabs for Blue -->
+                        <div class="slot-tabs-row">
+                            <div class="slot-tab active" id="tab-blue-slot-0" data-team="blue" data-target="slot-0">
+                                <img src="assets/yanagi/avatar.png?v=75" id="thumb-slot-0" class="slot-tab-thumb" alt="P1">
+                                <div class="slot-tab-info">
+                                    <div class="slot-tab-role">P1 (HOST / YOU)</div>
+                                    <div class="slot-tab-name" id="name-slot-0">Yanagi</div>
                                 </div>
-                                <div class="slot-body">
-                                    <img src="assets/yanagi/avatar.png" id="slot-0-avatar" class="slot-avatar" alt="P1">
-                                    <div class="slot-info">
-                                        <select class="char-picker-select" id="slot-0-char-select"></select>
-                                    </div>
+                                <span class="slot-tab-status">READY</span>
+                            </div>
+
+                            <div class="slot-tab" id="tab-blue-slot-1" data-team="blue" data-target="slot-1">
+                                <img src="assets/velina/avatar.png?v=75" id="thumb-slot-1" class="slot-tab-thumb" alt="P2">
+                                <div class="slot-tab-info">
+                                    <div class="slot-tab-role">P2 (TEAMMATE)</div>
+                                    <div class="slot-tab-name" id="name-slot-1">Verina</div>
+                                </div>
+                                <button class="bot-toggle-btn is-bot" id="btn-toggle-slot-1">🤖 BOT</button>
+                            </div>
+
+                            <div class="slot-tab ban-tab" id="tab-blue-ban" data-team="blue" data-target="ban">
+                                <div class="ban-tab-thumb-box">
+                                    <img src="" id="thumb-blue-ban" class="slot-tab-thumb hidden" alt="Ban">
+                                    <span id="thumb-blue-ban-none" class="ban-empty-icon">🚫</span>
+                                </div>
+                                <div class="slot-tab-info">
+                                    <div class="slot-tab-role" style="color: #ef4444;">BLUE BAN</div>
+                                    <div class="slot-tab-name" id="name-blue-ban">NO BAN</div>
                                 </div>
                             </div>
-                            <!-- Slot 1: P2 -->
-                            <div class="slot-card" id="slot-card-1" data-slot="1">
-                                <div class="slot-header">
-                                    <span class="slot-badge blue-badge">P2 (TEAMMATE)</span>
-                                    <button class="bot-toggle-btn" id="btn-toggle-slot-1">🤖 BOT</button>
-                                </div>
-                                <div class="slot-body">
-                                    <img src="assets/velina/avatar.png" id="slot-1-avatar" class="slot-avatar" alt="P2">
-                                    <div class="slot-info">
-                                        <select class="char-picker-select" id="slot-1-char-select"></select>
-                                    </div>
-                                </div>
+                        </div>
+
+                        <!-- Picker Sub-header -->
+                        <div class="grid-sub-header">
+                            <span class="section-label" id="blue-picker-label">SELECT FIGHTER FOR P1:</span>
+                            <button class="no-ban-btn hidden" id="btn-blue-no-ban">🚫 CLEAR BAN</button>
+                        </div>
+
+                        <!-- 15 Character Grid for Blue -->
+                        <div class="char-grid" id="blue-char-grid">
+                            <div class="char-card selected selected-yanagi" data-team="blue" data-char="yanagi">
+                                <img src="assets/yanagi/avatar.png?v=75" class="char-avatar" alt="Yanagi">
+                                <div class="char-title">Yanagi</div>
+                                <span class="char-type type-yanagi">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="velina">
+                                <img src="assets/velina/avatar.png?v=75" class="char-avatar" alt="Verina">
+                                <div class="char-title">Verina</div>
+                                <span class="char-type type-velina">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="nicole">
+                                <img src="assets/nicole/avatar.png?v=75" class="char-avatar" alt="Nicole">
+                                <div class="char-title">Nicole</div>
+                                <span class="char-type type-nicole">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="trigger">
+                                <img src="assets/trigger/avatar.png?v=75" class="char-avatar" alt="Trigger">
+                                <div class="char-title">Trigger</div>
+                                <span class="char-type type-trigger">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="vivian">
+                                <img src="assets/vivian/avatar.png?v=75" class="char-avatar" alt="Vivian">
+                                <div class="char-title">Vivian</div>
+                                <span class="char-type type-vivian">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="jotaro">
+                                <img src="assets/jotaro/avatar.png?v=75" class="char-avatar" alt="Jotaro">
+                                <div class="char-title">Jotaro</div>
+                                <span class="char-type type-jotaro">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="goku">
+                                <img src="assets/goku/avatar.png?v=75" class="char-avatar" alt="Goku">
+                                <div class="char-title">Goku</div>
+                                <span class="char-type type-goku">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="giorno">
+                                <img src="assets/giorno/avatar.png?v=75" class="char-avatar" alt="Giorno">
+                                <div class="char-title">Giorno</div>
+                                <span class="char-type type-giorno">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="naoya">
+                                <img src="assets/naoya/avatar.png?v=75" class="char-avatar" alt="Naoya">
+                                <div class="char-title">Naoya</div>
+                                <span class="char-type type-naoya">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="luffy">
+                                <img src="assets/luffy/avatar.png?v=75" class="char-avatar" alt="Luffy">
+                                <div class="char-title">Luffy</div>
+                                <span class="char-type type-luffy">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="gojo">
+                                <img src="assets/gojo/avatar.png?v=75" class="char-avatar" alt="Gojo">
+                                <div class="char-title">Gojo</div>
+                                <span class="char-type type-gojo">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="sukuna">
+                                <img src="assets/sukuna/avatar.png?v=75" class="char-avatar" alt="Sukuna">
+                                <div class="char-title">Sukuna</div>
+                                <span class="char-type type-sukuna">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="saitama">
+                                <img src="assets/saitama/avatar.png?v=75" class="char-avatar" alt="Saitama">
+                                <div class="char-title">Saitama</div>
+                                <span class="char-type type-saitama">👊 MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="megumi">
+                                <img src="assets/megumi/avatar.png?v=75" class="char-avatar" alt="Megumi">
+                                <div class="char-title">Megumi</div>
+                                <span class="char-type type-megumi">🐺 MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="blue" data-char="mirai">
+                                <img src="assets/mirai/avatar.png?v=75" class="char-avatar" alt="Mirai">
+                                <div class="char-title">Mirai</div>
+                                <span class="char-type type-mirai">🩸 MELEE</span>
                             </div>
                         </div>
+
+                        <!-- Skill Info Box for Team Blue -->
+                        <div class="skill-info-box" id="team-blue-skill-info"></div>
                     </div>
 
-                    <div class="vs-divider-2v2">
-                        <span class="vs-text">VS</span>
-                    </div>
-
-                    <!-- TEAM RED (P3 + P4) -->
-                    <div class="team-col team-red-col">
-                        <div class="team-title-banner red-banner">
-                            <span>⚔️ TEAM RED</span>
-                            <span class="team-meta">[Team 2]</span>
+                    <!-- TEAM RED LOADOUT -->
+                    <div class="player-box team-red-box">
+                        <div class="player-header">
+                            <span class="red-color">⚔️ TEAM RED</span>
+                            <span class="section-label">[TEAM 2]</span>
                         </div>
-                        <div class="slot-cards-group">
-                            <!-- Slot 2: P3 -->
-                            <div class="slot-card" id="slot-card-2" data-slot="2">
-                                <div class="slot-header">
-                                    <span class="slot-badge red-badge">P3 (OPPONENT 1)</span>
-                                    <button class="bot-toggle-btn" id="btn-toggle-slot-2">🤖 BOT</button>
+
+                        <!-- Slot / Ban Selector Tabs for Red -->
+                        <div class="slot-tabs-row">
+                            <div class="slot-tab active" id="tab-red-slot-2" data-team="red" data-target="slot-2">
+                                <img src="assets/saitama/avatar.png?v=75" id="thumb-slot-2" class="slot-tab-thumb" alt="P3">
+                                <div class="slot-tab-info">
+                                    <div class="slot-tab-role">P3 (OPPONENT 1)</div>
+                                    <div class="slot-tab-name" id="name-slot-2">Saitama</div>
                                 </div>
-                                <div class="slot-body">
-                                    <img src="assets/saitama/avatar.png" id="slot-2-avatar" class="slot-avatar" alt="P3">
-                                    <div class="slot-info">
-                                        <select class="char-picker-select" id="slot-2-char-select"></select>
-                                    </div>
+                                <button class="bot-toggle-btn is-bot" id="btn-toggle-slot-2">🤖 BOT</button>
+                            </div>
+
+                            <div class="slot-tab" id="tab-red-slot-3" data-team="red" data-target="slot-3">
+                                <img src="assets/sukuna/avatar.png?v=75" id="thumb-slot-3" class="slot-tab-thumb" alt="P4">
+                                <div class="slot-tab-info">
+                                    <div class="slot-tab-role">P4 (OPPONENT 2)</div>
+                                    <div class="slot-tab-name" id="name-slot-3">Sukuna</div>
+                                </div>
+                                <button class="bot-toggle-btn is-bot" id="btn-toggle-slot-3">🤖 BOT</button>
+                            </div>
+
+                            <div class="slot-tab ban-tab" id="tab-red-ban" data-team="red" data-target="ban">
+                                <div class="ban-tab-thumb-box">
+                                    <img src="" id="thumb-red-ban" class="slot-tab-thumb hidden" alt="Ban">
+                                    <span id="thumb-red-ban-none" class="ban-empty-icon">🚫</span>
+                                </div>
+                                <div class="slot-tab-info">
+                                    <div class="slot-tab-role" style="color: #ef4444;">RED BAN</div>
+                                    <div class="slot-tab-name" id="name-red-ban">NO BAN</div>
                                 </div>
                             </div>
-                            <!-- Slot 3: P4 -->
-                            <div class="slot-card" id="slot-card-3" data-slot="3">
-                                <div class="slot-header">
-                                    <span class="slot-badge red-badge">P4 (OPPONENT 2)</span>
-                                    <button class="bot-toggle-btn" id="btn-toggle-slot-3">🤖 BOT</button>
-                                </div>
-                                <div class="slot-body">
-                                    <img src="assets/sukuna/avatar.png" id="slot-3-avatar" class="slot-avatar" alt="P4">
-                                    <div class="slot-info">
-                                        <select class="char-picker-select" id="slot-3-char-select"></select>
-                                    </div>
-                                </div>
+                        </div>
+
+                        <!-- Picker Sub-header -->
+                        <div class="grid-sub-header">
+                            <span class="section-label" id="red-picker-label">SELECT FIGHTER FOR P3:</span>
+                            <button class="no-ban-btn hidden" id="btn-red-no-ban">🚫 CLEAR BAN</button>
+                        </div>
+
+                        <!-- 15 Character Grid for Red -->
+                        <div class="char-grid" id="red-char-grid">
+                            <div class="char-card" data-team="red" data-char="yanagi">
+                                <img src="assets/yanagi/avatar.png?v=75" class="char-avatar" alt="Yanagi">
+                                <div class="char-title">Yanagi</div>
+                                <span class="char-type type-yanagi">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="velina">
+                                <img src="assets/velina/avatar.png?v=75" class="char-avatar" alt="Verina">
+                                <div class="char-title">Verina</div>
+                                <span class="char-type type-velina">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="nicole">
+                                <img src="assets/nicole/avatar.png?v=75" class="char-avatar" alt="Nicole">
+                                <div class="char-title">Nicole</div>
+                                <span class="char-type type-nicole">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="trigger">
+                                <img src="assets/trigger/avatar.png?v=75" class="char-avatar" alt="Trigger">
+                                <div class="char-title">Trigger</div>
+                                <span class="char-type type-trigger">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="vivian">
+                                <img src="assets/vivian/avatar.png?v=75" class="char-avatar" alt="Vivian">
+                                <div class="char-title">Vivian</div>
+                                <span class="char-type type-vivian">🏹 RANGED</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="jotaro">
+                                <img src="assets/jotaro/avatar.png?v=75" class="char-avatar" alt="Jotaro">
+                                <div class="char-title">Jotaro</div>
+                                <span class="char-type type-jotaro">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="goku">
+                                <img src="assets/goku/avatar.png?v=75" class="char-avatar" alt="Goku">
+                                <div class="char-title">Goku</div>
+                                <span class="char-type type-goku">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="giorno">
+                                <img src="assets/giorno/avatar.png?v=75" class="char-avatar" alt="Giorno">
+                                <div class="char-title">Giorno</div>
+                                <span class="char-type type-giorno">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="naoya">
+                                <img src="assets/naoya/avatar.png?v=75" class="char-avatar" alt="Naoya">
+                                <div class="char-title">Naoya</div>
+                                <span class="char-type type-naoya">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="luffy">
+                                <img src="assets/luffy/avatar.png?v=75" class="char-avatar" alt="Luffy">
+                                <div class="char-title">Luffy</div>
+                                <span class="char-type type-luffy">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="gojo">
+                                <img src="assets/gojo/avatar.png?v=75" class="char-avatar" alt="Gojo">
+                                <div class="char-title">Gojo</div>
+                                <span class="char-type type-gojo">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="sukuna">
+                                <img src="assets/sukuna/avatar.png?v=75" class="char-avatar" alt="Sukuna">
+                                <div class="char-title">Sukuna</div>
+                                <span class="char-type type-sukuna">⚔️ MELEE</span>
+                            </div>
+                            <div class="char-card selected selected-saitama" data-team="red" data-char="saitama">
+                                <img src="assets/saitama/avatar.png?v=75" class="char-avatar" alt="Saitama">
+                                <div class="char-title">Saitama</div>
+                                <span class="char-type type-saitama">👊 MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="megumi">
+                                <img src="assets/megumi/avatar.png?v=75" class="char-avatar" alt="Megumi">
+                                <div class="char-title">Megumi</div>
+                                <span class="char-type type-megumi">🐺 MELEE</span>
+                            </div>
+                            <div class="char-card" data-team="red" data-char="mirai">
+                                <img src="assets/mirai/avatar.png?v=75" class="char-avatar" alt="Mirai">
+                                <div class="char-title">Mirai</div>
+                                <span class="char-type type-mirai">🩸 MELEE</span>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- BAN PHASE SECTION -->
-                <div class="ban-phase-row">
-                    <div class="ban-box blue-ban">
-                        <span class="ban-label">🛡️ TEAM BLUE BAN:</span>
-                        <select id="select-blue-ban" class="ban-select">
-                            <option value="none">-- NO BAN --</option>
-                        </select>
-                    </div>
-                    <div class="ban-box red-ban">
-                        <span class="ban-label">⚔️ TEAM RED BAN:</span>
-                        <select id="select-red-ban" class="ban-select">
-                            <option value="none">-- NO BAN --</option>
-                        </select>
+                        <!-- Skill Info Box for Team Red -->
+                        <div class="skill-info-box" id="team-red-skill-info"></div>
                     </div>
                 </div>
 

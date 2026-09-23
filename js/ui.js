@@ -262,6 +262,8 @@ export class UIManager {
         this.selected2v2Map = 'brawlhaven';
         this.is2v2Online = false;
         this.my2v2Slot = 0;
+        this.activeBlueTarget = 'slot-0';
+        this.activeRedTarget = 'slot-2';
         this.slots2v2 = [
             { slotIndex: 0, char: 'yanagi', isBot: false, name: 'P1 (HOST)' },
             { slotIndex: 1, char: 'velina', isBot: true, name: 'P2 (BOT)' },
@@ -589,6 +591,11 @@ export class UIManager {
             if (clientWaitBox) clientWaitBox.classList.add('hidden');
 
             if (panel2v2) panel2v2.classList.remove('hidden');
+
+            this.update2v2BanVisual();
+            for (let i = 0; i < 4; i++) {
+                this.update2v2SlotVisual(i);
+            }
 
             if (this.onNetworkModeChange) this.onNetworkModeChange('2V2');
         };
@@ -947,11 +954,15 @@ export class UIManager {
             const idx = data.slotIndex;
             if (this.slots2v2 && this.slots2v2[idx]) {
                 this.slots2v2[idx].char = data.char;
-                if (data.isBot !== undefined) this.slots2v2[idx].isBot = data.isBot;
-                const selectEl = document.getElementById(`slot-${idx}-char-select`);
-                const avatarEl = document.getElementById(`slot-${idx}-avatar`);
-                if (selectEl) selectEl.value = data.char;
-                if (avatarEl) avatarEl.src = `assets/${data.char}/avatar.png`;
+                if (data.isBot !== undefined) {
+                    this.slots2v2[idx].isBot = data.isBot;
+                    const btn = document.getElementById(`btn-toggle-slot-${idx}`);
+                    if (btn) {
+                        btn.classList.toggle('is-bot', data.isBot);
+                        btn.textContent = data.isBot ? '🤖 BOT' : '👤 HUMAN';
+                    }
+                }
+                this.update2v2SlotVisual(idx);
             }
         } else if (data.type === '2V2_MAP_SELECT') {
             this.selected2v2Map = data.map;
@@ -961,10 +972,7 @@ export class UIManager {
             if (cardGreatHall) cardGreatHall.classList.toggle('active', data.map === 'great_hall');
         } else if (data.type === '2V2_BAN_UPDATE') {
             this.bans2v2 = data.bans || this.bans2v2;
-            const selectBlueBan = document.getElementById('select-blue-ban');
-            const selectRedBan = document.getElementById('select-red-ban');
-            if (selectBlueBan && data.bans.blue) selectBlueBan.value = data.bans.blue;
-            if (selectRedBan && data.bans.red) selectRedBan.value = data.bans.red;
+            this.update2v2BanVisual();
         } else if (this.onNetworkGameData) {
             this.onNetworkGameData(data);
         }
@@ -1022,9 +1030,168 @@ export class UIManager {
         box.innerHTML = html;
     }
 
+    getCharDisplayName(charId) {
+        const found = ALL_CHARACTERS.find(c => c.id === charId);
+        if (found) {
+            return found.name.split(' (')[0];
+        }
+        return charId ? charId.toUpperCase() : 'UNKNOWN';
+    }
+
+    update2v2GridSelection(team, charId) {
+        const gridId = team === 'blue' ? 'blue-char-grid' : 'red-char-grid';
+        document.querySelectorAll(`#${gridId} .char-card`).forEach(card => {
+            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno', 'selected-naoya', 'selected-luffy', 'selected-gojo', 'selected-sukuna', 'selected-saitama', 'selected-megumi', 'selected-mirai');
+            if (card.dataset.char === charId) {
+                card.classList.add('selected', `selected-${charId}`);
+            }
+        });
+    }
+
+    renderSkillInfo2v2(team, charId, targetSlotIndex) {
+        const box = document.getElementById(`team-${team}-skill-info`);
+        if (!box) return;
+        const data = SKILL_DATA[charId];
+        if (!data) {
+            box.innerHTML = '';
+            return;
+        }
+
+        let moves = data.p1 || [];
+        let key1 = 'Left Click / F (Melee)';
+        let key2 = 'R (Skill)';
+        let key3 = 'Space (Ultimate)';
+
+        if (targetSlotIndex === 1) {
+            key1 = 'J (Melee)';
+            key2 = 'I (Skill)';
+            key3 = 'Enter (Ultimate)';
+        } else if (targetSlotIndex === 2 || targetSlotIndex === 3) {
+            key1 = 'AI Combat (Melee Strike)';
+            key2 = 'AI Combat (Special Skill)';
+            key3 = 'AI Combat (Ultimate Burst)';
+        }
+
+        const isBan = (targetSlotIndex === 'ban');
+        let badgeText = isBan ? '🚫 BANNED TARGET' : (targetSlotIndex === 0 ? 'P1 CONTROLS' : (targetSlotIndex === 1 ? 'P2 CONTROLS' : 'BOT AI CONTROLS'));
+
+        let html = `
+            <div class="skill-info-header">
+                <span class="skill-char-name" style="color: ${data.color};">${data.title}</span>
+                <span class="skill-badge">${badgeText}</span>
+            </div>
+        `;
+
+        moves.forEach((m, idx) => {
+            let keyDisplay = m.key;
+            if (idx === 0) keyDisplay = key1;
+            else if (idx === 1) keyDisplay = key2;
+            else if (idx === 2) keyDisplay = key3;
+
+            html += `
+                <div class="skill-row">
+                    <span class="skill-key">${keyDisplay}</span>
+                    <span class="skill-name">${m.name}</span>
+                    <span class="skill-desc">${m.desc}</span>
+                </div>
+            `;
+        });
+
+        box.innerHTML = html;
+    }
+
+    update2v2SlotVisual(slotIndex) {
+        const slot = this.slots2v2[slotIndex];
+        if (!slot) return;
+        const thumbEl = document.getElementById(`thumb-slot-${slotIndex}`);
+        const nameEl = document.getElementById(`name-slot-${slotIndex}`);
+        if (thumbEl) thumbEl.src = `assets/${slot.char}/avatar.png?v=75`;
+        if (nameEl) nameEl.textContent = this.getCharDisplayName(slot.char);
+
+        const isBlue = (slotIndex === 0 || slotIndex === 1);
+        const activeTarget = isBlue ? this.activeBlueTarget : this.activeRedTarget;
+        const targetKey = `slot-${slotIndex}`;
+
+        if (activeTarget === targetKey) {
+            this.update2v2GridSelection(isBlue ? 'blue' : 'red', slot.char);
+            this.renderSkillInfo2v2(isBlue ? 'blue' : 'red', slot.char, slotIndex);
+        }
+    }
+
+    update2v2BanVisual() {
+        const blueBan = this.bans2v2.blue || 'none';
+        const thumbBlue = document.getElementById('thumb-blue-ban');
+        const thumbBlueNone = document.getElementById('thumb-blue-ban-none');
+        const nameBlue = document.getElementById('name-blue-ban');
+        const btnClearBlue = document.getElementById('btn-blue-no-ban');
+
+        if (blueBan !== 'none') {
+            if (thumbBlue) { thumbBlue.src = `assets/${blueBan}/avatar.png?v=75`; thumbBlue.classList.remove('hidden'); }
+            if (thumbBlueNone) thumbBlueNone.classList.add('hidden');
+            if (nameBlue) nameBlue.textContent = this.getCharDisplayName(blueBan);
+        } else {
+            if (thumbBlue) thumbBlue.classList.add('hidden');
+            if (thumbBlueNone) thumbBlueNone.classList.remove('hidden');
+            if (nameBlue) nameBlue.textContent = 'NO BAN';
+        }
+
+        const redBan = this.bans2v2.red || 'none';
+        const thumbRed = document.getElementById('thumb-red-ban');
+        const thumbRedNone = document.getElementById('thumb-red-ban-none');
+        const nameRed = document.getElementById('name-red-ban');
+        const btnClearRed = document.getElementById('btn-red-no-ban');
+
+        if (redBan !== 'none') {
+            if (thumbRed) { thumbRed.src = `assets/${redBan}/avatar.png?v=75`; thumbRed.classList.remove('hidden'); }
+            if (thumbRedNone) thumbRedNone.classList.add('hidden');
+            if (nameRed) nameRed.textContent = this.getCharDisplayName(redBan);
+        } else {
+            if (thumbRed) thumbRed.classList.add('hidden');
+            if (thumbRedNone) thumbRedNone.classList.remove('hidden');
+            if (nameRed) nameRed.textContent = 'NO BAN';
+        }
+
+        const bannedSet = new Set();
+        if (blueBan !== 'none') bannedSet.add(blueBan);
+        if (redBan !== 'none') bannedSet.add(redBan);
+
+        document.querySelectorAll('#blue-char-grid .char-card, #red-char-grid .char-card').forEach(card => {
+            const cId = card.dataset.char;
+            if (bannedSet.has(cId)) {
+                card.classList.add('banned-card');
+            } else {
+                card.classList.remove('banned-card');
+            }
+        });
+
+        if (this.activeBlueTarget === 'ban') {
+            this.update2v2GridSelection('blue', blueBan);
+            if (blueBan !== 'none') {
+                this.renderSkillInfo2v2('blue', blueBan, 'ban');
+            } else {
+                const box = document.getElementById('team-blue-skill-info');
+                if (box) box.innerHTML = '<div style="color: #94a3b8; font-size: 11px; padding: 6px; text-align: center;">🚫 Click any fighter card below to BAN them for this match.</div>';
+            }
+            if (btnClearBlue) btnClearBlue.classList.remove('hidden');
+        } else {
+            if (btnClearBlue) btnClearBlue.classList.add('hidden');
+        }
+
+        if (this.activeRedTarget === 'ban') {
+            this.update2v2GridSelection('red', redBan);
+            if (redBan !== 'none') {
+                this.renderSkillInfo2v2('red', redBan, 'ban');
+            } else {
+                const box = document.getElementById('team-red-skill-info');
+                if (box) box.innerHTML = '<div style="color: #94a3b8; font-size: 11px; padding: 6px; text-align: center;">🚫 Click any fighter card below to BAN them for this match.</div>';
+            }
+            if (btnClearRed) btnClearRed.classList.remove('hidden');
+        } else {
+            if (btnClearRed) btnClearRed.classList.add('hidden');
+        }
+    }
+
     setup2v2UI() {
-        const tab2v2 = document.getElementById('mode-2v2-tab');
-        const panel2v2 = document.getElementById('lobby-2v2-panel');
         const btnLocal = document.getElementById('btn-2v2-local-mode');
         const btnOnline = document.getElementById('btn-2v2-online-mode');
         const onlineBar = document.getElementById('online-2v2-bar');
@@ -1036,52 +1203,169 @@ export class UIManager {
         const btnCopyCode = document.getElementById('btn-copy-2v2-code');
         const statusOnline = document.getElementById('status-2v2-online');
         const btnStart2v2 = document.getElementById('btn-start-2v2-match');
-        const selectBlueBan = document.getElementById('select-blue-ban');
-        const selectRedBan = document.getElementById('select-red-ban');
 
-        // Populate Character Selects in 4 slots
-        for (let i = 0; i < 4; i++) {
-            const selectEl = document.getElementById(`slot-${i}-char-select`);
-            const avatarEl = document.getElementById(`slot-${i}-avatar`);
-            if (selectEl) {
-                selectEl.innerHTML = ALL_CHARACTERS.map(c => `
-                    <option value="${c.id}" ${c.id === this.slots2v2[i].char ? 'selected' : ''}>${c.name}</option>
-                `).join('');
+        // Blue Slot Tabs
+        const tabBlueSlot0 = document.getElementById('tab-blue-slot-0');
+        const tabBlueSlot1 = document.getElementById('tab-blue-slot-1');
+        const tabBlueBan = document.getElementById('tab-blue-ban');
+        const bluePickerLabel = document.getElementById('blue-picker-label');
+        const btnBlueNoBan = document.getElementById('btn-blue-no-ban');
 
-                selectEl.addEventListener('change', (e) => {
-                    const charId = e.target.value;
-                    this.slots2v2[i].char = charId;
-                    if (avatarEl) avatarEl.src = `assets/${charId}/avatar.png`;
-                    if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
-                        network.send({ type: '2V2_SLOT_UPDATE', slotIndex: i, char: charId, isBot: this.slots2v2[i].isBot });
-                    }
-                });
+        // Red Slot Tabs
+        const tabRedSlot2 = document.getElementById('tab-red-slot-2');
+        const tabRedSlot3 = document.getElementById('tab-red-slot-3');
+        const tabRedBan = document.getElementById('tab-red-ban');
+        const redPickerLabel = document.getElementById('red-picker-label');
+        const btnRedNoBan = document.getElementById('btn-red-no-ban');
+
+        const setBlueTarget = (target) => {
+            this.activeBlueTarget = target;
+            if (tabBlueSlot0) tabBlueSlot0.classList.toggle('active', target === 'slot-0');
+            if (tabBlueSlot1) tabBlueSlot1.classList.toggle('active', target === 'slot-1');
+            if (tabBlueBan) tabBlueBan.classList.toggle('active', target === 'ban');
+
+            if (target === 'slot-0') {
+                if (bluePickerLabel) bluePickerLabel.textContent = 'SELECT FIGHTER FOR P1:';
+                if (btnBlueNoBan) btnBlueNoBan.classList.add('hidden');
+                this.update2v2GridSelection('blue', this.slots2v2[0].char);
+                this.renderSkillInfo2v2('blue', this.slots2v2[0].char, 0);
+            } else if (target === 'slot-1') {
+                if (bluePickerLabel) bluePickerLabel.textContent = 'SELECT FIGHTER FOR P2:';
+                if (btnBlueNoBan) btnBlueNoBan.classList.add('hidden');
+                this.update2v2GridSelection('blue', this.slots2v2[1].char);
+                this.renderSkillInfo2v2('blue', this.slots2v2[1].char, 1);
+            } else if (target === 'ban') {
+                if (bluePickerLabel) bluePickerLabel.textContent = 'SELECT FIGHTER TO BAN (TEAM BLUE):';
+                if (btnBlueNoBan) btnBlueNoBan.classList.remove('hidden');
+                this.update2v2GridSelection('blue', this.bans2v2.blue);
+                if (this.bans2v2.blue !== 'none') {
+                    this.renderSkillInfo2v2('blue', this.bans2v2.blue, 'ban');
+                } else {
+                    const box = document.getElementById('team-blue-skill-info');
+                    if (box) box.innerHTML = '<div style="color: #94a3b8; font-size: 11px; padding: 6px; text-align: center;">🚫 Click any fighter card below to BAN them for this match.</div>';
+                }
             }
-        }
+        };
 
-        // Populate Ban dropdowns
-        const banOptionsHtml = '<option value="none">-- NO BAN --</option>' +
-            ALL_CHARACTERS.map(c => `<option value="${c.id}">🚫 ${c.name}</option>`).join('');
+        const setRedTarget = (target) => {
+            this.activeRedTarget = target;
+            if (tabRedSlot2) tabRedSlot2.classList.toggle('active', target === 'slot-2');
+            if (tabRedSlot3) tabRedSlot3.classList.toggle('active', target === 'slot-3');
+            if (tabRedBan) tabRedBan.classList.toggle('active', target === 'ban');
 
-        if (selectBlueBan) {
-            selectBlueBan.innerHTML = banOptionsHtml;
-            selectBlueBan.addEventListener('change', (e) => {
-                this.bans2v2.blue = e.target.value;
+            if (target === 'slot-2') {
+                if (redPickerLabel) redPickerLabel.textContent = 'SELECT FIGHTER FOR P3:';
+                if (btnRedNoBan) btnRedNoBan.classList.add('hidden');
+                this.update2v2GridSelection('red', this.slots2v2[2].char);
+                this.renderSkillInfo2v2('red', this.slots2v2[2].char, 2);
+            } else if (target === 'slot-3') {
+                if (redPickerLabel) redPickerLabel.textContent = 'SELECT FIGHTER FOR P4:';
+                if (btnRedNoBan) btnRedNoBan.classList.add('hidden');
+                this.update2v2GridSelection('red', this.slots2v2[3].char);
+                this.renderSkillInfo2v2('red', this.slots2v2[3].char, 3);
+            } else if (target === 'ban') {
+                if (redPickerLabel) redPickerLabel.textContent = 'SELECT FIGHTER TO BAN (TEAM RED):';
+                if (btnRedNoBan) btnRedNoBan.classList.remove('hidden');
+                this.update2v2GridSelection('red', this.bans2v2.red);
+                if (this.bans2v2.red !== 'none') {
+                    this.renderSkillInfo2v2('red', this.bans2v2.red, 'ban');
+                } else {
+                    const box = document.getElementById('team-red-skill-info');
+                    if (box) box.innerHTML = '<div style="color: #94a3b8; font-size: 11px; padding: 6px; text-align: center;">🚫 Click any fighter card below to BAN them for this match.</div>';
+                }
+            }
+        };
+
+        if (tabBlueSlot0) tabBlueSlot0.addEventListener('click', () => setBlueTarget('slot-0'));
+        if (tabBlueSlot1) tabBlueSlot1.addEventListener('click', () => setBlueTarget('slot-1'));
+        if (tabBlueBan) tabBlueBan.addEventListener('click', () => setBlueTarget('ban'));
+
+        if (tabRedSlot2) tabRedSlot2.addEventListener('click', () => setRedTarget('slot-2'));
+        if (tabRedSlot3) tabRedSlot3.addEventListener('click', () => setRedTarget('slot-3'));
+        if (tabRedBan) tabRedBan.addEventListener('click', () => setRedTarget('ban'));
+
+        // Clear Ban buttons
+        if (btnBlueNoBan) {
+            btnBlueNoBan.addEventListener('click', () => {
+                this.bans2v2.blue = 'none';
+                this.update2v2BanVisual();
                 if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
                     network.send({ type: '2V2_BAN_UPDATE', bans: this.bans2v2 });
                 }
             });
         }
 
-        if (selectRedBan) {
-            selectRedBan.innerHTML = banOptionsHtml;
-            selectRedBan.addEventListener('change', (e) => {
-                this.bans2v2.red = e.target.value;
+        if (btnRedNoBan) {
+            btnRedNoBan.addEventListener('click', () => {
+                this.bans2v2.red = 'none';
+                this.update2v2BanVisual();
                 if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
                     network.send({ type: '2V2_BAN_UPDATE', bans: this.bans2v2 });
                 }
             });
         }
+
+        // Blue character card clicks
+        document.querySelectorAll('#blue-char-grid .char-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const charId = card.dataset.char;
+                if (!charId) return;
+
+                if (this.activeBlueTarget === 'ban') {
+                    this.bans2v2.blue = charId;
+                    this.update2v2BanVisual();
+                    if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                        network.send({ type: '2V2_BAN_UPDATE', bans: this.bans2v2 });
+                    }
+                    return;
+                }
+
+                // Check if banned
+                if (charId === this.bans2v2.blue || charId === this.bans2v2.red) {
+                    alert(`🚫 ${this.getCharDisplayName(charId)} has been BANNED! Choose another fighter.`);
+                    return;
+                }
+
+                const slotIdx = (this.activeBlueTarget === 'slot-0') ? 0 : 1;
+                this.slots2v2[slotIdx].char = charId;
+                this.update2v2SlotVisual(slotIdx);
+
+                if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                    network.send({ type: '2V2_SLOT_UPDATE', slotIndex: slotIdx, char: charId, isBot: this.slots2v2[slotIdx].isBot });
+                }
+            });
+        });
+
+        // Red character card clicks
+        document.querySelectorAll('#red-char-grid .char-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const charId = card.dataset.char;
+                if (!charId) return;
+
+                if (this.activeRedTarget === 'ban') {
+                    this.bans2v2.red = charId;
+                    this.update2v2BanVisual();
+                    if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                        network.send({ type: '2V2_BAN_UPDATE', bans: this.bans2v2 });
+                    }
+                    return;
+                }
+
+                // Check if banned
+                if (charId === this.bans2v2.blue || charId === this.bans2v2.red) {
+                    alert(`🚫 ${this.getCharDisplayName(charId)} has been BANNED! Choose another fighter.`);
+                    return;
+                }
+
+                const slotIdx = (this.activeRedTarget === 'slot-2') ? 2 : 3;
+                this.slots2v2[slotIdx].char = charId;
+                this.update2v2SlotVisual(slotIdx);
+
+                if (this.gameMode === '2V2' && this.is2v2Online && network.isConnected) {
+                    network.send({ type: '2V2_SLOT_UPDATE', slotIndex: slotIdx, char: charId, isBot: this.slots2v2[slotIdx].isBot });
+                }
+            });
+        });
 
         // Bot toggle buttons for slots 1, 2, 3
         [1, 2, 3].forEach(idx => {
@@ -1089,7 +1373,8 @@ export class UIManager {
             if (btn) {
                 btn.classList.add('is-bot');
                 btn.textContent = '🤖 BOT';
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     this.slots2v2[idx].isBot = !this.slots2v2[idx].isBot;
                     btn.classList.toggle('is-bot', this.slots2v2[idx].isBot);
                     btn.textContent = this.slots2v2[idx].isBot ? '🤖 BOT' : '👤 HUMAN';
@@ -1100,6 +1385,14 @@ export class UIManager {
                 });
             }
         });
+
+        // Initialize visuals
+        for (let i = 0; i < 4; i++) {
+            this.update2v2SlotVisual(i);
+        }
+        this.update2v2BanVisual();
+        setBlueTarget('slot-0');
+        setRedTarget('slot-2');
 
         // Map selection
         const cardBrawlhaven = document.getElementById('map-card-brawlhaven');
