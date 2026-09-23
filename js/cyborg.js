@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=75';
-import { fx } from './particles.js?v=75';
-import { physics } from './physics.js?v=75';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=75';
-import { input } from './input.js?v=75';
+import { sound } from './audio.js';
+import { fx } from './particles.js';
+import { physics } from './physics.js';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js';
+import { input } from './input.js';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {

@@ -1,13 +1,13 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=80';
-import { input } from './input.js?v=80';
-import { fx } from './particles.js?v=80';
-import { combat, Projectile } from './combat.js?v=80';
-import { Cyborg } from './cyborg.js?v=80';
-import { GameRenderer } from './renderer.js?v=80';
-import { UIManager } from './ui.js?v=80';
-import { network } from './network.js?v=80';
-import { BotController } from './bot.js?v=80';
+import { sound } from './audio.js';
+import { input } from './input.js';
+import { fx } from './particles.js';
+import { combat, Projectile } from './combat.js';
+import { Cyborg } from './cyborg.js';
+import { GameRenderer } from './renderer.js';
+import { UIManager } from './ui.js';
+import { network } from './network.js';
+import { BotController } from './bot.js';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
