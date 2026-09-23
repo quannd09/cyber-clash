@@ -144,12 +144,13 @@ export class Cyborg {
         this.vy = 0;
         this.ax = 0;
         this.ay = 0;
-        this.facingAngle = facing;
-        this.aimAngle = facing;
+        this.facingAngle = Number.isFinite(facing) ? facing : (this.index === 0 ? 0 : Math.PI);
+        this.aimAngle = this.facingAngle;
         this.isStrafing = false;
         this.hp = this.maxHp;
         this.energy = this.maxEnergy;
         this.isAttacking = false;
+        this.isShooting = false;
         this.attackCooldown = 0;
         this.isShielding = false;
         this.shieldTimer = 0;
@@ -295,9 +296,14 @@ export class Cyborg {
         // Handle Attack animation & cooldown
         if (this.attackCooldown > 0) {
             this.attackCooldown -= dt;
+        } else if (!Number.isFinite(this.attackCooldown) || this.attackCooldown < 0) {
+            this.attackCooldown = 0;
         }
+
         if (this.spamDelayTimer > 0) {
             this.spamDelayTimer -= dt;
+        } else if (!Number.isFinite(this.spamDelayTimer) || this.spamDelayTimer < 0) {
+            this.spamDelayTimer = 0;
         }
 
         // Buffer attack execution for ultra-responsive controls (especially on mobile)
@@ -313,6 +319,7 @@ export class Cyborg {
             this.attackTimer += dt;
             if (this.attackTimer >= this.attackDuration) {
                 this.isAttacking = false;
+                this.isShooting = false;
                 this.hasClashed = false;
             }
         }
@@ -384,8 +391,10 @@ export class Cyborg {
     }
 
     setAimAngle(angle) {
-        this.aimAngle = angle;
-        this.facingAngle = angle;
+        if (Number.isFinite(angle)) {
+            this.aimAngle = angle;
+            this.facingAngle = angle;
+        }
     }
 
     canAttack() {
@@ -395,7 +404,16 @@ export class Cyborg {
     attack() {
         if (!this.canAttack()) return;
 
-        const weapon = WEAPONS[this.characterId.toUpperCase()];
+        if (!Number.isFinite(this.aimAngle)) {
+            this.aimAngle = (this.index === 0 ? 0 : Math.PI);
+        }
+
+        const weapon = WEAPONS[this.characterId.toUpperCase()] || {
+            attackDuration: 20,
+            attackRange: (this.combatStyle === 'ranged' ? 520 : 85),
+            attackDmg: 25,
+            attackCooldown: 22
+        };
         const now = performance.now();
         const isTouchPlayer = (this.index === 0 && ((typeof input !== 'undefined' && input.touchEnabled) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)));
 
@@ -412,17 +430,17 @@ export class Cyborg {
         this.isAttacking = true;
         this.attackType = 'basic';
         this.attackTimer = 0;
-        this.attackDuration = weapon.attackDuration;
-        this.attackReach = weapon.attackRange;
-        this.currentAttackDamage = weapon.attackDmg;
+        this.attackDuration = weapon.attackDuration || 20;
+        this.attackReach = weapon.attackRange || 85;
+        this.currentAttackDamage = weapon.attackDmg || 25;
         this.attackHitRegistered = false;
         this.hasClashed = false;
 
         // Reduce attack latency on mobile devices:
         // 20% cooldown reduction on touch devices for fluid responsiveness
         const baseCooldown = isTouchPlayer
-            ? Math.max(12, Math.round(weapon.attackCooldown * 0.8))
-            : weapon.attackCooldown;
+            ? Math.max(12, Math.round((weapon.attackCooldown || 22) * 0.8))
+            : (weapon.attackCooldown || 22);
 
         // Anti-spam buffer: brief breather rather than harsh lockout so attacks never feel stuck
         if (this.recentAttackTimes.length >= 8) {
@@ -452,20 +470,20 @@ export class Cyborg {
                 spawnY,
                 Math.cos(this.aimAngle) * speed,
                 Math.sin(this.aimAngle) * speed,
-                weapon.attackDmg,
+                weapon.attackDmg || 25,
                 this.color,
                 projRadius,
                 projType
             );
             combat.addProjectile(proj);
-            sound.playLaser();
+            try { sound.playLaser(); } catch (err) {}
             fx.spawnHitSparks(spawnX, spawnY, this.color, 6);
             // Small recoil
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 4.5);
         } else {
             // MELEE SLASH / STRIKE
             this.isShooting = false;
-            sound.playSlash(true);
+            try { sound.playSlash(true); } catch (err) {}
             // Lunging dash momentum
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 6.5);
 

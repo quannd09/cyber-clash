@@ -175,16 +175,16 @@ export const SKILLS = {
 export class Projectile {
     constructor(ownerIndex, x, y, vx, vy, damage, color, radius = 8, type = 'standard') {
         this.ownerIndex = ownerIndex;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.damage = damage;
-        this.color = color;
-        this.radius = radius;
+        this.x = Number.isFinite(x) ? x : 0;
+        this.y = Number.isFinite(y) ? y : 0;
+        this.vx = Number.isFinite(vx) ? vx : 0;
+        this.vy = Number.isFinite(vy) ? vy : 0;
+        this.damage = Number.isFinite(damage) ? damage : 20;
+        this.color = color || '#ffffff';
+        this.radius = Number.isFinite(radius) ? radius : 8;
         this.life = 160;
         this.isReflected = false;
-        this.type = type; // 'standard', 'hollow_purple', 'fire_orb'
+        this.type = type || 'standard';
         this.animTimer = 0;
     }
 
@@ -470,10 +470,13 @@ export class CombatResolver {
 
             p.update(dt);
 
-            // Bounds check
-            if (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
-                p.y < arenaBounds.minY || p.y > arenaBounds.maxY || p.life <= 0) {
-                fx.spawnHitSparks(p.x, p.y, p.color, 8);
+            // Bounds & safety check
+            if (!Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+                (arenaBounds && (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
+                p.y < arenaBounds.minY || p.y > arenaBounds.maxY)) || p.life <= 0) {
+                if (Number.isFinite(p.x) && Number.isFinite(p.y)) {
+                    fx.spawnHitSparks(p.x, p.y, p.color, 8);
+                }
                 this.projectiles.splice(i, 1);
             }
         }

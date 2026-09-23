@@ -69,12 +69,12 @@ class CyberClashGame {
 
     setGameMode(mode) {
         this.gameMode = mode;
-        const isLocal2P = (mode === 'LOCAL');
+        // Player 1 mouse is enabled across all modes (LOCAL, BOT, ONLINE) so mouse aiming and left-click attack always function
         if (input && typeof input.setMouseEnabled === 'function') {
-            input.setMouseEnabled(!isLocal2P);
+            input.setMouseEnabled(true);
         }
         if (this.canvas) {
-            this.canvas.style.cursor = isLocal2P ? 'default' : 'crosshair';
+            this.canvas.style.cursor = 'crosshair';
         }
     }
 
@@ -609,21 +609,23 @@ class CyberClashGame {
         }
 
         // 2b. Mouse & Touch Aiming for Player 1 (Active in BOT and ONLINE modes)
-        // 2b. Direction & Aiming
-        const isLocal2P = (this.gameMode === 'LOCAL');
-        if (!isLocal2P && index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
-            if (input.mouse && typeof input.mouse.x === 'number') {
+        // 2b. Direction & Aiming (Mouse Aiming for Player 1 across all modes; fallback to move dir or tracking opponent)
+        let aimDetermined = false;
+        if (index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
+            if (input.mouse && typeof input.mouse.x === 'number' && typeof input.mouse.y === 'number') {
                 const dx = input.mouse.x - player.x;
                 const dy = input.mouse.y - player.y;
-                if (Math.hypot(dx, dy) > 10) {
+                if (Math.hypot(dx, dy) > 8) {
                     player.setAimAngle(Math.atan2(dy, dx));
+                    aimDetermined = true;
                 }
             }
-        } else if (opponent) {
-            // In keyboard / local / idle mouse mode: aim in movement direction or track opponent when stationary
+        }
+        
+        if (!aimDetermined) {
             if (move && (move.x !== 0 || move.y !== 0)) {
                 player.setAimAngle(Math.atan2(move.y, move.x));
-            } else {
+            } else if (opponent) {
                 const dx = opponent.x - player.x;
                 const dy = opponent.y - player.y;
                 if (Math.hypot(dx, dy) > 10) {

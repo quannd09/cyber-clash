@@ -213,6 +213,10 @@ export class InputManager {
         if (code.length === 1) {
             return !!(this.keys[code.toLowerCase()] || this.keys[code.toUpperCase()]);
         }
+        if (code.startsWith('Key')) {
+            const letter = code.slice(3);
+            return !!(this.keys[letter.toLowerCase()] || this.keys[letter.toUpperCase()]);
+        }
         return false;
     }
 
@@ -226,6 +230,12 @@ export class InputManager {
         if (code.length === 1) {
             const lower = code.toLowerCase();
             const upper = code.toUpperCase();
+            return (!!this.keys[lower] && !this.prevKeys[lower]) ||
+                   (!!this.keys[upper] && !this.prevKeys[upper]);
+        }
+        if (code.startsWith('Key')) {
+            const lower = code.slice(3).toLowerCase();
+            const upper = code.slice(3).toUpperCase();
             return (!!this.keys[lower] && !this.prevKeys[lower]) ||
                    (!!this.keys[upper] && !this.prevKeys[upper]);
         }
@@ -247,8 +257,8 @@ export class InputManager {
             if (this.touchActionsJust[action]) justDown = true;
         }
 
-        // Player 1 Mouse Integration (ONLY active in Single Player vs BOT or Online mode, DISABLED in Local 2-Player mode)
-        if (this.mouseEnabled && playerIndex === 0 && this.mouse) {
+        // Player 1 Mouse Integration (Active for Player 1 across all modes)
+        if (playerIndex === 0 && this.mouse) {
             if (action === 'lightAttack') {
                 if (this.mouse.leftDown) isDown = true;
                 if (this.mouse.leftJustDown) justDown = true;
@@ -539,12 +549,18 @@ export class InputManager {
                 this.p2Bindings.dash.push('Numpad0', 'ControlRight');
             }
 
-            // Migration: Ensure P2 bindings include letter keys (J, L, I, U, O) for laptops without Numpad
+            // Migration: Ensure essential keys are present for P1 and P2
             const ensureKeys = (arr, keysToAdd) => {
                 const list = Array.isArray(arr) ? [...arr] : [];
                 keysToAdd.forEach(k => { if (!list.includes(k)) list.push(k); });
                 return list;
             };
+
+            this.p1Bindings.lightAttack = ensureKeys(this.p1Bindings.lightAttack, ['KeyF', 'keyf', 'f', 'F']);
+            this.p1Bindings.shield = ensureKeys(this.p1Bindings.shield, ['KeyH', 'keyh', 'h', 'H']);
+            this.p1Bindings.skill = ensureKeys(this.p1Bindings.skill, ['KeyR', 'keyr', 'r', 'R']);
+            this.p1Bindings.ultimate = ensureKeys(this.p1Bindings.ultimate, ['Space', ' ', 'Spacebar']);
+
             this.p2Bindings.lightAttack = ensureKeys(this.p2Bindings.lightAttack, ['KeyJ', 'keyj', 'j', 'J', 'Numpad1']);
             this.p2Bindings.shield = ensureKeys(this.p2Bindings.shield, ['KeyL', 'keyl', 'l', 'L', 'Numpad3']);
             this.p2Bindings.skill = ensureKeys(this.p2Bindings.skill, ['KeyI', 'keyi', 'i', 'I', 'Numpad5']);
