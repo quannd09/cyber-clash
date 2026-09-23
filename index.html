@@ -110,7 +110,7 @@
                         ⚔️ 2V2 BRAWL ARENA (GRAVITY &amp; TERRAIN)
                     </div>
                     <div class="lobby-mode-sub" style="color: #94a3b8; font-size: 12px; margin-top: 2px;">
-                        Chiến đấu đồng đội 4 người • Vật lý trọng lực &amp; Nhảy đúp • Địa hình Brawlhaven / Great Hall • Thể thức Bo3
+                        4-Player Team Brawl • Gravity Physics &amp; Double Jump • Brawlhaven / Great Hall Maps • Best of 3 Format
                     </div>
                 </div>
 
@@ -123,14 +123,14 @@
                 <!-- ONLINE 2V2 ROOM BAR (Hidden in local practice) -->
                 <div id="online-2v2-bar" class="online-2v2-bar hidden">
                     <div class="online-2v2-room-controls">
-                        <button id="btn-create-2v2-room" class="lobby-btn host-action-btn" style="padding: 6px 14px; font-size: 12px;">⚡ TẠO PHÒNG 2V2</button>
+                        <button id="btn-create-2v2-room" class="lobby-btn host-action-btn" style="padding: 6px 14px; font-size: 12px;">⚡ CREATE 2V2 ROOM</button>
                         <div id="box-2v2-room-code" class="code-pill hidden">
-                            MÃ: <strong id="lbl-2v2-room-code" style="color: #f59e0b;">CLASH-XXXX</strong>
+                            CODE: <strong id="lbl-2v2-room-code" style="color: #f59e0b;">CLASH-XXXX</strong>
                             <button id="btn-copy-2v2-code" class="copy-btn" style="margin-left: 6px; padding: 2px 6px;">📋</button>
                         </div>
                         <div class="join-inline-row">
-                            <input type="text" id="input-2v2-room-code" class="room-input" placeholder="Mã phòng..." maxlength="12" style="width: 130px; padding: 5px 8px; font-size: 12px;">
-                            <button id="btn-join-2v2-room" class="lobby-btn client-action-btn" style="padding: 6px 12px; font-size: 12px;">🚀 VÀO</button>
+                            <input type="text" id="input-2v2-room-code" class="room-input" placeholder="Room code..." maxlength="12" style="width: 130px; padding: 5px 8px; font-size: 12px;">
+                            <button id="btn-join-2v2-room" class="lobby-btn client-action-btn" style="padding: 6px 12px; font-size: 12px;">🚀 JOIN</button>
                         </div>
                     </div>
                     <div id="status-2v2-online" class="lobby-status-msg" style="margin-top: 4px; font-size: 12px;"></div>
@@ -139,21 +139,21 @@
                 <!-- MAP SELECTION ROW -->
                 <div class="map-selection-section">
                     <div class="map-section-label">
-                        🗺️ CHỌN BẢN ĐỒ CHIẾN ĐẤU (TERRAIN &amp; GRAVITY MAP)
+                        🗺️ SELECT BATTLE MAP (TERRAIN &amp; GRAVITY MAP)
                     </div>
                     <div class="map-cards-row">
                         <div class="map-card active" data-map="brawlhaven" id="map-card-brawlhaven">
                             <img src="assets/brawlhaven.png?v=10" class="map-thumb" alt="Brawlhaven">
                             <div class="map-info">
                                 <div class="map-name" style="color: #38bdf8;">BRAWLHAVEN</div>
-                                <div class="map-desc">Đảo bay lơ lửng • Sàn chính rộng + 2 bục mềm đối xứng</div>
+                                <div class="map-desc">Floating Sky Island • Wide Main Stage + Dual Symmetrical Platforms</div>
                             </div>
                         </div>
                         <div class="map-card" data-map="great_hall" id="map-card-great-hall">
                             <img src="assets/great_hall.png?v=10" class="map-thumb" alt="Great Hall">
                             <div class="map-info">
                                 <div class="map-name" style="color: #f59e0b;">GREAT HALL</div>
-                                <div class="map-desc">Đại sảnh hoàng gia • 3 tầng địa hình tháp bục cao thấp</div>
+                                <div class="map-desc">Imperial Citadel • Multi-Tier Spire &amp; Balconies</div>
                             </div>
                         </div>
                     </div>
@@ -164,15 +164,15 @@
                     <!-- TEAM BLUE (P1 + P2) -->
                     <div class="team-col team-blue-col">
                         <div class="team-title-banner blue-banner">
-                            <span>🛡️ TEAM BLUE (XANH DƯƠNG)</span>
+                            <span>🛡️ TEAM BLUE</span>
                             <span class="team-meta">[Team 1]</span>
                         </div>
                         <div class="slot-cards-group">
                             <!-- Slot 0: P1 -->
                             <div class="slot-card" id="slot-card-0" data-slot="0">
                                 <div class="slot-header">
-                                    <span class="slot-badge blue-badge">P1 (HOST / BẠN)</span>
-                                    <span class="slot-status" id="slot-0-status">SẴN SÀNG</span>
+                                    <span class="slot-badge blue-badge">P1 (HOST / YOU)</span>
+                                    <span class="slot-status" id="slot-0-status">READY</span>
                                 </div>
                                 <div class="slot-body">
                                     <img src="assets/yanagi/avatar.png" id="slot-0-avatar" class="slot-avatar" alt="P1">
@@ -184,7 +184,7 @@
                             <!-- Slot 1: P2 -->
                             <div class="slot-card" id="slot-card-1" data-slot="1">
                                 <div class="slot-header">
-                                    <span class="slot-badge blue-badge">P2 (ĐỒNG ĐỘI)</span>
+                                    <span class="slot-badge blue-badge">P2 (TEAMMATE)</span>
                                     <button class="bot-toggle-btn" id="btn-toggle-slot-1">🤖 BOT</button>
                                 </div>
                                 <div class="slot-body">
@@ -204,14 +204,14 @@
                     <!-- TEAM RED (P3 + P4) -->
                     <div class="team-col team-red-col">
                         <div class="team-title-banner red-banner">
-                            <span>⚔️ TEAM RED (ĐỎ HỒNG)</span>
+                            <span>⚔️ TEAM RED</span>
                             <span class="team-meta">[Team 2]</span>
                         </div>
                         <div class="slot-cards-group">
                             <!-- Slot 2: P3 -->
                             <div class="slot-card" id="slot-card-2" data-slot="2">
                                 <div class="slot-header">
-                                    <span class="slot-badge red-badge">P3 (ĐỐI THỦ 1)</span>
+                                    <span class="slot-badge red-badge">P3 (OPPONENT 1)</span>
                                     <button class="bot-toggle-btn" id="btn-toggle-slot-2">🤖 BOT</button>
                                 </div>
                                 <div class="slot-body">
@@ -224,7 +224,7 @@
                             <!-- Slot 3: P4 -->
                             <div class="slot-card" id="slot-card-3" data-slot="3">
                                 <div class="slot-header">
-                                    <span class="slot-badge red-badge">P4 (ĐỐI THỦ 2)</span>
+                                    <span class="slot-badge red-badge">P4 (OPPONENT 2)</span>
                                     <button class="bot-toggle-btn" id="btn-toggle-slot-3">🤖 BOT</button>
                                 </div>
                                 <div class="slot-body">
@@ -243,20 +243,20 @@
                     <div class="ban-box blue-ban">
                         <span class="ban-label">🛡️ TEAM BLUE BAN:</span>
                         <select id="select-blue-ban" class="ban-select">
-                            <option value="none">-- KHÔNG CẤM (NO BAN) --</option>
+                            <option value="none">-- NO BAN --</option>
                         </select>
                     </div>
                     <div class="ban-box red-ban">
                         <span class="ban-label">⚔️ TEAM RED BAN:</span>
                         <select id="select-red-ban" class="ban-select">
-                            <option value="none">-- KHÔNG CẤM (NO BAN) --</option>
+                            <option value="none">-- NO BAN --</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- START 2V2 BUTTON -->
                 <div class="start-2v2-row">
-                    <button id="btn-start-2v2-match" class="ready-btn start-2v2-btn">⚔️ BẮT ĐẦU TRẬN CHIẾN 2V2 (START BRAWL)</button>
+                    <button id="btn-start-2v2-match" class="ready-btn start-2v2-btn">⚔️ START 2V2 BRAWL MATCH</button>
                 </div>
             </div>
 
@@ -492,7 +492,7 @@
             <h1 id="winner-title" class="victory-title">PLAYER 1 DOMINATES!</h1>
             <div class="victory-btn-group">
                 <button id="rematch-btn" class="rematch-btn">⚔️ REMATCH</button>
-                <button id="btn-victory-lobby" class="victory-exit-btn">🏠 THOÁT RA MENU CHÍNH</button>
+                <button id="btn-victory-lobby" class="victory-exit-btn">🏠 RETURN TO MAIN MENU</button>
             </div>
         </div>
 
@@ -543,8 +543,8 @@
                         </tr>
                         <tr>
                             <td><strong>Ultimate Overdrive</strong></td>
-                            <td><code>Space</code> (Cần 100% Overdrive)</td>
-                            <td><code>Enter</code> or <code>O</code> (Cần 100% Overdrive)</td>
+                            <td><code>Space</code> (Requires 100% Overdrive)</td>
+                            <td><code>Enter</code> or <code>O</code> (Requires 100% Overdrive)</td>
                             <td>Right Trigger (RT / R1)</td>
                         </tr>
                     </tbody>

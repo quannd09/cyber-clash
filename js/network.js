@@ -96,18 +96,18 @@ export class WebSocketNetworkProvider {
             this.ws = null;
         }
 
-        this.manager.notifyStatus(`[Online 1] Đang kết nối tới WebSocket Server (${url})...`);
+        this.manager.notifyStatus(`[Online 1] Connecting to WebSocket Server (${url})...`);
 
         try {
             this.ws = new WebSocket(url);
         } catch (err) {
-            this.manager.notifyStatus(`[Online 1] Lỗi URL WebSocket: ${err.message}`, true);
+            this.manager.notifyStatus(`[Online 1] WebSocket URL Error: ${err.message}`, true);
             return;
         }
 
         this.connectionTimeout = setTimeout(() => {
             if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-                this.manager.notifyStatus(`[Online 1] Không thể kết nối tới Server (${url}). Vui lòng đảm bảo server đang chạy!`, true);
+                this.manager.notifyStatus(`[Online 1] Could not connect to Server (${url}). Please ensure the server is running!`, true);
                 this.disconnect();
             }
         }, 10000);
@@ -137,26 +137,26 @@ export class WebSocketNetworkProvider {
                 this.roomMode = packet.mode || '1v1';
                 this.roomCode = packet.roomCode;
                 this.manager.notifyRoomCreated(this.roomCode, this.slotIndex, this.roomMode);
-                this.manager.notifyStatus(`[Online 1] Phòng [${this.roomCode}] đã sẵn sàng! Đang chờ đối thủ...`);
+                this.manager.notifyStatus(`[Online 1] Room [${this.roomCode}] ready! Waiting for players...`);
             } else if (type === 'ROOM_JOINED') {
                 this.role = 'CLIENT';
                 this.slotIndex = packet.slotIndex !== undefined ? packet.slotIndex : 1;
                 this.roomMode = packet.mode || '1v1';
                 this.roomCode = packet.roomCode;
                 this.isConnected = true;
-                this.manager.notifyStatus(`[Online 1] ✅ Đã kết nối vào phòng [${this.roomCode}]! (Slot ${this.slotIndex + 1})`);
+                this.manager.notifyStatus(`[Online 1] ✅ Connected to room [${this.roomCode}]! (Slot ${this.slotIndex + 1})`);
                 this.manager.notifyConnected(this.role, this.roomCode, this.slotIndex, this.roomMode);
             } else if (type === 'OPPONENT_JOINED') {
                 // Host receives this when a client joins
                 this.isConnected = true;
-                this.manager.notifyStatus(`[Online 1] ✅ Người chơi mới đã vào phòng!`);
+                this.manager.notifyStatus(`[Online 1] ✅ New player joined the room!`);
                 this.manager.notifyConnected(this.role, this.roomCode, this.slotIndex, this.roomMode);
             } else if (type === 'ROOM_MEMBERS_UPDATE') {
                 this.manager.notifyMembersUpdate(packet);
             } else if (type === 'RELAY') {
                 this.manager.notifyData(packet.data, packet.senderSlot);
             } else if (type === 'OPPONENT_LEFT') {
-                this.manager.notifyStatus(`[Online 1] ⚠️ ${packet.message || 'Người chơi đã thoát phòng!'}`, true);
+                this.manager.notifyStatus(`[Online 1] ⚠️ ${packet.message || 'Player has left the room!'}`, true);
                 this.manager.notifyDisconnected();
             } else if (type === 'ERROR') {
                 this.manager.notifyStatus(`[Online 1] ❌ ${packet.message}`, true);
@@ -167,7 +167,7 @@ export class WebSocketNetworkProvider {
             this.stopHeartbeat();
             if (this.isConnected) {
                 this.isConnected = false;
-                this.manager.notifyStatus(`[Online 1] Mất kết nối tới WebSocket Server!`, true);
+                this.manager.notifyStatus(`[Online 1] Lost connection to WebSocket Server!`, true);
                 this.manager.notifyDisconnected();
             }
         };
@@ -214,7 +214,7 @@ export class WebSocketNetworkProvider {
         this.disconnect();
         const code = cleanRoomCode(rawCode);
         if (!code || code === 'CLASH-') {
-            this.manager.notifyStatus('[Online 1] Vui lòng nhập mã phòng hợp lệ!', true);
+            this.manager.notifyStatus('[Online 1] Please enter a valid room code!', true);
             return;
         }
 
@@ -223,7 +223,7 @@ export class WebSocketNetworkProvider {
 
         this.connectSocket(() => {
             if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-                this.manager.notifyStatus(`[Online 1] Đang tìm và vào phòng [${this.roomCode}]...`);
+                this.manager.notifyStatus(`[Online 1] Searching and joining room [${this.roomCode}]...`);
                 this.ws.send(JSON.stringify({
                     type: 'JOIN_ROOM',
                     roomCode: this.roomCode
@@ -319,11 +319,11 @@ export class WebRTCNetworkProvider {
         this.roomCode = generateRoomCode();
         const peerId = this.getPeerIdFromCode(this.roomCode);
 
-        this.manager.notifyStatus(`[Online 2] Khởi tạo phòng P2P [${this.roomCode}]...`);
+        this.manager.notifyStatus(`[Online 2] Initializing P2P room [${this.roomCode}]...`);
 
         try {
             if (typeof Peer === 'undefined') {
-                this.manager.notifyStatus('[Online 2] Lỗi: Thư viện PeerJS chưa được tải!', true);
+                this.manager.notifyStatus('[Online 2] Error: PeerJS library is not loaded!', true);
                 return;
             }
 
@@ -336,7 +336,7 @@ export class WebRTCNetworkProvider {
 
             this.peer.on('open', () => {
                 this.startHeartbeat();
-                this.manager.notifyStatus(`[Online 2] Phòng [${this.roomCode}] sẵn sàng! Đang chờ đối thủ...`);
+                this.manager.notifyStatus(`[Online 2] Room [${this.roomCode}] ready! Waiting for opponent...`);
                 this.manager.notifyRoomCreated(this.roomCode);
             });
 
@@ -349,7 +349,7 @@ export class WebRTCNetworkProvider {
             });
 
             this.peer.on('connection', (conn) => {
-                this.manager.notifyStatus(`[Online 2] Đối thủ đang bắt tay P2P...`);
+                this.manager.notifyStatus(`[Online 2] Opponent establishing P2P handshake...`);
                 this.conn = conn;
                 this.setupConnection(conn, true);
             });
@@ -359,15 +359,15 @@ export class WebRTCNetworkProvider {
                 if (err.type === 'unavailable-id') {
                     this.createRoom();
                 } else if (err.type === 'network') {
-                    this.manager.notifyStatus('[Online 2] Lỗi mạng báo hiệu. Đang thử lại...', true);
+                    this.manager.notifyStatus('[Online 2] Signaling network error. Retrying...', true);
                 } else {
-                    this.manager.notifyStatus(`[Online 2] Lỗi kết nối: ${err.type || err.message}`, true);
+                    this.manager.notifyStatus(`[Online 2] Connection error: ${err.type || err.message}`, true);
                 }
             });
 
         } catch (e) {
             console.error('[Create Room Exception]', e);
-            this.manager.notifyStatus(`[Online 2] Không thể khởi tạo phòng: ${e.message}`, true);
+            this.manager.notifyStatus(`[Online 2] Failed to initialize room: ${e.message}`, true);
         }
     }
 
@@ -375,7 +375,7 @@ export class WebRTCNetworkProvider {
         this.disconnect();
         const code = cleanRoomCode(rawCode);
         if (!code || code === 'CLASH-') {
-            this.manager.notifyStatus('[Online 2] Vui lòng nhập mã phòng hợp lệ!', true);
+            this.manager.notifyStatus('[Online 2] Please enter a valid room code!', true);
             return;
         }
 
@@ -383,11 +383,11 @@ export class WebRTCNetworkProvider {
         this.roomCode = code;
         const hostPeerId = this.getPeerIdFromCode(code);
 
-        this.manager.notifyStatus(`[Online 2] Đang tìm phòng [${code}] qua WebRTC...`);
+        this.manager.notifyStatus(`[Online 2] Searching room [${code}] via WebRTC...`);
 
         try {
             if (typeof Peer === 'undefined') {
-                this.manager.notifyStatus('[Online 2] Lỗi: Thư viện PeerJS chưa được tải!', true);
+                this.manager.notifyStatus('[Online 2] Error: PeerJS library is not loaded!', true);
                 return;
             }
 
@@ -400,7 +400,7 @@ export class WebRTCNetworkProvider {
 
             this.peer.on('open', () => {
                 this.startHeartbeat();
-                this.manager.notifyStatus(`[Online 2] Tìm thấy phòng [${code}]! Đang bắt tay STUN/TURN...`);
+                this.manager.notifyStatus(`[Online 2] Found room [${code}]! Performing STUN/TURN handshake...`);
                 const conn = this.peer.connect(hostPeerId, {
                     reliable: true
                 });
@@ -420,16 +420,16 @@ export class WebRTCNetworkProvider {
                 console.error('[WebRTC Client Error]', err);
                 this.clearConnectionTimeout();
                 if (err.type === 'peer-unavailable') {
-                    this.manager.notifyStatus(`[Online 2] Phòng [${code}] không tồn tại hoặc đã đóng!`, true);
+                    this.manager.notifyStatus(`[Online 2] Room [${code}] does not exist or has been closed!`, true);
                 } else {
-                    this.manager.notifyStatus(`[Online 2] Lỗi kết nối: ${err.type || err.message}`, true);
+                    this.manager.notifyStatus(`[Online 2] Connection error: ${err.type || err.message}`, true);
                 }
             });
 
         } catch (e) {
             console.error('[Join Room Exception]', e);
             this.clearConnectionTimeout();
-            this.manager.notifyStatus(`[Online 2] Không thể tham gia phòng: ${e.message}`, true);
+            this.manager.notifyStatus(`[Online 2] Unable to join room: ${e.message}`, true);
         }
     }
 
@@ -439,7 +439,7 @@ export class WebRTCNetworkProvider {
         if (!isHost) {
             this.connectionTimeout = setTimeout(() => {
                 if (!this.isConnected) {
-                    this.manager.notifyStatus(`[Online 2] ⚠️ Quá thời gian chờ (20s). Bạn có thể thử chuyển sang chế độ ONLINE 1 (WebSocket)!`, true);
+                    this.manager.notifyStatus(`[Online 2] ⚠️ Connection timed out (20s). You may try ONLINE 1 (WebSocket) mode instead!`, true);
                     this.disconnect();
                 }
             }, 20000);
@@ -449,7 +449,7 @@ export class WebRTCNetworkProvider {
             if (this.isConnected) return;
             this.clearConnectionTimeout();
             this.isConnected = true;
-            this.manager.notifyStatus(`[Online 2] ✅ Kết nối P2P thành công! Đang vào sàn đấu...`);
+            this.manager.notifyStatus(`[Online 2] ✅ P2P connection established! Entering arena...`);
             this.manager.notifyConnected(this.role, this.roomCode);
         };
 
@@ -466,14 +466,14 @@ export class WebRTCNetworkProvider {
         conn.on('close', () => {
             this.isConnected = false;
             this.clearConnectionTimeout();
-            this.manager.notifyStatus(`[Online 2] ⚠️ Mất kết nối P2P với đối thủ!`, true);
+            this.manager.notifyStatus(`[Online 2] ⚠️ Lost P2P connection with opponent!`, true);
             this.manager.notifyDisconnected();
         });
 
         conn.on('error', (err) => {
             console.error('[DataChannel Error]', err);
             this.clearConnectionTimeout();
-            this.manager.notifyStatus(`[Online 2] Lỗi DataChannel: ${err.message || err.type}`, true);
+            this.manager.notifyStatus(`[Online 2] DataChannel Error: ${err.message || err.type}`, true);
         });
     }
 
@@ -530,7 +530,7 @@ export class NetworkManager {
         this.activeProvider = (target === 'WEBRTC') ? this.rtcProvider : this.wsProvider;
         
         const modeLabel = target === 'WEBSOCKET' ? 'ONLINE 1 (WebSocket Server)' : 'ONLINE 2 (WebRTC P2P)';
-        this.notifyStatus(`Đã chọn chế độ: ${modeLabel}`);
+        this.notifyStatus(`Selected mode: ${modeLabel}`);
     }
 
     get role() {

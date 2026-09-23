@@ -216,7 +216,7 @@ export class GameRenderer {
         else if (c.isBoosted) pose = 'attack_light';
         else if (Math.hypot(c.vx, c.vy) > 0.8) pose = 'thrust';
 
-        // ALWAYS USE 1 SINGLE BASE IMAGE (thay vì đổi nhiều ảnh)
+        // ALWAYS USE 1 SINGLE BASE IMAGE (procedural skeletal deformations)
         const customSprite = assets.getCharacterSprite(c.characterId, 'idle');
 
         // Draw Projection Afterimages (e.g. Naoya's 24 FPS Afterimages)
@@ -270,50 +270,50 @@ export class GameRenderer {
                 ? (customSprite.naturalWidth / customSprite.naturalHeight) 
                 : 1;
             const targetW = targetH * aspect;
-            const pivotY = 48; // Đặt tâm xoay ở dưới chân (feet level)
+            const pivotY = 48; // Pivot set at feet level
             
-            // Chuyển tâm (pivot) về dưới chân để khi xoay, nghiêng không bị lơ lửng
+            // Translate pivot to feet so tilt and rotations keep feet grounded
             ctx.translate(0, pivotY);
 
             // Dynamic Action Transformations on the SINGLE image
             if (pose === 'dead') {
                 const dt = c.deathTimer || 0;
 
-                // 1. Phim hoạt họa cái chết nhiều giai đoạn (Multi-phase anime KO animation)
+                // 1. Multi-phase anime KO animation
                 if (dt < 22) {
-                    // Giai đoạn 1 (frames 0 - 22): Cú đánh kết liễu - giật lùi dữ dội, ngửa cổ ra sau, rung lắc chấn động
+                    // Phase 1 (frames 0 - 22): Finishing blow - violent recoil, head snap, camera shake
                     const reelProgress = dt / 22;
                     const reelAngle = -0.55 * Math.sin(reelProgress * Math.PI / 2);
                     ctx.rotate(reelAngle);
-                    ctx.scale(1.15, 0.85); // Kéo biến dạng va đập
+                    ctx.scale(1.15, 0.85); // Impact squash & stretch
                     ctx.translate(-25 * reelProgress, -12 * Math.sin(reelProgress * Math.PI));
                     ctx.filter = 'drop-shadow(0 0 25px rgba(239, 68, 68, 0.95)) sepia(100%) hue-rotate(-50deg) saturate(450%) contrast(150%)';
                 } else if (dt < 65) {
-                    // Giai đoạn 2 (frames 22 - 65): Lộn ngược trong môi trường không trọng lực (Zero-G spin) & gục ngã dần xuống sàn
+                    // Phase 2 (frames 22 - 65): Zero-G spin and gradual floor drop
                     const fallProgress = (dt - 22) / 43;
                     const baseRot = -0.55;
-                    const targetRot = -Math.PI / 2; // Nằm ngang 90 độ
+                    const targetRot = -Math.PI / 2; // Horizontal 90 deg
                     const currentRot = baseRot + (targetRot - baseRot) * Math.sin(fallProgress * Math.PI / 2);
 
                     ctx.rotate(currentRot);
                     ctx.translate(-25 + fallProgress * 15, fallProgress * 20);
 
-                    // Nhấp nháy hologram lỗi kết nối (glitch flickering)
+                    // Hologram connection error glitch flickering
                     const flicker = Math.sin(dt * 1.2) > 0 ? 0.95 : 0.65;
                     ctx.globalAlpha = flicker;
                     ctx.filter = `drop-shadow(0 0 15px ${c.color}) grayscale(${Math.round(fallProgress * 70)}%) brightness(90%)`;
                 } else {
-                    // Giai đoạn 3 (frames 65+): Đã ngã gục hoàn toàn (Defeated / Offline)
+                    // Phase 3 (frames 65+): Defeated / Offline state
                     ctx.rotate(-Math.PI / 2);
-                    ctx.scale(1.18, 0.72); // Bị ép phẳng xuống sàn
+                    ctx.scale(1.18, 0.72); // Flattened onto floor
                     ctx.translate(-10, 22);
 
-                    // Tông màu xám kim loại mất điện (depleted power)
+                    // Metallic depleted-power desaturation
                     ctx.globalAlpha = 0.65;
                     ctx.filter = 'grayscale(100%) brightness(40%) drop-shadow(0 0 8px rgba(0, 0, 0, 0.8))';
                 }
 
-                // Digital Scanline Glitch Slices (Vỡ ảnh kỹ thuật số khi trúng đòn tử trận)
+                // Digital Scanline Glitch Slices on fatal hit
                 if (dt < 55) {
                     const slices = 4;
                     const sliceH = targetH / slices;
@@ -331,10 +331,10 @@ export class GameRenderer {
                     ctx.drawImage(customSprite, -targetW / 2, -targetH, targetW, targetH);
                 }
 
-                // Holographic Defeated HUD Emblem (Huy hiệu K.O. OFFLINE nổi trên người)
+                // Holographic Defeated HUD Emblem floating overhead
                 if (dt > 25) {
                     ctx.save();
-                    ctx.rotate(Math.PI / 2); // Xoay ngược lại thẳng đứng
+                    ctx.rotate(Math.PI / 2); // Re-orient upright
                     ctx.translate(-targetH * 0.45, -targetW * 0.6);
 
                     const hudAlpha = Math.min(1, (dt - 25) / 25);
@@ -363,17 +363,17 @@ export class GameRenderer {
                 ctx.restore();
                 return;
             } else if (pose === 'attack_light') {
-                // Lao tới, nghiêng người và kéo giãn tạo cảm giác chém nhanh
+                // Dash forward, lean, and stretch for rapid slash feel
                 ctx.rotate(0.35); 
-                ctx.scale(1.15, 0.9); // Kéo dài theo trục X, ép trục Y
+                ctx.scale(1.15, 0.9); // Stretch along X, squash Y
                 ctx.translate(15, 0);
                 
-                // Hiệu ứng bóng mờ (Motion Blur)
+                // Motion Blur ghost trail
                 ctx.globalAlpha = 0.4;
                 ctx.drawImage(customSprite, -targetW / 2 - 20, -targetH, targetW, targetH);
                 ctx.globalAlpha = 1.0;
             } else if (pose === 'attack_heavy') {
-                // Chém mạnh: Xoay gập người xuống sâu
+                // Heavy slash: Deep forward lean rotation
                 ctx.rotate(0.55);
                 ctx.scale(1.2, 0.85);
                 ctx.translate(25, 0);
@@ -382,38 +382,38 @@ export class GameRenderer {
                 ctx.drawImage(customSprite, -targetW / 2 - 30, -targetH, targetW, targetH);
                 ctx.globalAlpha = 1.0;
             } else if (pose === 'hurt') {
-                // Bị thương: Ngửa ra sau, nén người lại (squash)
+                // Hurt: Recoil backward, squash impact
                 ctx.rotate(-0.4);
                 ctx.scale(1.1, 0.7); 
                 ctx.translate(-20, 10);
             } else if (pose === 'shield') {
-                // Đỡ đòn: Co ro người lại
+                // Guard: Defensive crouch
                 ctx.rotate(-0.1);
                 ctx.scale(0.95, 0.95);
                 ctx.translate(-5, 0);
             } else if (pose === 'thrust') {
-                // Đang chạy lướt: Nghiêng tới trước
+                // Dash thrust: Forward tilt
                 ctx.rotate(0.2);
                 ctx.scale(1.05, 0.95);
                 ctx.translate(15, 0);
             } else {
-                // Đứng yên: Nhịp thở tự nhiên (co giãn theo nhịp điệu)
+                // Idle: Natural breathing rhythm
                 const time = Date.now() * 0.004;
                 const bob = Math.sin(time + c.index * 2) * 2.5;
-                const breath = 1 + Math.sin(time * 0.8) * 0.025; // Nhịp phập phồng
+                const breath = 1 + Math.sin(time * 0.8) * 0.025; // Breathing pulse
                 ctx.translate(0, bob);
-                ctx.scale(1 / breath, breath); // Ép một trục, giãn một trục để giữ thể tích
+                ctx.scale(1 / breath, breath); // Volume-conserving breathing scaling
             }
 
-            // Damage flash tint if hurt (Nháy đỏ nguyên người)
+            // Damage flash tint if hurt
             if (c.isStunned) {
                 ctx.filter = 'drop-shadow(0 0 15px rgba(239, 68, 68, 0.9)) sepia(100%) hue-rotate(-50deg) saturate(400%)';
             }
 
-            // Vẽ ảnh gốc tại toạ độ đã được transform
+            // Render sprite at transformed coordinates
             ctx.drawImage(customSprite, -targetW / 2, -targetH, targetW, targetH);
 
-            // 24 FPS Celluloid Projection Frame Effect (Hiệu ứng đóng băng khung hình 24 FPS)
+            // 24 FPS Celluloid Projection Frame Effect
             if (c.frameFrozenTimer > 0) {
                 ctx.save();
                 ctx.strokeStyle = '#a3e635';
@@ -670,7 +670,7 @@ export class GameRenderer {
         // 5.5 Signature Passive Auras
         if (!c.isDead && !c.isStunned) {
             if (c.characterId === 'gojo') {
-                // Gojo: Infinity Barrier Spatial Ripple (Vô Hạn Trụ)
+                // Gojo: Infinity Barrier Spatial Ripple
                 ctx.save();
                 const pulse = Math.sin(Date.now() * 0.005) * 3;
                 ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
@@ -796,7 +796,7 @@ export class GameRenderer {
                     ctx.restore();
                 }
             } else if (c.characterId === 'nicole') {
-                // NICOLE: GRAVITATIONAL SINGULARITY (HỐ ĐEN TRỌNG LỰC)
+                // NICOLE: GRAVITATIONAL SINGULARITY (BLACK HOLE)
                 const holeDist = 320;
                 ctx.save();
                 ctx.translate(holeDist, 0);
@@ -863,7 +863,7 @@ export class GameRenderer {
                     ctx.stroke();
                 }
             } else if (c.characterId === 'vivian') {
-                // VIVIAN: BANSHEE BLOOM (BÃO LÔNG VŨ ETHER - RANGE 500)
+                // VIVIAN: BANSHEE BLOOM (ETHER FEATHER STORM - RANGE 500)
                 const bloomRadius = 460 + pulse * 8;
                 ctx.shadowColor = '#c084fc';
                 ctx.shadowBlur = 40;
@@ -1114,7 +1114,7 @@ export class GameRenderer {
                 ctx.restore();
 
             } else if (c.characterId === 'gojo') {
-                // GOJO: DOMAIN EXPANSION - UNLIMITED VOID (VÔ LƯỢNG KHÔNG XỨ)
+                // GOJO: DOMAIN EXPANSION - UNLIMITED VOID
                 ctx.save();
                 const domainRadius = 450;
 
@@ -1158,7 +1158,7 @@ export class GameRenderer {
                 ctx.restore();
 
             } else if (c.characterId === 'sukuna') {
-                // SUKUNA: DOMAIN EXPANSION - MALEVOLENT SHRINE (PHỤC MA NGỰ KHẢM TỬ)
+                // SUKUNA: DOMAIN EXPANSION - MALEVOLENT SHRINE
                 ctx.save();
                 const shrineRadius = 420;
 
@@ -1309,7 +1309,7 @@ export class GameRenderer {
                 ctx.restore();
 
             } else if (c.characterId === 'mirai') {
-                // MIRAI: BLOOD CATACLYSM STRIKE (CỰ ĐẠI HUYẾT KIẾM) 🩸
+                // MIRAI: BLOOD CATACLYSM STRIKE (COLOSSAL BLOOD BLADE) 🩸
                 ctx.save();
                 const slamProgress = Math.min(1, (c.ultimateTimer - 12) / 22);
                 const swordY = -220 + slamProgress * 220;
@@ -1616,7 +1616,7 @@ export class GameRenderer {
             ctx.fillRect(x, hpY, hpFillWidth, barHeight);
         }
 
-        // Numeric HP text (Hiển thị rõ lượng máu: Vivian 650 HP, các nhân vật khác 500 HP)
+        // Numeric HP text display
         ctx.save();
         ctx.font = `700 11px 'Orbitron', sans-serif`;
         ctx.fillStyle = '#ffffff';

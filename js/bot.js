@@ -33,7 +33,7 @@ export class BotController {
         let shouldShield = false;
         let parryDuration = 6;
 
-        // Nerf bot Easy & Normal: Hoàn toàn không được block/parry bất kỳ đòn đánh nào
+        // Nerf bot Easy & Normal: Completely disables blocking and parrying any attacks
         const canBlock = (this.difficulty === 'impossible' || this.difficulty === 'master');
 
         if (canBlock) {
@@ -209,19 +209,19 @@ export class BotController {
         }
 
         // -------------------------------------------------------------
-        // 3. PREDICTIVE AIMING SYSTEM (Luôn khóa góc ngắm về phía đối thủ)
+        // 3. PREDICTIVE AIMING SYSTEM (Lock aim angle towards opponent)
         // -------------------------------------------------------------
         let targetAimAngle = Math.atan2(opponent.y - bot.y, opponent.x - bot.x);
 
         if (isMelee) {
-            // Tướng cận chiến: Khóa thẳng góc ngắm trực tiếp vào đối thủ
-            // Bù nhẹ 2 frames nếu đối thủ di chuyển nhanh để vung kiếm/đấm trúng đích
+            // Melee fighters: Lock aim directly at opponent
+            // Slight 2-frame lead compensation for fast moving targets
             const leadFrames = (this.difficulty === 'impossible' || this.difficulty === 'master') ? 2 : 0;
             const predX = opponent.x + opponent.vx * leadFrames;
             const predY = opponent.y + opponent.vy * leadFrames;
             targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
         } else {
-            // Tướng tầm xa: Tính toán đón đầu đường đạn (Ballistic Lead Aim)
+            // Ranged fighters: Ballistic Lead Aim calculation
             if (this.difficulty === 'impossible' || this.difficulty === 'master') {
                 const bulletSpeed = 14.5;
                 const travelTime = dist / bulletSpeed;
@@ -230,19 +230,19 @@ export class BotController {
                 targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
 
                 if (this.difficulty === 'master') {
-                    // Sai lệch người chơi siêu nhỏ (±2 độ)
+                    // Tiny aim inaccuracy (±2 deg)
                     targetAimAngle += (Math.random() - 0.5) * 0.04;
                 }
             } else if (this.difficulty === 'normal') {
-                // Độ lệch nhẹ (±5 độ)
+                // Light aim inaccuracy (±5 deg)
                 targetAimAngle += (Math.random() - 0.5) * 0.09;
             } else {
-                // Easy: Độ lệch vừa phải (±12 độ)
+                // Easy: Moderate aim inaccuracy (±12 deg)
                 targetAimAngle += (Math.random() - 0.5) * 0.20;
             }
         }
 
-        // Thiết lập góc ngắm và hướng mặt chuẩn xác về đối thủ
+        // Set aim angle and facing direction towards opponent
         bot.setAimAngle(targetAimAngle);
 
         // -------------------------------------------------------------
@@ -255,7 +255,7 @@ export class BotController {
         this.overheatEndTime = this.overheatEndTime || 0;
         const isOverheated = now < this.overheatEndTime;
 
-        // Attack range check chuẩn theo tầm đánh từng vũ khí
+        // Attack range check according to character weapon range
         const weapon = WEAPONS[bot.characterId.toUpperCase()] || { attackRange: isMelee ? 85 : 550 };
         const inAttackRange = isMelee ? (dist <= weapon.attackRange + 25) : (dist <= (weapon.attackRange || 600));
 

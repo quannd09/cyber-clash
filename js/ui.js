@@ -7,12 +7,12 @@ const SKILL_DATA = {
         title: '⚡ TSUKISHIRO YANAGI (MELEE • 515 HP)',
         color: '#a78bfa',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Electric Naginata (3-Hit: Đảo Cực Hút Nộ)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Electric Naginata (3-Hit: Polarity Charge)', desc: '' },
             { key: 'R (Skill)', name: 'Phase Blink ⚡', desc: '' },
             { key: 'Space (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Electric Naginata (3-Hit: Đảo Cực Hút Nộ)', desc: '' },
+            { key: 'J (Melee)', name: 'Electric Naginata (3-Hit: Polarity Charge)', desc: '' },
             { key: 'I (Skill)', name: 'Phase Blink ⚡', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ]
@@ -21,13 +21,13 @@ const SKILL_DATA = {
         title: '🌸 VERINA AIRGID (RANGED • 510 HP)',
         color: '#34d399',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Photonic Flora (3-Hit: Nở Hoa Hồi 18 HP)', desc: '' },
-            { key: 'R (Skill)', name: 'Photosynthesis (Hồi 35 HP + Đẩy lùi)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Photonic Flora (3-Hit: Bloom Heal 18 HP)', desc: '' },
+            { key: 'R (Skill)', name: 'Photosynthesis (Heal 35 HP + Knockback)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Photonic Flora (3-Hit: Nở Hoa Hồi 18 HP)', desc: '' },
-            { key: 'I (Skill)', name: 'Photosynthesis (Hồi 35 HP + Đẩy lùi)', desc: '' },
+            { key: 'J (Ranged)', name: 'Photonic Flora (3-Hit: Bloom Heal 18 HP)', desc: '' },
+            { key: 'I (Skill)', name: 'Photosynthesis (Heal 35 HP + Knockback)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ]
     },
@@ -35,13 +35,13 @@ const SKILL_DATA = {
         title: '💼 NICOLE DEMARA (RANGED • 510 HP)',
         color: '#f472b6',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon (3-Hit: Nổ Chùm Ether)', desc: '' },
-            { key: 'R (Skill)', name: 'Sugar Slide (Trượt lùi bắn pháo)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon (3-Hit: Ether Cluster Blast)', desc: '' },
+            { key: 'R (Skill)', name: 'Sugar Slide (Backslide Cannon Fire)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Briefcase Cannon (3-Hit: Nổ Chùm Ether)', desc: '' },
-            { key: 'I (Skill)', name: 'Sugar Slide (Trượt lùi bắn pháo)', desc: '' },
+            { key: 'J (Ranged)', name: 'Briefcase Cannon (3-Hit: Ether Cluster Blast)', desc: '' },
+            { key: 'I (Skill)', name: 'Sugar Slide (Backslide Cannon Fire)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ]
     },
@@ -49,12 +49,12 @@ const SKILL_DATA = {
         title: '🎯 TRIGGER (RANGED • 505 HP)',
         color: '#38bdf8',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Sniper Beam (3-Hit: Khóa Bạo Kích x1.4)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Sniper Beam (3-Hit: Crit Lock x1.4)', desc: '' },
             { key: 'R (Skill)', name: 'Sniper Stance 🎯', desc: '' },
             { key: 'Space (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Sniper Beam (3-Hit: Khóa Bạo Kích x1.4)', desc: '' },
+            { key: 'J (Ranged)', name: 'Sniper Beam (3-Hit: Crit Lock x1.4)', desc: '' },
             { key: 'I (Skill)', name: 'Sniper Stance 🎯', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ]
@@ -63,13 +63,13 @@ const SKILL_DATA = {
         title: '🔮 VIVIAN BANSHEE (RANGED • 520 HP)',
         color: '#c084fc',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Ether Feathers (3-Hit: Lời Nguyền Chậm Đánh)', desc: '' },
-            { key: 'R (Skill)', name: 'Abloom Burst (Hồi 20 HP + Chùm lông)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Ether Feathers (3-Hit: Curse Slow)', desc: '' },
+            { key: 'R (Skill)', name: 'Abloom Burst (Heal 20 HP + Feather Burst)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Ether Feathers (3-Hit: Lời Nguyền Chậm Đánh)', desc: '' },
-            { key: 'I (Skill)', name: 'Abloom Burst (Hồi 20 HP + Chùm lông)', desc: '' },
+            { key: 'J (Ranged)', name: 'Ether Feathers (3-Hit: Curse Slow)', desc: '' },
+            { key: 'I (Skill)', name: 'Abloom Burst (Heal 20 HP + Feather Burst)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ]
     },
@@ -77,27 +77,27 @@ const SKILL_DATA = {
         title: '👊 JOTARO KUJO (MELEE • 525 HP)',
         color: '#818cf8',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Liên Hoàn)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'ORA ORA (3-Hit: Rapid Stand Rush)', desc: '' },
             { key: 'R (Skill)', name: 'Star Finger 👊', desc: '' },
-            { key: 'Space (Ultimate)', name: 'The World: Dừng Thời Gian', desc: '' }
+            { key: 'Space (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Liên Hoàn)', desc: '' },
+            { key: 'J (Melee)', name: 'ORA ORA (3-Hit: Rapid Stand Rush)', desc: '' },
             { key: 'I (Skill)', name: 'Star Finger 👊', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'The World: Dừng Thời Gian', desc: '' }
+            { key: 'Enter (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ]
     },
     goku: {
         title: '🥋 SON GOKU (MELEE • 520 HP)',
         color: '#fbbf24',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dragon Fist (3-Hit: Nộ Kaioken +Speed +25 Eng)', desc: '' },
-            { key: 'R (Skill)', name: 'Meteor Smash (Dịch chuyển bổ búa)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dragon Fist (3-Hit: Kaioken Surge +Speed +25 Eng)', desc: '' },
+            { key: 'R (Skill)', name: 'Meteor Smash (Teleport Hammer Slam)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dragon Fist (3-Hit: Nộ Kaioken +Speed +25 Eng)', desc: '' },
-            { key: 'I (Skill)', name: 'Meteor Smash (Dịch chuyển bổ búa)', desc: '' },
+            { key: 'J (Melee)', name: 'Dragon Fist (3-Hit: Kaioken Surge +Speed +25 Eng)', desc: '' },
+            { key: 'I (Skill)', name: 'Meteor Smash (Teleport Hammer Slam)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ]
     },
@@ -105,12 +105,12 @@ const SKILL_DATA = {
         title: '🐞 GIORNO GIOVANNA (MELEE • 515 HP)',
         color: '#facc15',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA (3-Hit: Quá Tải Cảm Giác -50% Speed)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA (3-Hit: Senses Overload -50% Speed)', desc: '' },
             { key: 'R (Skill)', name: 'Tree of Life 🌳', desc: '' },
             { key: 'Space (Ultimate)', name: 'Return To Zero (GER)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'MUDA MUDA (3-Hit: Quá Tải Cảm Giác -50% Speed)', desc: '' },
+            { key: 'J (Melee)', name: 'MUDA MUDA (3-Hit: Senses Overload -50% Speed)', desc: '' },
             { key: 'I (Skill)', name: 'Tree of Life 🌳', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Return To Zero (GER)', desc: '' }
         ]
@@ -119,13 +119,13 @@ const SKILL_DATA = {
         title: '🎞️ NAOYA ZEN\'IN (MELEE • 510 HP)',
         color: '#a3e635',
         p1: [
-            { key: 'Left Click / F (Melee)', name: '24 FPS Fists (3-Hit: Đóng Băng Khung Hình)', desc: '' },
-            { key: 'R (Skill)', name: 'Projection Step 🎞️ (Tàn ảnh)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: '24 FPS Fists (3-Hit: Frame Freeze)', desc: '' },
+            { key: 'R (Skill)', name: 'Projection Step 🎞️ (Afterimage)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Mach 3 Barrage (10 FPS)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: '24 FPS Fists (3-Hit: Đóng Băng Khung Hình)', desc: '' },
-            { key: 'I (Skill)', name: 'Projection Step 🎞️ (Tàn ảnh)', desc: '' },
+            { key: 'J (Melee)', name: '24 FPS Fists (3-Hit: Frame Freeze)', desc: '' },
+            { key: 'I (Skill)', name: 'Projection Step 🎞️ (Afterimage)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage (10 FPS)', desc: '' }
         ]
     },
@@ -133,12 +133,12 @@ const SKILL_DATA = {
         title: '🍖 MONKEY D. LUFFY (MELEE • 520 HP)',
         color: '#ef4444',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Bazooka Dội Tường)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Wall Bounce Bazooka)', desc: '' },
             { key: 'R (Skill)', name: 'Gigant Stomp 🍖', desc: '' },
             { key: 'Space (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Bazooka Dội Tường)', desc: '' },
+            { key: 'J (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Wall Bounce Bazooka)', desc: '' },
             { key: 'I (Skill)', name: 'Gigant Stomp 🍖', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ]
@@ -147,27 +147,27 @@ const SKILL_DATA = {
         title: '♾️ SATORU GOJO (MELEE • 515 HP)',
         color: '#0284c7',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Black Flash (Passive: Vô Hạn Trụ Chậm Đạn • 3-Hit: Hắc Thiểm)', desc: '' },
-            { key: 'R (Skill)', name: 'Lapse Blue 🌀 (Hút Chân Không)', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌 (Tê Liệt Vô Hạn)', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'Black Flash (Passive: Infinity Barrier • 3-Hit: Black Flash)', desc: '' },
+            { key: 'R (Skill)', name: 'Lapse Blue 🌀 (Vacuum Pull)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌 (Infinite Stun)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Black Flash (Passive: Vô Hạn Trụ Chậm Đạn • 3-Hit: Hắc Thiểm)', desc: '' },
-            { key: 'I (Skill)', name: 'Lapse Blue 🌀 (Hút Chân Không)', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌 (Tê Liệt Vô Hạn)', desc: '' }
+            { key: 'J (Melee)', name: 'Black Flash (Passive: Infinity Barrier • 3-Hit: Black Flash)', desc: '' },
+            { key: 'I (Skill)', name: 'Lapse Blue 🌀 (Vacuum Pull)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌 (Infinite Stun)', desc: '' }
         ]
     },
     sukuna: {
         title: '⛩️ RYOMEN SUKUNA (MELEE • 520 HP)',
         color: '#f43f5e',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes (3-Hit: Bát Trảm Xé Giáp + Chảy Máu)', desc: '' },
-            { key: 'R (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes (3-Hit: Cleave Bleed & Armor Shred)', desc: '' },
+            { key: 'R (Skill)', name: 'Kamino: Fuga 🔥 (Flame Arrow)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dismantle Slashes (3-Hit: Bát Trảm Xé Giáp + Chảy Máu)', desc: '' },
-            { key: 'I (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
+            { key: 'J (Melee)', name: 'Dismantle Slashes (3-Hit: Cleave Bleed & Armor Shred)', desc: '' },
+            { key: 'I (Skill)', name: 'Kamino: Fuga 🔥 (Flame Arrow)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ]
     },
@@ -175,27 +175,27 @@ const SKILL_DATA = {
         title: '👊 SAITAMA (HERO • 535 HP)',
         color: '#f59e0b',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Consecutive Normal Punches (Liên hoàn đấm)', desc: '' },
-            { key: 'R (Skill)', name: 'Serious Sidesteps ⚡ (Bật nhảy tàn ảnh)', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Serious Punch 💥 (Cú Đấm Nghiêm Túc)', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'Consecutive Normal Punches (Rapid Punch Barrage)', desc: '' },
+            { key: 'R (Skill)', name: 'Serious Sidesteps ⚡ (Omnidirectional Afterimages)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Serious Punch 💥 (Devastating Death Blow)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Consecutive Normal Punches (Liên hoàn đấm)', desc: '' },
-            { key: 'I (Skill)', name: 'Serious Sidesteps ⚡ (Bật nhảy tàn ảnh)', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Serious Punch 💥 (Cú Đấm Nghiêm Túc)', desc: '' }
+            { key: 'J (Melee)', name: 'Consecutive Normal Punches (Rapid Punch Barrage)', desc: '' },
+            { key: 'I (Skill)', name: 'Serious Sidesteps ⚡ (Omnidirectional Afterimages)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Serious Punch 💥 (Devastating Death Blow)', desc: '' }
         ]
     },
     megumi: {
         title: '🐺 MEGUMI FUSHIGURO (SHIKIGAMI • 515 HP)',
         color: '#6366f1',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Toad Shadow Grab (3-Hit: Thập Chủng Ảnh Pháp)', desc: '' },
-            { key: 'R (Skill)', name: 'Divine Dog: Totality 🐺 (Hắc Cẩu cắn choáng)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Toad Shadow Grab (3-Hit: Ten Shadows)', desc: '' },
+            { key: 'R (Skill)', name: 'Divine Dog: Totality 🐺 (Shadow Wolf Stun Pounce)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Eight-Handled Sword: Mahoraga ⛩️', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Toad Shadow Grab (3-Hit: Thập Chủng Ảnh Pháp)', desc: '' },
-            { key: 'I (Skill)', name: 'Divine Dog: Totality 🐺 (Hắc Cẩu cắn choáng)', desc: '' },
+            { key: 'J (Melee)', name: 'Toad Shadow Grab (3-Hit: Ten Shadows)', desc: '' },
+            { key: 'I (Skill)', name: 'Divine Dog: Totality 🐺 (Shadow Wolf Stun Pounce)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Eight-Handled Sword: Mahoraga ⛩️', desc: '' }
         ]
     },
@@ -203,14 +203,14 @@ const SKILL_DATA = {
         title: '🩸 KURIYAMA MIRAI (SPIRIT WARRIOR • 510 HP)',
         color: '#f43f5e',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Blood Katana (3-Hit: Huyết Kiếm Hồi HP)', desc: '' },
-            { key: 'R (Skill)', name: 'Blood Crescent Wave 🩸 (Trăng máu tiêu HP)', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Blood Cataclysm ⚔️ (Đại Huyết Kiếm Trảm)', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'Blood Katana (3-Hit: Blood Lifesteal)', desc: '' },
+            { key: 'R (Skill)', name: 'Blood Crescent Wave 🩸 (HP Consuming Slashes)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Blood Cataclysm ⚔️ (Colossal Blood Blade)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Blood Katana (3-Hit: Huyết Kiếm Hồi HP)', desc: '' },
-            { key: 'I (Skill)', name: 'Blood Crescent Wave 🩸 (Trăng máu tiêu HP)', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Blood Cataclysm ⚔️ (Đại Huyết Kiếm Trảm)', desc: '' }
+            { key: 'J (Melee)', name: 'Blood Katana (3-Hit: Blood Lifesteal)', desc: '' },
+            { key: 'I (Skill)', name: 'Blood Crescent Wave 🩸 (HP Consuming Slashes)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Blood Cataclysm ⚔️ (Colossal Blood Blade)', desc: '' }
         ]
     }
 };
@@ -539,7 +539,7 @@ export class UIManager {
                     bannerModeIndicator.style.color = '#34d399';
                 }
                 if (lobbyGuideNote) {
-                    lobbyGuideNote.innerHTML = '💡 <strong>Online 1 (WebSocket):</strong> Cả 2 người chơi kết nối qua Server trung gian (Render/Localhost). Host bấm <strong>⚡ CREATE ROOM</strong> và chia sẻ mã CLASH-XXXX cho Khách bấm <strong>🚀 JOIN</strong>.';
+                    lobbyGuideNote.innerHTML = '💡 <strong>Online 1 (WebSocket):</strong> Both players connect via an intermediary Relay Server (Render/Localhost). Host clicks <strong>⚡ CREATE ROOM</strong> and shares the CLASH-XXXX room code for Guest to click <strong>🚀 JOIN</strong>.';
                 }
             } else {
                 if (online1Tab) online1Tab.classList.remove('active');
@@ -553,7 +553,7 @@ export class UIManager {
                     bannerModeIndicator.style.color = '#c084fc';
                 }
                 if (lobbyGuideNote) {
-                    lobbyGuideNote.innerHTML = '💡 <strong>Online 2 (WebRTC P2P):</strong> Kết nối trực tiếp máy-đến-máy thông qua PeerJS STUN/TURN. Host bấm <strong>⚡ CREATE ROOM</strong> và gửi mã cho Player 2 bấm <strong>🚀 JOIN</strong>.';
+                    lobbyGuideNote.innerHTML = '💡 <strong>Online 2 (WebRTC P2P):</strong> Direct peer-to-peer connection via PeerJS STUN/TURN. Host clicks <strong>⚡ CREATE ROOM</strong> and sends the code to Player 2 to click <strong>🚀 JOIN</strong>.';
                 }
             }
 
@@ -606,7 +606,7 @@ export class UIManager {
                 const url = inputWsServer.value.trim();
                 network.setWsServerUrl(url);
                 if (globalMsg) {
-                    globalMsg.textContent = url ? `Đã lưu Relay Server: ${url}` : 'Đã khôi phục Relay Server mặc định (localhost / Render)';
+                    globalMsg.textContent = url ? `Relay Server saved: ${url}` : 'Restored default Relay Server (localhost / Render)';
                     globalMsg.classList.remove('error');
                 }
                 btnSaveServer.textContent = '✔️ SAVED!';
@@ -725,7 +725,7 @@ export class UIManager {
                 const status = document.getElementById('status-2v2-online');
                 if (box) box.classList.remove('hidden');
                 if (lbl) lbl.textContent = code;
-                if (status) status.textContent = `Phòng 2V2 [${code}] đã sẵn sàng! Gửi mã cho đồng đội & đối thủ.`;
+                if (status) status.textContent = `2V2 Room [${code}] ready! Share code with teammates & opponents.`;
                 return;
             }
             if (hostCodeBox) hostCodeBox.classList.remove('hidden');
@@ -758,7 +758,7 @@ export class UIManager {
             if (roomMode === '2v2' || this.gameMode === '2V2') {
                 this.my2v2Slot = slotIndex || 0;
                 const status = document.getElementById('status-2v2-online');
-                if (status) status.textContent = `✅ Đã kết nối vào phòng 2V2 [${code}] (Slot ${this.my2v2Slot + 1} - ${role})!`;
+                if (status) status.textContent = `✅ Connected to 2V2 Room [${code}] (Slot ${this.my2v2Slot + 1} - ${role})!`;
                 if (this.onNetworkConnected) {
                     this.onNetworkConnected(role, code, slotIndex, roomMode);
                 }
@@ -934,7 +934,7 @@ export class UIManager {
             if (this.switchToLocal) this.switchToLocal();
             const modal = document.getElementById('disconnect-modal');
             const msg = document.getElementById('disconnect-msg');
-            if (msg) msg.textContent = 'Đối thủ đã rời khỏi phòng hoặc thoát về menu chính.';
+            if (msg) msg.textContent = 'Opponent has left the room or returned to main menu.';
         } else if (data.type === '2V2_MATCH_START') {
             this.hideLoadout();
             this.selected2v2Map = data.map || 'brawlhaven';
@@ -1060,7 +1060,7 @@ export class UIManager {
         }
 
         // Populate Ban dropdowns
-        const banOptionsHtml = '<option value="none">-- KHÔNG CẤM (NO BAN) --</option>' +
+        const banOptionsHtml = '<option value="none">-- NO BAN --</option>' +
             ALL_CHARACTERS.map(c => `<option value="${c.id}">🚫 ${c.name}</option>`).join('');
 
         if (selectBlueBan) {
@@ -1143,7 +1143,7 @@ export class UIManager {
         if (btnCreateRoom) {
             btnCreateRoom.addEventListener('click', () => {
                 network.createRoom('2v2');
-                if (statusOnline) statusOnline.textContent = 'Đang khởi tạo phòng 2v2...';
+                if (statusOnline) statusOnline.textContent = 'Initializing 2v2 room...';
             });
         }
 
@@ -1152,11 +1152,11 @@ export class UIManager {
             btnJoinRoom.addEventListener('click', () => {
                 const code = inputRoomCode.value.trim();
                 if (!code) {
-                    if (statusOnline) statusOnline.textContent = 'Vui lòng nhập mã phòng!';
+                    if (statusOnline) statusOnline.textContent = 'Please enter room code!';
                     return;
                 }
                 network.joinRoom(code);
-                if (statusOnline) statusOnline.textContent = `Đang kết nối vào phòng [${code}]...`;
+                if (statusOnline) statusOnline.textContent = `Connecting to room [${code}]...`;
             });
         }
 
@@ -1174,7 +1174,7 @@ export class UIManager {
         network.onMembersUpdate = (info) => {
             if (this.gameMode !== '2V2') return;
             if (statusOnline) {
-                statusOnline.textContent = `Phòng đã kết nối ${info.playerCount} / ${info.maxPlayers || 4} người chơi!`;
+                statusOnline.textContent = `Room connected ${info.playerCount} / ${info.maxPlayers || 4} players!`;
             }
         };
 
@@ -1189,14 +1189,14 @@ export class UIManager {
                 for (let i = 0; i < 4; i++) {
                     const picked = this.slots2v2[i].char;
                     if ((blueBan !== 'none' && picked === blueBan) || (redBan !== 'none' && picked === redBan)) {
-                        alert(`Nhân vật ${picked.toUpperCase()} đã bị cấm (Banned)! Vui lòng chọn nhân vật khác ở Slot ${i + 1}.`);
+                        alert(`Character ${picked.toUpperCase()} has been banned! Please pick another fighter for Slot ${i + 1}.`);
                         return;
                     }
                 }
 
                 if (this.is2v2Online && network.isConnected) {
                     if (network.role !== 'HOST') {
-                        alert('Chỉ Chủ Phòng (Host) mới có quyền bấm Bắt đầu trận chiến!');
+                        alert('Only the Host can start the 2V2 brawl match!');
                         return;
                     }
                     network.send({
@@ -1273,7 +1273,7 @@ export class UIManager {
 
                     activeListeningBtn = btn;
                     btn.classList.add('listening');
-                    btn.textContent = 'BẤM PHÍM...';
+                    btn.textContent = 'PRESS KEY...';
                 });
             });
         };

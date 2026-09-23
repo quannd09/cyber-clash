@@ -230,7 +230,7 @@ export class Cyborg {
             this.energy = Math.min(this.maxEnergy, this.energy + 0.35 * dt);
         }
 
-        // Tự động hồi nộ chiêu cuối (Overdrive) theo thời gian (khi đứng im, né chạy, di chuyển)
+        // Passive Overdrive meter accumulation over time (standing, dashing, moving)
         let isOpponentUltActive = false;
         if (typeof window !== 'undefined' && window.game) {
             const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
@@ -405,9 +405,9 @@ export class Cyborg {
         const now = performance.now();
         const isTouchPlayer = (this.index === 0 && ((typeof input !== 'undefined' && input.touchEnabled) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)));
 
-        // Giới hạn spam đòn đánh:
-        // Với tướng cận chiến: cửa sổ 3.75s (3750ms) cho 6 hits để hạn chế spam
-        // Với tướng tầm xa: cửa sổ 3.0s (3000ms)
+        // Attack spam limitation:
+        // Melee: 3.75s (3750ms) window for 6 hits to mitigate spam
+        // Ranged: 3.0s (3000ms) window
         const spamWindowMs = this.combatStyle === 'melee'
             ? 3750
             : Math.max(3000, (weapon.attackCooldown || 25) * 5.5 * (1000 / 60));
@@ -424,17 +424,17 @@ export class Cyborg {
         this.attackHitRegistered = false;
         this.hasClashed = false;
 
-        // Giảm độ trễ đánh thường trên điện thoại:
-        // Giảm 20% cooldown hồi đòn đánh thường trên mobile để phản hồi nhạy bén và mượt mà
+        // Mobile responsiveness tuning:
+        // 20% lower basic attack cooldown on mobile for smoother responsiveness
         const baseCooldown = isTouchPlayer
             ? Math.max(12, Math.round(weapon.attackCooldown * 0.8))
             : weapon.attackCooldown;
 
-        // Phạt delay nếu đạt limit 6 đòn trong cửa sổ spam (3.75s cho cận chiến, 3s cho tầm xa)
+        // Delay penalty if 6-strike spam limit reached within window
         if (this.recentAttackTimes.length >= 6) {
-            this.spamDelayTimer = weapon.attackDuration + 60; // Khóa đánh trọn vẹn 1s (60 frames) sau khi đòn thứ 6 kết thúc
-            this.attackCooldown = weapon.attackDuration + 60; // Thêm delay 1s sau đòn thứ 6
-            this.recentAttackTimes = []; // Reset sau khi kích hoạt phạt
+            this.spamDelayTimer = weapon.attackDuration + 60; // Lock attack for 1s (60 frames) after 6th strike
+            this.attackCooldown = weapon.attackDuration + 60; // Add 1s cooldown after 6th strike
+            this.recentAttackTimes = []; // Reset after applying penalty
         } else {
             this.attackCooldown = baseCooldown;
         }
@@ -507,7 +507,7 @@ export class Cyborg {
 
         const weapon = WEAPONS[this.characterId.toUpperCase()];
         const normalDmg = weapon ? weapon.attackDmg : 30;
-        // Dame đòn skill bằng 2x dame 1 đòn đánh thường
+        // Skill damage equals 2x basic attack damage
         const skillDmg = normalDmg * 2;
 
         if (skill.id === 'PHASE_BLINK') {
@@ -517,7 +517,7 @@ export class Cyborg {
             this.y += Math.sin(this.aimAngle) * 160;
             fx.spawnParryBurst(this.x, this.y, '#ffffff');
             fx.addText(this.x, this.y - 30, '🌀 BLINK!', this.color, 22);
-            // Sóng điện gây 2x sát thương nếu đối thủ ở gần điểm xuất hiện
+            // Electric shockwave deals 2x damage if opponent is near appearance point
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 140) {
                 opponent.takeDamage(skillDmg);
@@ -530,7 +530,7 @@ export class Cyborg {
         } else if (skill.id === 'PHOTOSYNTHESIS' || skill.id === 'EMP_BLAST') {
             sound.playEMP();
             fx.spawnClashShockwave(this.x, this.y);
-            // Quang Hợp (Photosynthesis): Hồi 25 HP & Sóng đẩy bảo hộ
+            // Photosynthesis: Heal 25 HP & protective repulsion wave
             this.hp = Math.min(this.maxHp, this.hp + 25);
             fx.addText(this.x, this.y - 30, '+25 HP HEAL!', '#34d399', 24);
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
@@ -545,7 +545,7 @@ export class Cyborg {
             sound.playWallBounce();
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 12);
             fx.addText(this.x, this.y - 30, '💼 SUGAR SLIDE!', '#f472b6', 22);
-            // Bắn 2 viên ether, mỗi viên bằng 1x thường (tổng 2x đòn thường)
+            // Fire 2 ether projectiles, each equal to 1x normal damage (total 2x)
             for (let angleOff of [-0.15, 0.15]) {
                 const proj = new Projectile(
                     this.index,
@@ -562,7 +562,7 @@ export class Cyborg {
         } else if (skill.id === 'SNIPER_STANCE') {
             sound.playLaser();
             fx.addText(this.x, this.y - 30, '🎯 SNIPER SHOT!', '#38bdf8', 24);
-            // Đạn bắn tỉa xuyên giáp gây 2x sát thương đòn thường
+            // Armor-piercing sniper projectile deals 2x normal damage
             const proj = new Projectile(
                 this.index,
                 this.x + Math.cos(this.aimAngle) * 35,
@@ -580,12 +580,12 @@ export class Cyborg {
             this.hp = Math.min(this.maxHp, this.hp + 16);
             fx.addText(this.x, this.y - 30, '🔮 ABLOOM BURST!', '#c084fc', 22);
 
-            // Tự động căn góc bắn chuẩn về phía đối thủ
+            // Automatically align firing angle towards opponent
             const angleToOpponent = Math.atan2(opponent.y - this.y, opponent.x - this.x);
             const isFacingOpponent = Math.cos(this.aimAngle) * Math.cos(angleToOpponent) > 0;
             const baseAngle = isFacingOpponent ? angleToOpponent : this.aimAngle;
 
-            // 4 chùm lông vũ ether chụm góc, tốc độ cao 16, bán kính 10px để gây đủ 50 dmg
+            // 4 tight ether feather projectiles, speed 16, radius 10px to deal skill damage
             const spreadAngles = [-0.12, -0.04, 0.04, 0.12];
             for (let a of spreadAngles) {
                 const finalAngle = baseAngle + a;
@@ -699,7 +699,7 @@ export class Cyborg {
                 sound.playHit(true);
             }
         } else if (skill.id === 'LAPSE_BLUE') {
-            // GOJO: CURSED TECHNIQUE LAPSE - BLUE (THUẬN CHUYỂN: THƯƠNG) 🌀
+            // GOJO: CURSED TECHNIQUE LAPSE - BLUE 🌀
             sound.playEMP();
             const pullX = this.x + Math.cos(this.aimAngle) * 200;
             const pullY = this.y + Math.sin(this.aimAngle) * 200;
@@ -717,7 +717,7 @@ export class Cyborg {
             sound.playHit(true);
             fx.spawnHitSparks(opponent.x, opponent.y, '#0284c7', 18);
         } else if (skill.id === 'KAMINO_FIRE_ARROW') {
-            // SUKUNA: KAMINO FUGA (HỎA KHAI / FLAME ARROW) 🔥
+            // SUKUNA: KAMINO FUGA (FLAME ARROW) 🔥
             sound.playLaser();
             fx.addText(this.x, this.y - 35, '🔥 KAMINO: FUGA!', '#ef4444', 24);
             const proj = new Projectile(
@@ -764,7 +764,7 @@ export class Cyborg {
             );
             combat.addProjectile(proj);
         } else if (skill.id === 'BLOOD_CRESCENT') {
-            // MIRAI: BLOOD CRESCENT WAVE (Huyết Nguyệt Trảm) 🩸
+            // MIRAI: BLOOD CRESCENT WAVE 🩸
             sound.playSlash(true);
             // HP cost: 4% current HP (failsafe: cannot self-kill below 5% HP)
             if (this.hp > this.maxHp * 0.05) {
@@ -864,14 +864,14 @@ export class Cyborg {
 
         this.hp = Math.max(0, this.hp - amount);
 
-        // Failsafe: Kiểm tra xem đối thủ có đang tung chiêu cuối hay không
+        // Failsafe: Check if any opponent is executing an ultimate
         let isAnyOpponentUltActive = false;
         if (typeof window !== 'undefined' && window.game) {
             const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
             if (opp && opp.isUsingUltimate) isAnyOpponentUltActive = true;
         }
 
-        // Chỉ giảm thời gian hồi ulti (tăng nộ Overdrive) khi nhận đòn từ đòn đánh thường/skill, KHÔNG nhận từ ulti đối thủ
+        // Only gain Overdrive from basic attacks/skills, NOT from opponent ultimates
         if (!isFromUltimate && !this.isUsingUltimate && !isAnyOpponentUltActive && this.overdrive < 100) {
             const damageOdGain = (amount * 0.48 + 3.0) * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + damageOdGain);

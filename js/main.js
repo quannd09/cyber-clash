@@ -283,7 +283,7 @@ class CyberClashGame {
     syncFullscreenUI(active) {
         const fsBtn = document.getElementById('fullscreen-toggle-btn');
         if (fsBtn) {
-            fsBtn.textContent = active ? '🗗 Thu nhỏ' : '⛶ Fullscreen';
+            fsBtn.textContent = active ? '🗗 Exit Fullscreen' : '⛶ Fullscreen';
         }
     }
 
