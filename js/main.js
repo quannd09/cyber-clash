@@ -295,6 +295,7 @@ class CyberClashGame {
         const charNames = {
             yanagi: 'TSUKISHIRO YANAGI',
             velina: 'VERINA AIRGID',
+            verina: 'VERINA AIRGID',
             nicole: 'NICOLE DEMARA',
             trigger: 'TRIGGER',
             vivian: 'VIVIAN BANSHEE',
@@ -311,6 +312,7 @@ class CyberClashGame {
         const charColors = {
             yanagi: '#a78bfa',
             velina: '#34d399',
+            verina: '#34d399',
             nicole: '#f472b6',
             trigger: '#38bdf8',
             vivian: '#c084fc',
@@ -607,6 +609,7 @@ class CyberClashGame {
         }
 
         // 2b. Mouse & Touch Aiming for Player 1 (Active in BOT and ONLINE modes)
+        // 2b. Direction & Aiming
         const isLocal2P = (this.gameMode === 'LOCAL');
         if (!isLocal2P && index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
             if (input.mouse && typeof input.mouse.x === 'number') {
@@ -616,20 +619,24 @@ class CyberClashGame {
                     player.setAimAngle(Math.atan2(dy, dx));
                 }
             }
-        } else if (!isLocal2P && index === 0 && opponent) {
-            // In Single Player VS BOT or Online mode when mouse is idle:
-            // Auto-aim towards opponent so attacks, skills, and shots fire directly at the enemy
-            const dx = opponent.x - player.x;
-            const dy = opponent.y - player.y;
-            if (Math.hypot(dx, dy) > 10) {
-                player.setAimAngle(Math.atan2(dy, dx));
+        } else if (opponent) {
+            // In keyboard / local / idle mouse mode: aim in movement direction or track opponent when stationary
+            if (move && (move.x !== 0 || move.y !== 0)) {
+                player.setAimAngle(Math.atan2(move.y, move.x));
+            } else {
+                const dx = opponent.x - player.x;
+                const dy = opponent.y - player.y;
+                if (Math.hypot(dx, dy) > 10) {
+                    player.setAimAngle(Math.atan2(dy, dx));
+                }
             }
         }
 
         // 3. Attacks (Mouse Left Click or F for P1, Num1/J for P2, Touch Button for Mobile)
         const attack = input.getActionState(index, 'lightAttack');
         const touchAttackHeld = (index === 0 && input && input.touchEnabled && attack && attack.isDown);
-        if (attack && (attack.justDown || touchAttackHeld)) {
+        const shouldAttack = attack && (attack.justDown || touchAttackHeld || (attack.isDown && player.attackCooldown <= 0 && !player.isAttacking));
+        if (shouldAttack) {
             if (player.canAttack()) {
                 player.attack();
                 player.attackBufferTimer = 0;

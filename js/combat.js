@@ -23,6 +23,16 @@ export const WEAPONS = {
         isRanged: true,
         icon: '🌸'
     },
+    VERINA: {
+        id: 'VELINA',
+        name: 'Photonic Flora',
+        attackDmg: 25,
+        attackRange: 540,
+        attackDuration: 20,
+        attackCooldown: 22,
+        isRanged: true,
+        icon: '🌸'
+    },
     NICOLE: {
         id: 'NICOLE',
         name: 'Briefcase Cannon',
@@ -203,6 +213,12 @@ export class Projectile {
                 const sparkColor = Math.random() < 0.5 ? '#a3e635' : '#bef264';
                 fx.spawnHitSparks(this.x, this.y, sparkColor, 1);
             }
+        } else if (this.type === 'photonic_flora') {
+            // Emerald & mint floral glowing petal sparks
+            if (Math.random() < 0.75) {
+                const sparkColor = Math.random() < 0.6 ? '#34d399' : '#a7f3d0';
+                fx.spawnHitSparks(this.x, this.y, sparkColor, 1);
+            }
         } else {
             // Standard Spark tail
             if (Math.random() < 0.4) {
@@ -345,6 +361,55 @@ export class Projectile {
             ctx.stroke();
 
             ctx.restore();
+
+        } else if (this.type === 'photonic_flora') {
+            // VERINA: PHOTONIC FLORA BLOSSOM (Glowing emerald-mint flower petal energy sphere)
+            const r = this.radius;
+            const pulse = Math.sin(this.animTimer * 0.3) * 2;
+
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.animTimer * 0.12);
+
+            ctx.shadowColor = '#34d399';
+            ctx.shadowBlur = 24;
+
+            // 5 Orbiting Floral Petals
+            ctx.fillStyle = 'rgba(52, 211, 153, 0.75)';
+            ctx.strokeStyle = '#a7f3d0';
+            ctx.lineWidth = 1.8;
+            for (let i = 0; i < 5; i++) {
+                const angle = i * (Math.PI * 2 / 5);
+                const px = Math.cos(angle) * (r + 4 + pulse);
+                const py = Math.sin(angle) * (r + 4 + pulse);
+                ctx.beginPath();
+                ctx.arc(px, py, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // Central radiant flora core
+            const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, r + 2);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.35, '#a7f3d0');
+            grad.addColorStop(0.75, '#34d399');
+            grad.addColorStop(1, '#059669');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // Beam tail
+            const angle = Math.atan2(this.vy, this.vx);
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 28, this.y - Math.sin(angle) * 28);
+            ctx.stroke();
 
         } else {
             // Standard Projectile

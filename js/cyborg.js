@@ -14,6 +14,7 @@ export class Cyborg {
         const charColors = {
             yanagi: '#a78bfa',
             velina: '#34d399',
+            verina: '#34d399',
             nicole: '#f472b6',
             trigger: '#38bdf8',
             vivian: '#c084fc',
@@ -30,6 +31,7 @@ export class Cyborg {
         const charStyles = {
             yanagi: 'melee',
             velina: 'ranged',
+            verina: 'ranged',
             nicole: 'ranged',
             trigger: 'ranged',
             vivian: 'ranged',
@@ -80,6 +82,7 @@ export class Cyborg {
             giorno: 515,
             gojo: 515,
             velina: 510,
+            verina: 510,
             nicole: 510,
             naoya: 510,
             trigger: 505
@@ -432,9 +435,17 @@ export class Cyborg {
         if (this.combatStyle === 'ranged') {
             // FIRE PROJECTILE
             this.isShooting = true;
-            const speed = 14.5;
-            const spawnX = this.x + Math.cos(this.aimAngle) * (this.radius + 16);
-            const spawnY = this.y + Math.sin(this.aimAngle) * (this.radius + 16);
+            const speed = 15;
+            const spawnX = this.x + Math.cos(this.aimAngle) * (this.radius + 18);
+            const spawnY = this.y + Math.sin(this.aimAngle) * (this.radius + 18);
+
+            let projType = 'standard';
+            let projRadius = 10;
+            if (this.characterId === 'velina' || this.characterId === 'verina') {
+                projType = 'photonic_flora';
+                projRadius = 12;
+            }
+
             const proj = new Projectile(
                 this.index,
                 spawnX,
@@ -443,10 +454,12 @@ export class Cyborg {
                 Math.sin(this.aimAngle) * speed,
                 weapon.attackDmg,
                 this.color,
-                9
+                projRadius,
+                projType
             );
             combat.addProjectile(proj);
             sound.playLaser();
+            fx.spawnHitSparks(spawnX, spawnY, this.color, 6);
             // Small recoil
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 4.5);
         } else {
@@ -516,6 +529,7 @@ export class Cyborg {
         const skillMap = {
             yanagi: SKILLS.YANAGI_SKILL,
             velina: SKILLS.VERINA_SKILL,
+            verina: SKILLS.VERINA_SKILL,
             nicole: SKILLS.NICOLE_SKILL,
             trigger: SKILLS.TRIGGER_SKILL,
             vivian: SKILLS.VIVIAN_SKILL,
@@ -853,6 +867,7 @@ export class Cyborg {
         const ultShouts = {
             yanagi: '⚡ LIGHTNING CANNON! ⚡',
             velina: '🌪️ LIFE BLOSSOM STORM! 🌪️',
+            verina: '🌪️ LIFE BLOSSOM STORM! 🌪️',
             nicole: '🕳️ GRAVITATIONAL BLACK HOLE! 🕳️',
             trigger: '🎯 SYNCHRONIZED FIREPOWER! 🎯',
             vivian: '🔮 FEATHER STORM HARBINGER! 🔮',

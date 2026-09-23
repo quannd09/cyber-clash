@@ -538,6 +538,18 @@ export class InputManager {
             } else if (!this.p2Bindings.dash.includes('Numpad0')) {
                 this.p2Bindings.dash.push('Numpad0', 'ControlRight');
             }
+
+            // Migration: Ensure P2 bindings include letter keys (J, L, I, U, O) for laptops without Numpad
+            const ensureKeys = (arr, keysToAdd) => {
+                const list = Array.isArray(arr) ? [...arr] : [];
+                keysToAdd.forEach(k => { if (!list.includes(k)) list.push(k); });
+                return list;
+            };
+            this.p2Bindings.lightAttack = ensureKeys(this.p2Bindings.lightAttack, ['KeyJ', 'keyj', 'j', 'J', 'Numpad1']);
+            this.p2Bindings.shield = ensureKeys(this.p2Bindings.shield, ['KeyL', 'keyl', 'l', 'L', 'Numpad3']);
+            this.p2Bindings.skill = ensureKeys(this.p2Bindings.skill, ['KeyI', 'keyi', 'i', 'I', 'Numpad5']);
+            this.p2Bindings.dash = ensureKeys(this.p2Bindings.dash, ['KeyU', 'keyu', 'u', 'U', 'Numpad0', 'ControlRight']);
+            this.p2Bindings.ultimate = ensureKeys(this.p2Bindings.ultimate, ['KeyO', 'keyo', 'o', 'O', 'Enter', 'NumpadEnter']);
         } catch (err) {
             console.warn('[InputManager] Could not load saved bindings:', err);
         }
