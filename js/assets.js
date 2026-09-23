@@ -18,15 +18,11 @@ export class AssetManager {
         this.loadImage('p1', `assets/p1.png?v=${v}`);
         this.loadImage('p2', `assets/p2.png?v=${v}`);
 
-<<<<<<< HEAD
         // Maps
         this.loadImage('map_brawlhaven', `assets/brawlhaven.png?v=${v}`);
         this.loadImage('map_great_hall', `assets/great_hall.png?v=${v}`);
 
         const allChars = ['yanagi', 'velina', 'nicole', 'trigger', 'vivian', 'jotaro', 'goku', 'giorno', 'naoya', 'luffy', 'gojo', 'sukuna', 'saitama', 'megumi', 'mirai'];
-=======
-        const allChars = ['yanagi', 'velina', 'nicole', 'trigger', 'vivian', 'jotaro', 'goku', 'giorno', 'naoya', 'luffy', 'gojo', 'sukuna', 'saitama', 'tst26'];
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         allChars.forEach(char => {
             this.loadImage(`${char}_idle`, `assets/${char}/idle.png?v=${v}`);
         });

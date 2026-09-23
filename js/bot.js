@@ -1,11 +1,7 @@
 // AI Bot Controller for Cyber Clash: Zero-G Arena
 // Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
-<<<<<<< HEAD
 import { WEAPONS, combat } from './combat.js?v=75';
 import { physics } from './physics.js?v=75';
-=======
-import { WEAPONS, combat } from './combat.js';
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 
 export class BotController {
     constructor(difficulty = 'normal') {
@@ -37,7 +33,7 @@ export class BotController {
         let shouldShield = false;
         let parryDuration = 6;
 
-        // Nerf bot Easy & Normal: completely disable block/parry
+        // Nerf bot Easy & Normal: Hoàn toàn không được block/parry bất kỳ đòn đánh nào
         const canBlock = (this.difficulty === 'impossible' || this.difficulty === 'master');
 
         if (canBlock) {
@@ -213,19 +209,19 @@ export class BotController {
         }
 
         // -------------------------------------------------------------
-        // 3. PREDICTIVE AIMING SYSTEM (Always lock aim angle towards opponent)
+        // 3. PREDICTIVE AIMING SYSTEM (Luôn khóa góc ngắm về phía đối thủ)
         // -------------------------------------------------------------
         let targetAimAngle = Math.atan2(opponent.y - bot.y, opponent.x - bot.x);
 
         if (isMelee) {
-            // Melee fighters: Direct lock on target
-            // Compensate 2 frames if target moves fast to land hit
+            // Tướng cận chiến: Khóa thẳng góc ngắm trực tiếp vào đối thủ
+            // Bù nhẹ 2 frames nếu đối thủ di chuyển nhanh để vung kiếm/đấm trúng đích
             const leadFrames = (this.difficulty === 'impossible' || this.difficulty === 'master') ? 2 : 0;
             const predX = opponent.x + opponent.vx * leadFrames;
             const predY = opponent.y + opponent.vy * leadFrames;
             targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
         } else {
-            // Ranged fighters: Ballistic lead aiming calculation
+            // Tướng tầm xa: Tính toán đón đầu đường đạn (Ballistic Lead Aim)
             if (this.difficulty === 'impossible' || this.difficulty === 'master') {
                 const bulletSpeed = 14.5;
                 const travelTime = dist / bulletSpeed;
@@ -234,19 +230,19 @@ export class BotController {
                 targetAimAngle = Math.atan2(predY - bot.y, predX - bot.x);
 
                 if (this.difficulty === 'master') {
-                    // Slight human error (±2 deg)
+                    // Sai lệch người chơi siêu nhỏ (±2 độ)
                     targetAimAngle += (Math.random() - 0.5) * 0.04;
                 }
             } else if (this.difficulty === 'normal') {
-                // Minor deviation (±5 deg)
+                // Độ lệch nhẹ (±5 độ)
                 targetAimAngle += (Math.random() - 0.5) * 0.09;
             } else {
-                // Easy: Moderate deviation (±12 deg)
+                // Easy: Độ lệch vừa phải (±12 độ)
                 targetAimAngle += (Math.random() - 0.5) * 0.20;
             }
         }
 
-        // Set aim angle and facing precisely towards opponent
+        // Thiết lập góc ngắm và hướng mặt chuẩn xác về đối thủ
         bot.setAimAngle(targetAimAngle);
 
         // -------------------------------------------------------------
@@ -259,7 +255,7 @@ export class BotController {
         this.overheatEndTime = this.overheatEndTime || 0;
         const isOverheated = now < this.overheatEndTime;
 
-        // Attack range check based on individual weapon reach
+        // Attack range check chuẩn theo tầm đánh từng vũ khí
         const weapon = WEAPONS[bot.characterId.toUpperCase()] || { attackRange: isMelee ? 85 : 550 };
         const inAttackRange = isMelee ? (dist <= weapon.attackRange + 25) : (dist <= (weapon.attackRange || 600));
 

@@ -459,14 +459,9 @@ canvas {
 .char-card.selected-luffy { border-color: #ef4444 !important; background: #351414 !important; box-shadow: 0 0 14px rgba(239, 68, 68, 0.5); }
 .char-card.selected-gojo { border-color: #0284c7 !important; background: #0c2738 !important; box-shadow: 0 0 14px rgba(2, 132, 199, 0.5); }
 .char-card.selected-sukuna { border-color: #f43f5e !important; background: #38121d !important; box-shadow: 0 0 14px rgba(244, 63, 94, 0.5); }
-<<<<<<< HEAD
 .char-card.selected-saitama { border-color: #f59e0b !important; background: #38240a !important; box-shadow: 0 0 14px rgba(245, 158, 11, 0.5); }
 .char-card.selected-megumi { border-color: #6366f1 !important; background: #181938 !important; box-shadow: 0 0 14px rgba(99, 102, 241, 0.5); }
 .char-card.selected-mirai { border-color: #f43f5e !important; background: #38101a !important; box-shadow: 0 0 14px rgba(244, 63, 94, 0.5); }
-=======
-.char-card.selected-saitama { border-color: #eab308 !important; background: #352a0a !important; box-shadow: 0 0 16px rgba(234, 179, 8, 0.7); }
-.char-card.selected-tst26 { border-color: #ec4899 !important; background: #350f25 !important; box-shadow: 0 0 16px rgba(236, 72, 153, 0.7); }
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 
 .char-avatar {
     width: 38px !important;
@@ -521,39 +516,9 @@ canvas {
 .type-luffy { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
 .type-gojo { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }
 .type-sukuna { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
-<<<<<<< HEAD
 .type-saitama { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
 .type-megumi { background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); }
 .type-mirai { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.4); }
-=======
-.type-saitama { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.5); }
-.type-tst26 { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.5); }
-
-.char-card.secret-card {
-    position: relative;
-    border: 1px dashed rgba(234, 179, 8, 0.6);
-}
-.char-card.secret-card::after {
-    content: "SECRET";
-    position: absolute;
-    top: -5px;
-    right: -3px;
-    font-size: 6px;
-    font-weight: 900;
-    background: #eab308;
-    color: #000;
-    padding: 1px 3px;
-    border-radius: 3px;
-    letter-spacing: 0.5px;
-}
-.char-card.secret-card-tst26 {
-    border-color: rgba(236, 72, 153, 0.6);
-}
-.char-card.secret-card-tst26::after {
-    background: #ec4899;
-    color: #fff;
-}
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 
 /* SKILL POP-UP / INFO PANEL */
 .skill-info-box {

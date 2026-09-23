@@ -1,53 +1,53 @@
 # Cyber Clash WebSocket Relay Server (Online 1)
 
-High-speed WebSocket Relay Server supporting 1v1 matchmaking for **Cyber Clash: Zero-G Arena** using Room Codes.
+Server WebSocket Relay siêu tốc độ, hỗ trợ kết nối 1v1 cho **Cyber Clash: Zero-G Arena** qua cơ chế phòng chơi (Room Code).
 
 ---
 
-## 🚀 Free Deployment Guide on Render.com
+## 🚀 Hướng Dẫn Deploy Lên Render.com (Miễn Phí 100%)
 
-Render provides free Node.js Web Services supporting native WebSocket (`wss://`):
+Render cung cấp Web Service Node.js miễn phí, hỗ trợ WebSocket Native (`wss://`):
 
-### Step 1: Push source code to GitHub
-1. Create a repository on GitHub (or use your existing repo).
-2. Push the `server/` directory to GitHub (including `server.js` and `package.json`).
+### Bước 1: Đẩy mã nguồn lên GitHub
+1. Tạo một repository mới trên GitHub (hoặc dùng repo hiện tại của bạn).
+2. Đẩy thư mục `server/` lên GitHub (gồm `server.js` và `package.json`).
 
-### Step 2: Create Web Service on Render
-1. Log in to [https://dashboard.render.com/](https://dashboard.render.com/).
-2. Click **New +** -> Select **Web Service**.
-3. Select your repository and click **Connect**.
-4. Configure settings:
-   - **Name**: `cyber-clash-server` (or any custom name)
-   - **Region**: Singapore (`Southeast Asia`) or nearest region to you
+### Bước 2: Tạo Web Service trên Render
+1. Đăng nhập [https://dashboard.render.com/](https://dashboard.render.com/).
+2. Nhấn nút **New +** ở góc phải -> Chọn **Web Service**.
+3. Chọn repository GitHub vừa tạo và nhấn **Connect**.
+4. Cấu hình thông số như sau:
+   - **Name**: `cyber-clash-server` (hoặc tên tùy thích)
+   - **Region**: Singapore (`Southeast Asia`) hoặc Frankfurt / Oregon (chọn gần bạn nhất để ping thấp nhất)
    - **Branch**: `main`
-   - **Root Directory**: `server`
+   - **Root Directory**: `server` (nếu đặt trong subfolder `server`)
    - **Runtime**: `Node`
    - **Build Command**: `npm install`
    - **Start Command**: `node server.js`
    - **Instance Type**: `Free`
-5. Click **Deploy Web Service**.
+5. Nhấn **Deploy Web Service**.
 
-### Step 3: Get WebSocket URL
-- Render assigns a domain such as:
+### Bước 3: Lấy URL WebSocket
+- Sau 1 - 2 phút, Render sẽ cấp cho bạn một domain dạng:
   `https://cyber-clash-server.onrender.com`
-- The corresponding WebSocket Relay URL is:
+- Đường dẫn WebSocket Relay tương ứng sẽ là:
   `wss://cyber-clash-server.onrender.com`
-- In Cyber Clash lobby under **ONLINE 1**, paste this URL into the **RELAY SERVER** input box (or set it in `network.js`) to allow players anywhere in the world to connect.
+- Trong game Cyber Clash, tại sảnh **ONLINE 1**, bạn chỉ cần dán URL này vào ô **SERVER URL** (hoặc đặt mặc định trong `network.js`) là mọi người chơi trên thế giới (kể cả dùng 4G/5G) đều có thể kết nối ngay lập tức!
 
 ---
 
-## 💻 Running Locally (Localhost)
+## 💻 Chạy Thử Trên Máy Tính Cục Bộ (Localhost)
 
-To run the Node.js relay server locally:
+Nếu muốn test trên máy cá nhân:
 ```bash
 cd server
 npm install
 npm start
 ```
-Server runs at `ws://localhost:3000`.
+Server sẽ chạy tại `ws://localhost:3000`.
 
-Or with Python (no Node.js required):
+Hoặc nếu dùng Python (không cần cài Node.js):
 ```bash
 python server/relay_server.py
 ```
-Python server runs at `ws://localhost:3000`.
+Server Python sẽ chạy tại `ws://localhost:3000`.

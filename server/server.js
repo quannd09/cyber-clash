@@ -176,16 +176,11 @@ wss.on('connection', (ws, req) => {
                 }
 
                 const room = rooms.get(code);
-<<<<<<< HEAD
                 const currentCount = (room.members && room.members.length) || (room.client ? 2 : 1);
                 const maxLimit = room.maxPlayers || 2;
 
                 if (currentCount >= maxLimit) {
                     safeSend(ws, { type: 'ERROR', message: `Room [${code}] is full (${maxLimit} players max)!` });
-=======
-                if (room.client && room.client !== ws && room.client.readyState === WebSocket.OPEN) {
-                    safeSend(ws, { type: 'ERROR', message: `Room [${code}] is already full!` });
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
                     return;
                 }
 
@@ -280,7 +275,6 @@ function cleanupClient(ws) {
     const room = rooms.get(code);
 
     if (ws.role === 'HOST') {
-<<<<<<< HEAD
         // Host left -> inform all clients and destroy room
         if (room.members) {
             for (const m of room.members) {
@@ -289,16 +283,11 @@ function cleanupClient(ws) {
                 }
             }
         } else if (room.client && room.client.readyState === WebSocket.OPEN) {
-=======
-        // Host left -> inform client and destroy room
-        if (room.client && room.client.readyState === WebSocket.OPEN) {
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
             safeSend(room.client, { type: 'OPPONENT_LEFT', message: 'Host has left the room!' });
         }
         rooms.delete(code);
         console.log(`[Room Closed] Host left room ${code}`);
     } else if (ws.role === 'CLIENT') {
-<<<<<<< HEAD
         // Client left -> inform host and remove from room members
         if (room.members) {
             const idx = room.members.indexOf(ws);
@@ -326,11 +315,6 @@ function cleanupClient(ws) {
                 safeSend(room.host, { type: 'OPPONENT_LEFT', message: 'Opponent has disconnected!' });
             }
             room.client = null;
-=======
-        // Client left -> inform host and reset client slot
-        if (room.host && room.host.readyState === WebSocket.OPEN) {
-            safeSend(room.host, { type: 'OPPONENT_LEFT', message: 'Opponent disconnected!' });
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         }
         console.log(`[Client Disconnected] Room ${code} player left`);
     }

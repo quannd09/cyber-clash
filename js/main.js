@@ -1,5 +1,4 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-<<<<<<< HEAD
 import { sound } from './audio.js?v=75';
 import { input } from './input.js?v=75';
 import { fx } from './particles.js?v=75';
@@ -11,17 +10,6 @@ import { network } from './network.js?v=75';
 import { BotController } from './bot.js?v=75';
 import { physics } from './physics.js?v=75';
 import { mapManager, MAPS } from './maps.js?v=75';
-=======
-import { sound } from './audio.js';
-import { input } from './input.js';
-import { fx } from './particles.js';
-import { combat, Projectile } from './combat.js';
-import { Cyborg } from './cyborg.js';
-import { GameRenderer } from './renderer.js';
-import { UIManager } from './ui.js';
-import { network } from './network.js';
-import { BotController } from './bot.js';
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -92,12 +80,12 @@ class CyberClashGame {
 
     setGameMode(mode) {
         this.gameMode = mode;
-        // Player 1 mouse is enabled across all modes (LOCAL, BOT, ONLINE) so mouse aiming and left-click attack always function
+        const isLocal2P = (mode === 'LOCAL');
         if (input && typeof input.setMouseEnabled === 'function') {
-            input.setMouseEnabled(true);
+            input.setMouseEnabled(!isLocal2P);
         }
         if (this.canvas) {
-            this.canvas.style.cursor = 'crosshair';
+            this.canvas.style.cursor = isLocal2P ? 'default' : 'crosshair';
         }
     }
 
@@ -295,7 +283,7 @@ class CyberClashGame {
     syncFullscreenUI(active) {
         const fsBtn = document.getElementById('fullscreen-toggle-btn');
         if (fsBtn) {
-            fsBtn.textContent = active ? '🗗 Windowed' : '⛶ Fullscreen';
+            fsBtn.textContent = active ? '🗗 Thu nhỏ' : '⛶ Fullscreen';
         }
     }
 
@@ -323,7 +311,6 @@ class CyberClashGame {
         const charNames = {
             yanagi: 'TSUKISHIRO YANAGI',
             velina: 'VERINA AIRGID',
-            verina: 'VERINA AIRGID',
             nicole: 'NICOLE DEMARA',
             trigger: 'TRIGGER',
             vivian: 'VIVIAN BANSHEE',
@@ -335,17 +322,12 @@ class CyberClashGame {
             gojo: 'SATORU GOJO',
             sukuna: 'RYOMEN SUKUNA',
             saitama: 'SAITAMA',
-<<<<<<< HEAD
             megumi: 'FUSHIGURO MEGUMI',
             mirai: 'KURIYAMA MIRAI'
-=======
-            tst26: 'TST-26'
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         };
         const charColors = {
             yanagi: '#a78bfa',
             velina: '#34d399',
-            verina: '#34d399',
             nicole: '#f472b6',
             trigger: '#38bdf8',
             vivian: '#c084fc',
@@ -356,14 +338,9 @@ class CyberClashGame {
             luffy: '#ef4444',
             gojo: '#0284c7',
             sukuna: '#f43f5e',
-<<<<<<< HEAD
             saitama: '#facc15',
             megumi: '#38bdf8',
             mirai: '#ef4444'
-=======
-            saitama: '#eab308',
-            tst26: '#ec4899'
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         };
 
         const p1Name = charNames[p1Char] || 'TSUKISHIRO YANAGI';
@@ -875,37 +852,29 @@ class CyberClashGame {
             }
         }
 
-        // 2b. Mouse & Touch Aiming for Player 1 (Active in BOT and ONLINE modes)
-        // 2b. Direction & Aiming (Mouse Aiming for Player 1 across all modes; fallback to move dir or tracking opponent)
-        let aimDetermined = false;
-        if (index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
-            if (input.mouse && typeof input.mouse.x === 'number' && typeof input.mouse.y === 'number') {
+        // 2b. Mouse & Touch Aiming for Player 1 (Only in BOT or ONLINE mode, NEVER in LOCAL 2-player mode)
+        const isLocal2P = (this.gameMode === 'LOCAL');
+        if (!isLocal2P && index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
+            if (input.mouse && typeof input.mouse.x === 'number') {
                 const dx = input.mouse.x - player.x;
                 const dy = input.mouse.y - player.y;
-                if (Math.hypot(dx, dy) > 8) {
-                    player.setAimAngle(Math.atan2(dy, dx));
-                    aimDetermined = true;
-                }
-            }
-        }
-        
-        if (!aimDetermined) {
-            if (move && (move.x !== 0 || move.y !== 0)) {
-                player.setAimAngle(Math.atan2(move.y, move.x));
-            } else if (opponent) {
-                const dx = opponent.x - player.x;
-                const dy = opponent.y - player.y;
                 if (Math.hypot(dx, dy) > 10) {
                     player.setAimAngle(Math.atan2(dy, dx));
                 }
+            }
+        } else if (index === 0 && opponent && input && input.touchEnabled && (!move || (move.x === 0 && move.y === 0))) {
+            // When playing on mobile with touch controls and not actively steering, auto-aim towards opponent
+            const dx = opponent.x - player.x;
+            const dy = opponent.y - player.y;
+            if (Math.hypot(dx, dy) > 10) {
+                player.setAimAngle(Math.atan2(dy, dx));
             }
         }
 
         // 3. Attacks (Mouse Left Click or F for P1, Num1/J for P2, Touch Button for Mobile)
         const attack = input.getActionState(index, 'lightAttack');
         const touchAttackHeld = (index === 0 && input && input.touchEnabled && attack && attack.isDown);
-        const shouldAttack = attack && (attack.justDown || touchAttackHeld || (attack.isDown && player.attackCooldown <= 0 && !player.isAttacking));
-        if (shouldAttack) {
+        if (attack && (attack.justDown || touchAttackHeld)) {
             if (player.canAttack()) {
                 player.attack();
                 player.attackBufferTimer = 0;
@@ -1546,7 +1515,6 @@ class CyberClashGame {
         this.renderer.drawArena(this.bounds, this.is2v2Mode ? mapManager.currentMap : null);
 
         if (this.state !== STATE_LOADOUT) {
-<<<<<<< HEAD
             combat.drawProjectiles(this.ctx);
 
             if (this.is2v2Mode && this.players2v2.length > 0) {
@@ -1561,16 +1529,6 @@ class CyberClashGame {
                 fx.draw(this.ctx);
                 this.renderer.drawHUD(this.p1, this.p2, this.matchTimer, this.roundMessage);
             }
-=======
-            this.renderer.drawCyborg(this.p1);
-            this.renderer.drawCyborg(this.p2);
-
-            combat.drawProjectiles(this.ctx);
-
-            fx.draw(this.ctx);
-
-            this.renderer.drawHUD(this.p1, this.p2, this.matchTimer, this.roundMessage);
->>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         }
     }
 }

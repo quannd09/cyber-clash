@@ -8,5 +8,4 @@ Thumbs.db
 # Node / Scratch / Temporary scripts
 node_modules/
 *.py
-!serve.py
 !assets/
