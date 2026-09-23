@@ -1,18 +1,18 @@
-import { assets } from './assets.js?v=75';
-import { network } from './network.js?v=75';
-import { input } from './input.js?v=75';
+import { assets } from './assets.js';
+import { network } from './network.js';
+import { input } from './input.js';
 
 const SKILL_DATA = {
     yanagi: {
         title: '⚡ TSUKISHIRO YANAGI (MELEE • 515 HP)',
         color: '#a78bfa',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Electric Naginata (3-Hit: Đảo Cực Hút Nộ)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Electric Naginata (3-Hit: Polarity Inversion Energy Drain)', desc: '' },
             { key: 'R (Skill)', name: 'Phase Blink ⚡', desc: '' },
             { key: 'Space (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Electric Naginata (3-Hit: Đảo Cực Hút Nộ)', desc: '' },
+            { key: 'J (Melee)', name: 'Electric Naginata (3-Hit: Polarity Inversion Energy Drain)', desc: '' },
             { key: 'I (Skill)', name: 'Phase Blink ⚡', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Lightning Cannon', desc: '' }
         ]
@@ -21,13 +21,13 @@ const SKILL_DATA = {
         title: '🌸 VERINA AIRGID (RANGED • 510 HP)',
         color: '#34d399',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Photonic Flora (3-Hit: Nở Hoa Hồi 18 HP)', desc: '' },
-            { key: 'R (Skill)', name: 'Photosynthesis (Hồi 35 HP + Đẩy lùi)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Photonic Flora (3-Hit: Blossom Heal 18 HP)', desc: '' },
+            { key: 'R (Skill)', name: 'Photosynthesis (Heal 35 HP + Knockback)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Photonic Flora (3-Hit: Nở Hoa Hồi 18 HP)', desc: '' },
-            { key: 'I (Skill)', name: 'Photosynthesis (Hồi 35 HP + Đẩy lùi)', desc: '' },
+            { key: 'J (Ranged)', name: 'Photonic Flora (3-Hit: Blossom Heal 18 HP)', desc: '' },
+            { key: 'I (Skill)', name: 'Photosynthesis (Heal 35 HP + Knockback)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Life Blossom Storm', desc: '' }
         ]
     },
@@ -35,13 +35,13 @@ const SKILL_DATA = {
         title: '💼 NICOLE DEMARA (RANGED • 510 HP)',
         color: '#f472b6',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon (3-Hit: Nổ Chùm Ether)', desc: '' },
-            { key: 'R (Skill)', name: 'Sugar Slide (Trượt lùi bắn pháo)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Briefcase Cannon (3-Hit: Ether Cluster Explosion)', desc: '' },
+            { key: 'R (Skill)', name: 'Sugar Slide (Backslide Cannon Fire)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Briefcase Cannon (3-Hit: Nổ Chùm Ether)', desc: '' },
-            { key: 'I (Skill)', name: 'Sugar Slide (Trượt lùi bắn pháo)', desc: '' },
+            { key: 'J (Ranged)', name: 'Briefcase Cannon (3-Hit: Ether Cluster Explosion)', desc: '' },
+            { key: 'I (Skill)', name: 'Sugar Slide (Backslide Cannon Fire)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Gravitational Black Hole', desc: '' }
         ]
     },
@@ -49,12 +49,12 @@ const SKILL_DATA = {
         title: '🎯 TRIGGER (RANGED • 505 HP)',
         color: '#38bdf8',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Sniper Beam (3-Hit: Khóa Bạo Kích x1.4)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Sniper Beam (3-Hit: Target Lock Crit x1.4)', desc: '' },
             { key: 'R (Skill)', name: 'Sniper Stance 🎯', desc: '' },
             { key: 'Space (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Sniper Beam (3-Hit: Khóa Bạo Kích x1.4)', desc: '' },
+            { key: 'J (Ranged)', name: 'Sniper Beam (3-Hit: Target Lock Crit x1.4)', desc: '' },
             { key: 'I (Skill)', name: 'Sniper Stance 🎯', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Synchronized Firepower', desc: '' }
         ]
@@ -63,13 +63,13 @@ const SKILL_DATA = {
         title: '🔮 VIVIAN BANSHEE (RANGED • 520 HP)',
         color: '#c084fc',
         p1: [
-            { key: 'Left Click / F (Ranged)', name: 'Ether Feathers (3-Hit: Lời Nguyền Chậm Đánh)', desc: '' },
-            { key: 'R (Skill)', name: 'Abloom Burst (Hồi 20 HP + Chùm lông)', desc: '' },
+            { key: 'Left Click / F (Ranged)', name: 'Ether Feathers (3-Hit: Decay Slow Curse)', desc: '' },
+            { key: 'R (Skill)', name: 'Abloom Burst (Heal 20 HP + Feather Burst)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ],
         p2: [
-            { key: 'J (Ranged)', name: 'Ether Feathers (3-Hit: Lời Nguyền Chậm Đánh)', desc: '' },
-            { key: 'I (Skill)', name: 'Abloom Burst (Hồi 20 HP + Chùm lông)', desc: '' },
+            { key: 'J (Ranged)', name: 'Ether Feathers (3-Hit: Decay Slow Curse)', desc: '' },
+            { key: 'I (Skill)', name: 'Abloom Burst (Heal 20 HP + Feather Burst)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Feather Storm Harbinger', desc: '' }
         ]
     },
@@ -77,27 +77,27 @@ const SKILL_DATA = {
         title: '👊 JOTARO KUJO (MELEE • 525 HP)',
         color: '#818cf8',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Liên Hoàn)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Barrage)', desc: '' },
             { key: 'R (Skill)', name: 'Star Finger 👊', desc: '' },
-            { key: 'Space (Ultimate)', name: 'The World: Dừng Thời Gian', desc: '' }
+            { key: 'Space (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Liên Hoàn)', desc: '' },
+            { key: 'J (Melee)', name: 'ORA ORA (3-Hit: Stand Rush Barrage)', desc: '' },
             { key: 'I (Skill)', name: 'Star Finger 👊', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'The World: Dừng Thời Gian', desc: '' }
+            { key: 'Enter (Ultimate)', name: 'The World: Time Stop', desc: '' }
         ]
     },
     goku: {
         title: '🥋 SON GOKU (MELEE • 520 HP)',
         color: '#fbbf24',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dragon Fist (3-Hit: Nộ Kaioken +Speed +25 Eng)', desc: '' },
-            { key: 'R (Skill)', name: 'Meteor Smash (Dịch chuyển bổ búa)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dragon Fist (3-Hit: Kaioken Rage +Speed +25 Energy)', desc: '' },
+            { key: 'R (Skill)', name: 'Meteor Smash (Instant Transmission Slam)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dragon Fist (3-Hit: Nộ Kaioken +Speed +25 Eng)', desc: '' },
-            { key: 'I (Skill)', name: 'Meteor Smash (Dịch chuyển bổ búa)', desc: '' },
+            { key: 'J (Melee)', name: 'Dragon Fist (3-Hit: Kaioken Rage +Speed +25 Energy)', desc: '' },
+            { key: 'I (Skill)', name: 'Meteor Smash (Instant Transmission Slam)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Super Kamehameha', desc: '' }
         ]
     },
@@ -105,12 +105,12 @@ const SKILL_DATA = {
         title: '🐞 GIORNO GIOVANNA (MELEE • 515 HP)',
         color: '#facc15',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA (3-Hit: Quá Tải Cảm Giác -50% Speed)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'MUDA MUDA (3-Hit: Sensory Overload -50% Speed)', desc: '' },
             { key: 'R (Skill)', name: 'Tree of Life 🌳', desc: '' },
             { key: 'Space (Ultimate)', name: 'Return To Zero (GER)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'MUDA MUDA (3-Hit: Quá Tải Cảm Giác -50% Speed)', desc: '' },
+            { key: 'J (Melee)', name: 'MUDA MUDA (3-Hit: Sensory Overload -50% Speed)', desc: '' },
             { key: 'I (Skill)', name: 'Tree of Life 🌳', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Return To Zero (GER)', desc: '' }
         ]
@@ -119,13 +119,13 @@ const SKILL_DATA = {
         title: '🎞️ NAOYA ZEN\'IN (MELEE • 510 HP)',
         color: '#a3e635',
         p1: [
-            { key: 'Left Click / F (Melee)', name: '24 FPS Fists (3-Hit: Đóng Băng Khung Hình)', desc: '' },
-            { key: 'R (Skill)', name: 'Projection Step 🎞️ (Tàn ảnh)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: '24 FPS Fists (3-Hit: Frame Freeze)', desc: '' },
+            { key: 'R (Skill)', name: 'Projection Step 🎞️ (Afterimages)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Mach 3 Barrage (10 FPS)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: '24 FPS Fists (3-Hit: Đóng Băng Khung Hình)', desc: '' },
-            { key: 'I (Skill)', name: 'Projection Step 🎞️ (Tàn ảnh)', desc: '' },
+            { key: 'J (Melee)', name: '24 FPS Fists (3-Hit: Frame Freeze)', desc: '' },
+            { key: 'I (Skill)', name: 'Projection Step 🎞️ (Afterimages)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Mach 3 Barrage (10 FPS)', desc: '' }
         ]
     },
@@ -133,12 +133,12 @@ const SKILL_DATA = {
         title: '🍖 MONKEY D. LUFFY (MELEE • 520 HP)',
         color: '#ef4444',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Bazooka Dội Tường)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Wall Bounce Bazooka)', desc: '' },
             { key: 'R (Skill)', name: 'Gigant Stomp 🍖', desc: '' },
             { key: 'Space (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Bazooka Dội Tường)', desc: '' },
+            { key: 'J (Melee)', name: 'Gomu Gomu Pistol (3-Hit: Wall Bounce Bazooka)', desc: '' },
             { key: 'I (Skill)', name: 'Gigant Stomp 🍖', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Bajrang Gun', desc: '' }
         ]
@@ -147,31 +147,32 @@ const SKILL_DATA = {
         title: '♾️ SATORU GOJO (MELEE • 515 HP)',
         color: '#0284c7',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Black Flash (Passive: Vô Hạn Trụ Chậm Đạn • 3-Hit: Hắc Thiểm)', desc: '' },
-            { key: 'R (Skill)', name: 'Lapse Blue 🌀 (Hút Chân Không)', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌 (Tê Liệt Vô Hạn)', desc: '' }
+            { key: 'Left Click / F (Melee)', name: 'Black Flash (Passive: Infinity Bullet Slow • 3-Hit: Black Flash)', desc: '' },
+            { key: 'R (Skill)', name: 'Lapse Blue 🌀 (Vacuum Vortex)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'Unlimited Void 🌌 (Infinite Domain Paralysis)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Black Flash (Passive: Vô Hạn Trụ Chậm Đạn • 3-Hit: Hắc Thiểm)', desc: '' },
-            { key: 'I (Skill)', name: 'Lapse Blue 🌀 (Hút Chân Không)', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌 (Tê Liệt Vô Hạn)', desc: '' }
+            { key: 'J (Melee)', name: 'Black Flash (Passive: Infinity Bullet Slow • 3-Hit: Black Flash)', desc: '' },
+            { key: 'I (Skill)', name: 'Lapse Blue 🌀 (Vacuum Vortex)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'Unlimited Void 🌌 (Infinite Domain Paralysis)', desc: '' }
         ]
     },
     sukuna: {
         title: '⛩️ RYOMEN SUKUNA (MELEE • 520 HP)',
         color: '#f43f5e',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes (3-Hit: Bát Trảm Xé Giáp + Chảy Máu)', desc: '' },
-            { key: 'R (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Dismantle Slashes (3-Hit: Cleave Armor Tear + Bleed)', desc: '' },
+            { key: 'R (Skill)', name: 'Kamino: Fuga 🔥 (Flame Arrow Blast)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Dismantle Slashes (3-Hit: Bát Trảm Xé Giáp + Chảy Máu)', desc: '' },
-            { key: 'I (Skill)', name: 'Kamino: Fuga 🔥 (Tên Lửa Nổ)', desc: '' },
+            { key: 'J (Melee)', name: 'Dismantle Slashes (3-Hit: Cleave Armor Tear + Bleed)', desc: '' },
+            { key: 'I (Skill)', name: 'Kamino: Fuga 🔥 (Flame Arrow Blast)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Malevolent Shrine ⛩️', desc: '' }
         ]
     },
     saitama: {
+<<<<<<< HEAD
         title: '👊 SAITAMA (HERO • 535 HP)',
         color: '#f59e0b',
         p1: [
@@ -211,6 +212,33 @@ const SKILL_DATA = {
             { key: 'J (Melee)', name: 'Blood Katana (3-Hit: Huyết Kiếm Hồi HP)', desc: '' },
             { key: 'I (Skill)', name: 'Blood Crescent Wave 🩸 (Trăng máu tiêu HP)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Blood Cataclysm ⚔️ (Đại Huyết Kiếm Trảm)', desc: '' }
+=======
+        title: '🥊 SAITAMA (SECRET MELEE • 650 HP)',
+        color: '#eab308',
+        p1: [
+            { key: 'Left Click / F (Melee)', name: 'Normal Punches (3-Hit: Serious Consecutive Punches)', desc: '' },
+            { key: 'R (Skill)', name: 'Consecutive Normal Punches 🥊 (Heavy Knockback Barrage)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'SERIOUS PUNCH: DEATH IMPACT (1.45x Multiplier)', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Melee)', name: 'Normal Punches (3-Hit: Serious Consecutive Punches)', desc: '' },
+            { key: 'I (Skill)', name: 'Consecutive Normal Punches 🥊 (Heavy Knockback Barrage)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'SERIOUS PUNCH: DEATH IMPACT (1.45x Multiplier)', desc: '' }
+        ]
+    },
+    tst26: {
+        title: '🎀 TST-26 (SECRET RANGED • 600 HP)',
+        color: '#ec4899',
+        p1: [
+            { key: 'Left Click / F (Ranged)', name: 'Sub-space Micro-Missiles (3-Hit: Hyper Beam + Heal 20 HP)', desc: '' },
+            { key: 'R (Skill)', name: 'Maid Purge Vortex 🎀 (Heal 35 HP + Graviton Pull)', desc: '' },
+            { key: 'Space (Ultimate)', name: 'MAXIMUM MAID SANITIZATION (1.3x Multiplier Beam)', desc: '' }
+        ],
+        p2: [
+            { key: 'J (Ranged)', name: 'Sub-space Micro-Missiles (3-Hit: Hyper Beam + Heal 20 HP)', desc: '' },
+            { key: 'I (Skill)', name: 'Maid Purge Vortex 🎀 (Heal 35 HP + Graviton Pull)', desc: '' },
+            { key: 'Enter (Ultimate)', name: 'MAXIMUM MAID SANITIZATION (1.3x Multiplier Beam)', desc: '' }
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         ]
     }
 };
@@ -275,6 +303,8 @@ export class UIManager {
 
     initUI() {
         this.setupCharacterSelection();
+        this.setupSecretTerminal();
+        this.loadUnlockedSecrets();
         this.setupOnlineUI();
         this.setup2v2UI();
 
@@ -539,7 +569,7 @@ export class UIManager {
                     bannerModeIndicator.style.color = '#34d399';
                 }
                 if (lobbyGuideNote) {
-                    lobbyGuideNote.innerHTML = '💡 <strong>Online 1 (WebSocket):</strong> Cả 2 người chơi kết nối qua Server trung gian (Render/Localhost). Host bấm <strong>⚡ CREATE ROOM</strong> và chia sẻ mã CLASH-XXXX cho Khách bấm <strong>🚀 JOIN</strong>.';
+                    lobbyGuideNote.innerHTML = '💡 <strong>Online 1 (WebSocket):</strong> Both players connect via central Relay Server (Render/Localhost). Host clicks <strong>⚡ CREATE ROOM</strong> and shares the CLASH-XXXX code with Guest to click <strong>🚀 JOIN</strong>.';
                 }
             } else {
                 if (online1Tab) online1Tab.classList.remove('active');
@@ -553,7 +583,7 @@ export class UIManager {
                     bannerModeIndicator.style.color = '#c084fc';
                 }
                 if (lobbyGuideNote) {
-                    lobbyGuideNote.innerHTML = '💡 <strong>Online 2 (WebRTC P2P):</strong> Kết nối trực tiếp máy-đến-máy thông qua PeerJS STUN/TURN. Host bấm <strong>⚡ CREATE ROOM</strong> và gửi mã cho Player 2 bấm <strong>🚀 JOIN</strong>.';
+                    lobbyGuideNote.innerHTML = '💡 <strong>Online 2 (WebRTC P2P):</strong> Direct peer-to-peer connection via WebRTC STUN/TURN. Host clicks <strong>⚡ CREATE ROOM</strong> and sends code to Player 2 to click <strong>🚀 JOIN</strong>.';
                 }
             }
 
@@ -606,7 +636,7 @@ export class UIManager {
                 const url = inputWsServer.value.trim();
                 network.setWsServerUrl(url);
                 if (globalMsg) {
-                    globalMsg.textContent = url ? `Đã lưu Relay Server: ${url}` : 'Đã khôi phục Relay Server mặc định (localhost / Render)';
+                    globalMsg.textContent = url ? `Relay Server saved: ${url}` : 'Restored default Relay Server (localhost / Render)';
                     globalMsg.classList.remove('error');
                 }
                 btnSaveServer.textContent = '✔️ SAVED!';
@@ -934,6 +964,7 @@ export class UIManager {
             if (this.switchToLocal) this.switchToLocal();
             const modal = document.getElementById('disconnect-modal');
             const msg = document.getElementById('disconnect-msg');
+<<<<<<< HEAD
             if (msg) msg.textContent = 'Đối thủ đã rời khỏi phòng hoặc thoát về menu chính.';
         } else if (data.type === '2V2_MATCH_START') {
             this.hideLoadout();
@@ -965,6 +996,10 @@ export class UIManager {
             const selectRedBan = document.getElementById('select-red-ban');
             if (selectBlueBan && data.bans.blue) selectBlueBan.value = data.bans.blue;
             if (selectRedBan && data.bans.red) selectRedBan.value = data.bans.red;
+=======
+            if (msg) msg.textContent = 'Opponent has left the room or returned to the lobby.';
+            if (modal) modal.classList.remove('hidden');
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         } else if (this.onNetworkGameData) {
             this.onNetworkGameData(data);
         }
@@ -972,7 +1007,11 @@ export class UIManager {
 
     updateCardSelection(player, charId) {
         document.querySelectorAll(`.char-card[data-player="${player}"]`).forEach(card => {
+<<<<<<< HEAD
             card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno', 'selected-naoya', 'selected-luffy', 'selected-gojo', 'selected-sukuna', 'selected-saitama', 'selected-megumi', 'selected-mirai');
+=======
+            card.classList.remove('selected', 'selected-yanagi', 'selected-velina', 'selected-nicole', 'selected-trigger', 'selected-vivian', 'selected-jotaro', 'selected-goku', 'selected-giorno', 'selected-naoya', 'selected-luffy', 'selected-gojo', 'selected-sukuna', 'selected-saitama', 'selected-tst26');
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
             if (card.dataset.char === charId) {
                 card.classList.add('selected', `selected-${charId}`);
             }
@@ -1273,7 +1312,7 @@ export class UIManager {
 
                     activeListeningBtn = btn;
                     btn.classList.add('listening');
-                    btn.textContent = 'BẤM PHÍM...';
+                    btn.textContent = 'PRESS KEY...';
                 });
             });
         };
@@ -1321,6 +1360,199 @@ export class UIManager {
         }
 
         renderTables();
+    }
+
+    getUnlockedSecrets() {
+        try {
+            const raw = localStorage.getItem('cyber_clash_unlocked_secrets');
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    saveUnlockedSecret(charId) {
+        try {
+            const list = this.getUnlockedSecrets();
+            if (!list.includes(charId)) {
+                list.push(charId);
+                localStorage.setItem('cyber_clash_unlocked_secrets', JSON.stringify(list));
+            }
+        } catch (e) {}
+    }
+
+    injectSecretCard(charId) {
+        const info = {
+            saitama: {
+                title: 'Saitama',
+                color: '#facc15',
+                typeClass: 'type-saitama',
+                typeText: '🥊 MELEE',
+                avatar: 'assets/saitama/avatar.png?v=75',
+                cardExtraClass: 'secret-card'
+            },
+            tst26: {
+                title: 'TST-26',
+                color: '#f472b6',
+                typeClass: 'type-tst26',
+                typeText: '🎀 RANGED',
+                avatar: 'assets/tst26/avatar.png?v=75',
+                cardExtraClass: 'secret-card secret-card-tst26'
+            }
+        }[charId];
+
+        if (!info) return;
+
+        ['p1', 'p2'].forEach(player => {
+            const grid = document.getElementById(`${player}-char-grid`);
+            if (!grid) return;
+
+            // Check if already injected
+            if (grid.querySelector(`.char-card[data-char="${charId}"]`)) return;
+
+            const card = document.createElement('div');
+            card.className = `char-card ${info.cardExtraClass}`;
+            card.dataset.player = player;
+            card.dataset.char = charId;
+            card.innerHTML = `
+                <img src="${info.avatar}" class="char-avatar" alt="${info.title}">
+                <div class="char-title" style="color: ${info.color};">${info.title}</div>
+                <span class="char-type ${info.typeClass}">${info.typeText}</span>
+            `;
+
+            card.addEventListener('click', () => {
+                if (this.gameMode === 'ONLINE' && player === 'p1' && this.networkRole === 'CLIENT') return;
+                if (this.gameMode === 'ONLINE' && player === 'p2' && this.networkRole === 'HOST') return;
+
+                if (player === 'p1') {
+                    this.p1Char = charId;
+                    this.updateCardSelection('p1', charId);
+                    this.renderSkillInfo('p1', charId);
+                    if (this.gameMode === 'ONLINE') {
+                        network.send({ type: 'CHAR_SELECT', player: 'p1', charId });
+                    }
+                } else {
+                    this.p2Char = charId;
+                    this.updateCardSelection('p2', charId);
+                    this.renderSkillInfo('p2', charId);
+                    if (this.gameMode === 'ONLINE') {
+                        network.send({ type: 'CHAR_SELECT', player: 'p2', charId });
+                    }
+                }
+            });
+
+            grid.appendChild(card);
+        });
+    }
+
+    loadUnlockedSecrets() {
+        const unlocked = this.getUnlockedSecrets();
+        unlocked.forEach(charId => {
+            this.injectSecretCard(charId);
+        });
+    }
+
+    setupSecretTerminal() {
+        const modal = document.getElementById('secret-code-modal');
+        const inputKey = document.getElementById('input-secret-key');
+        const btnSubmit = document.getElementById('btn-submit-secret');
+        const btnCancel = document.getElementById('btn-cancel-secret');
+        const btnClose = document.getElementById('btn-close-secret');
+        const msgBox = document.getElementById('secret-terminal-msg');
+
+        if (!modal) return;
+
+        const openModal = () => {
+            modal.classList.remove('hidden');
+            if (inputKey) {
+                inputKey.value = '';
+                setTimeout(() => inputKey.focus(), 80);
+            }
+            if (msgBox) {
+                msgBox.textContent = 'RESTRICTED TERMINAL READY. AWAITING INPUT.';
+                msgBox.style.color = '#94a3b8';
+            }
+        };
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        // Shortcut: Ctrl + Shift + CapsLock
+        window.addEventListener('keydown', (e) => {
+            const isCaps = (e.code === 'CapsLock' || e.key === 'CapsLock');
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && isCaps) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (modal.classList.contains('hidden')) {
+                    openModal();
+                } else {
+                    closeModal();
+                }
+            } else if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
+            }
+        });
+
+        if (btnClose) btnClose.addEventListener('click', closeModal);
+        if (btnCancel) btnCancel.addEventListener('click', closeModal);
+
+        const verifyKey = () => {
+            if (!inputKey || !msgBox) return;
+            const key = inputKey.value.trim().toLowerCase();
+            if (!key) {
+                msgBox.textContent = 'ERROR: PLEASE ENTER AN ACCESS KEY.';
+                msgBox.style.color = '#f87171';
+                return;
+            }
+
+            const currentSecrets = this.getUnlockedSecrets();
+
+            if (key === 'vvn') {
+                if (currentSecrets.includes('saitama')) {
+                    msgBox.textContent = 'NOTICE: SAITAMA IS ALREADY UNLOCKED!';
+                    msgBox.style.color = '#fbbf24';
+                    return;
+                }
+                this.saveUnlockedSecret('saitama');
+                this.injectSecretCard('saitama');
+                this.p1Char = 'saitama';
+                this.updateCardSelection('p1', 'saitama');
+                this.renderSkillInfo('p1', 'saitama');
+                msgBox.textContent = 'ACCESS GRANTED: SAITAMA UNLOCKED!';
+                msgBox.style.color = '#4ade80';
+                inputKey.value = '';
+                setTimeout(() => closeModal(), 1400);
+            } else if (key === 'tst26') {
+                if (currentSecrets.includes('tst26')) {
+                    msgBox.textContent = 'NOTICE: TST-26 IS ALREADY UNLOCKED!';
+                    msgBox.style.color = '#fbbf24';
+                    return;
+                }
+                this.saveUnlockedSecret('tst26');
+                this.injectSecretCard('tst26');
+                this.p1Char = 'tst26';
+                this.updateCardSelection('p1', 'tst26');
+                this.renderSkillInfo('p1', 'tst26');
+                msgBox.textContent = 'ACCESS GRANTED: TST-26 UNLOCKED!';
+                msgBox.style.color = '#4ade80';
+                inputKey.value = '';
+                setTimeout(() => closeModal(), 1400);
+            } else {
+                msgBox.textContent = 'ACCESS DENIED: INVALID AUTHORIZATION KEY!';
+                msgBox.style.color = '#ef4444';
+            }
+        };
+
+        if (btnSubmit) btnSubmit.addEventListener('click', verifyKey);
+        if (inputKey) {
+            inputKey.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    verifyKey();
+                }
+            });
+        }
     }
 
     checkBothReady() {

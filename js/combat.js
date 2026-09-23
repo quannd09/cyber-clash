@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=75';
-import { fx } from './particles.js?v=75';
-import { physics } from './physics.js?v=75';
+import { sound } from './audio.js';
+import { fx } from './particles.js';
+import { physics } from './physics.js';
 
 export const WEAPONS = {
     YANAGI: {
@@ -14,6 +14,16 @@ export const WEAPONS = {
         icon: '⚔️'
     },
     VELINA: {
+        id: 'VELINA',
+        name: 'Photonic Flora',
+        attackDmg: 25,
+        attackRange: 540,
+        attackDuration: 20,
+        attackCooldown: 22,
+        isRanged: true,
+        icon: '🌸'
+    },
+    VERINA: {
         id: 'VELINA',
         name: 'Photonic Flora',
         attackDmg: 25,
@@ -125,6 +135,7 @@ export const WEAPONS = {
     },
     SAITAMA: {
         id: 'SAITAMA',
+<<<<<<< HEAD
         name: 'Consecutive Punches',
         attackDmg: 33,
         attackRange: 85,
@@ -152,6 +163,25 @@ export const WEAPONS = {
         attackCooldown: 20,
         isRanged: false,
         icon: '🩸'
+=======
+        name: 'Serious Combat Fist',
+        attackDmg: 45,
+        attackRange: 105,
+        attackDuration: 16,
+        attackCooldown: 18,
+        isRanged: false,
+        icon: '🥊'
+    },
+    TST26: {
+        id: 'TST26',
+        name: 'Maid Precision Protocol',
+        attackDmg: 38,
+        attackRange: 560,
+        attackDuration: 17,
+        attackCooldown: 19,
+        isRanged: true,
+        icon: '🎀'
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
     }
 };
 
@@ -168,24 +198,29 @@ export const SKILLS = {
     LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
     GOJO_SKILL: { id: 'LAPSE_BLUE', name: 'Lapse Blue', cooldown: 210, icon: '🌀' },
     SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' },
+<<<<<<< HEAD
     SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 210, icon: '🥊' },
     MEGUMI_SKILL: { id: 'DIVINE_DOG', name: 'Divine Dog Lunge', cooldown: 220, icon: '🐺' },
     MIRAI_SKILL: { id: 'BLOOD_CRESCENT', name: 'Blood Crescent Wave', cooldown: 200, icon: '🩸' }
+=======
+    SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 170, icon: '🥊' },
+    TST26_SKILL: { id: 'MAID_PURGE', name: 'Absolute Sanitization Sweep', cooldown: 175, icon: '🎀' }
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 };
 
 export class Projectile {
     constructor(ownerIndex, x, y, vx, vy, damage, color, radius = 8, type = 'standard') {
         this.ownerIndex = ownerIndex;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.damage = damage;
-        this.color = color;
-        this.radius = radius;
+        this.x = Number.isFinite(x) ? x : 0;
+        this.y = Number.isFinite(y) ? y : 0;
+        this.vx = Number.isFinite(vx) ? vx : 0;
+        this.vy = Number.isFinite(vy) ? vy : 0;
+        this.damage = Number.isFinite(damage) ? damage : 20;
+        this.color = color || '#ffffff';
+        this.radius = Number.isFinite(radius) ? radius : 8;
         this.life = 160;
         this.isReflected = false;
-        this.type = type; // 'standard', 'hollow_purple', 'fire_orb'
+        this.type = type || 'standard';
         this.animTimer = 0;
     }
 
@@ -207,6 +242,18 @@ export class Projectile {
             if (Math.random() < 0.8) {
                 const flameColor = Math.random() < 0.6 ? '#dc2626' : '#f97316';
                 fx.spawnHitSparks(this.x, this.y, flameColor, 2);
+            }
+        } else if (this.type === 'projection_frame') {
+            // Lime green 24 FPS film shutter sparks
+            if (Math.random() < 0.7) {
+                const sparkColor = Math.random() < 0.5 ? '#a3e635' : '#bef264';
+                fx.spawnHitSparks(this.x, this.y, sparkColor, 1);
+            }
+        } else if (this.type === 'photonic_flora') {
+            // Emerald & mint floral glowing petal sparks
+            if (Math.random() < 0.75) {
+                const sparkColor = Math.random() < 0.6 ? '#34d399' : '#a7f3d0';
+                fx.spawnHitSparks(this.x, this.y, sparkColor, 1);
             }
         } else {
             // Standard Spark tail
@@ -267,7 +314,7 @@ export class Projectile {
             ctx.stroke();
 
         } else if (this.type === 'fire_orb') {
-            // SUKUNA: CRIMSON FIRE ORB / FIREBALL (Rực lửa đỏ cam cuồn cuộn)
+            // SUKUNA: CRIMSON FIRE ORB / FIREBALL (Swirling crimson flame sphere)
             const r = this.radius;
             const pulse = Math.sin(this.animTimer * 0.3) * 3;
 
@@ -315,6 +362,7 @@ export class Projectile {
             ctx.lineTo(this.x - Math.cos(angle) * 36, this.y - Math.sin(angle) * 36);
             ctx.stroke();
 
+<<<<<<< HEAD
         } else if (this.type === 'shadow_dog') {
             // MEGUMI: SHADOW DIVINE DOG 🐺
             const angle = Math.atan2(this.vy, this.vx);
@@ -390,17 +438,301 @@ export class Projectile {
             ctx.fillStyle = '#ffffff';
             ctx.strokeStyle = this.color;
             ctx.lineWidth = 3;
+=======
+        } else if (this.type === 'projection_frame') {
+            // NAOYA: 24 FPS PROJECTION FRAME BLADE / SORCERY FILM WAVE
+            const r = this.radius;
+            const angle = Math.atan2(this.vy, this.vx);
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+
+            ctx.shadowColor = '#a3e635';
+            ctx.shadowBlur = 24;
+
+            // Translucent glowing projection glass frame
+            ctx.fillStyle = 'rgba(163, 230, 53, 0.32)';
+            ctx.strokeStyle = '#a3e635';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-r * 1.5, -r, r * 3, r * 2);
+            ctx.fillRect(-r * 1.5, -r, r * 3, r * 2);
+
+            // Cinema film sprocket holes along the top and bottom edge
+            ctx.fillStyle = '#ffffff';
+            for (let i = -1; i <= 1; i++) {
+                ctx.fillRect(i * (r * 0.8) - 2, -r + 1, 4, 3);
+                ctx.fillRect(i * (r * 0.8) - 2, r - 4, 4, 3);
+            }
+
+            // High-speed center motion blade
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.moveTo(-r * 1.8, 0);
+            ctx.lineTo(r * 1.8, 0);
             ctx.stroke();
 
-            // Projectile direction beam tail
+            ctx.restore();
+
+        } else if (this.type === 'photonic_flora') {
+            // VERINA: PHOTONIC FLORA BLOSSOM (Radiant emerald-mint botanical energy orb)
+            const r = Math.max(18, this.radius);
+            const pulse = Math.sin(this.animTimer * 0.35) * 3;
             const angle = Math.atan2(this.vy, this.vx);
+
+            // 1. Long radiant emerald motion tail (65px)
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 65, this.y - Math.sin(angle) * 65
+            );
+            tailGrad.addColorStop(0, 'rgba(52, 211, 153, 0.9)');
+            tailGrad.addColorStop(0.5, 'rgba(16, 185, 129, 0.45)');
+            tailGrad.addColorStop(1, 'rgba(5, 150, 105, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 10;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x - Math.cos(angle) * 22, this.y - Math.sin(angle) * 22);
+            ctx.lineTo(this.x - Math.cos(angle) * 65, this.y - Math.sin(angle) * 65);
+            ctx.stroke();
+
+            // 2. Wide glowing outer aura
+            ctx.shadowColor = '#10b981';
+            ctx.shadowBlur = 35;
+
+            // 3. Orbiting floral petals
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.animTimer * 0.16);
+
+            ctx.fillStyle = 'rgba(167, 243, 208, 0.9)';
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 2.5;
+            for (let i = 0; i < 6; i++) {
+                const petalAngle = i * (Math.PI * 2 / 6);
+                const px = Math.cos(petalAngle) * (r + 6 + pulse);
+                const py = Math.sin(petalAngle) * (r + 6 + pulse);
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // Central radiant flora core
+            const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, r + 4);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.25, '#d1fae5');
+            grad.addColorStop(0.65, '#34d399');
+            grad.addColorStop(1, '#059669');
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Diamond crystal highlight
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.55);
+            ctx.lineTo(r * 0.55, 0);
+            ctx.lineTo(0, r * 0.55);
+            ctx.lineTo(-r * 0.55, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+
+        } else if (this.type === 'ether_cluster') {
+            // NICOLE: ETHER CLUSTER EXPLOSIVE (Vibrant magenta/hot-pink ether vortex)
+            const r = Math.max(20, this.radius);
+            const pulse = Math.sin(this.animTimer * 0.4) * 4;
+            const angle = Math.atan2(this.vy, this.vx);
+
+            // Gravitational distortion tail
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 75, this.y - Math.sin(angle) * 75
+            );
+            tailGrad.addColorStop(0, 'rgba(244, 114, 182, 0.95)');
+            tailGrad.addColorStop(0.5, 'rgba(219, 39, 119, 0.5)');
+            tailGrad.addColorStop(1, 'rgba(131, 24, 67, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 14;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 75, this.y - Math.sin(angle) * 75);
+            ctx.stroke();
+
+            ctx.shadowColor = '#f472b6';
+            ctx.shadowBlur = 40;
+
+            // Rotating vortex rings
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.animTimer * 0.22);
+            ctx.strokeStyle = 'rgba(251, 207, 232, 0.85)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r + 7 + pulse, (r + 7 + pulse) * 0.5, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Core
+            const grad = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, r + 3);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, '#fbcfe8');
+            grad.addColorStop(0.7, '#ec4899');
+            grad.addColorStop(1, '#831843');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+            ctx.fill();
+
+        } else if (this.type === 'sniper_beam') {
+            // TRIGGER: ELECTROMAGNETIC PLASMA RAILGUN DART
+            const r = Math.max(16, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            // Piercing railgun beam line (110px)
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 110, this.y - Math.sin(angle) * 110
+            );
+            tailGrad.addColorStop(0, '#ffffff');
+            tailGrad.addColorStop(0.3, '#38bdf8');
+            tailGrad.addColorStop(0.7, '#0284c7');
+            tailGrad.addColorStop(1, 'rgba(2, 132, 199, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 110, this.y - Math.sin(angle) * 110);
+            ctx.stroke();
+
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 35;
+
+            // Sharp plasma arrowhead
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(r * 1.6, 0);
+            ctx.lineTo(-r, -r * 0.8);
+            ctx.lineTo(-r * 0.4, 0);
+            ctx.lineTo(-r, r * 0.8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+        } else if (this.type === 'ether_feather') {
+            // VIVIAN: ABYSSAL BANSHEE ETHER FEATHER
+            const r = Math.max(18, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 70, this.y - Math.sin(angle) * 70
+            );
+            tailGrad.addColorStop(0, 'rgba(192, 132, 252, 0.95)');
+            tailGrad.addColorStop(0.6, 'rgba(147, 51, 234, 0.45)');
+            tailGrad.addColorStop(1, 'rgba(88, 28, 135, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 70, this.y - Math.sin(angle) * 70);
+            ctx.stroke();
+
+            ctx.shadowColor = '#c084fc';
+            ctx.shadowBlur = 35;
+
+            // Feather shape
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, r + 4);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.35, '#e9d5ff');
+            grad.addColorStop(0.75, '#a855f7');
+            grad.addColorStop(1, '#581c87');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r * 1.4, r * 0.7, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+        } else if (this.type === 'maid_needle') {
+            // TST-26: ABSOLUTE PRECISION SANITIZATION NEEDLE
+            const r = Math.max(16, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 80, this.y - Math.sin(angle) * 80
+            );
+            tailGrad.addColorStop(0, '#ffffff');
+            tailGrad.addColorStop(0.4, '#ec4899');
+            tailGrad.addColorStop(1, 'rgba(236, 72, 153, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 80, this.y - Math.sin(angle) * 80);
+            ctx.stroke();
+
+            ctx.shadowColor = '#ec4899';
+            ctx.shadowBlur = 35;
+
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#f472b6';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(r * 1.5, 0);
+            ctx.lineTo(0, -r * 0.6);
+            ctx.lineTo(-r * 1.5, 0);
+            ctx.lineTo(0, r * 0.6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+        } else {
+            // Standard / Custom colored glowing energy orb
+            const r = Math.max(16, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 60, this.y - Math.sin(angle) * 60
+            );
+            tailGrad.addColorStop(0, '#ffffff');
+            tailGrad.addColorStop(0.5, this.color);
+            tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 60, this.y - Math.sin(angle) * 60);
+            ctx.stroke();
+
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 3.5;
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+            ctx.fill();
             ctx.stroke();
         }
 
@@ -432,6 +764,7 @@ export class CombatResolver {
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
 
+<<<<<<< HEAD
             // Satoru Gojo: Infinity Barrier (Vô Hạn Trụ) - Slow down enemy projectiles within 150px
             for (const target of players) {
                 if (target && target.characterId === 'gojo' && target.index !== p.ownerIndex && !target.isStunned && !target.isDead) {
@@ -439,6 +772,12 @@ export class CombatResolver {
                         const owner = players.find(pl => pl && pl.index === p.ownerIndex);
                         if (owner && owner.teamId === target.teamId) continue; // Same team
                     }
+=======
+            // Satoru Gojo: Infinity Barrier - Slows opponent projectiles within 150px
+            if (p1 && p2) {
+                const target = (p.ownerIndex === 0) ? p2 : p1;
+                if (target && target.characterId === 'gojo' && !target.isStunned && !target.isDead) {
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
                     const distToGo = Math.hypot(target.x - p.x, target.y - p.y);
                     if (distToGo < 150) {
                         p.vx *= 0.70;
@@ -452,10 +791,13 @@ export class CombatResolver {
 
             p.update(dt);
 
-            // Bounds check
-            if (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
-                p.y < arenaBounds.minY || p.y > arenaBounds.maxY || p.life <= 0) {
-                fx.spawnHitSparks(p.x, p.y, p.color, 8);
+            // Bounds & safety check
+            if (!Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+                (arenaBounds && (p.x < arenaBounds.minX || p.x > arenaBounds.maxX ||
+                p.y < arenaBounds.minY || p.y > arenaBounds.maxY)) || p.life <= 0) {
+                if (Number.isFinite(p.x) && Number.isFinite(p.y)) {
+                    fx.spawnHitSparks(p.x, p.y, p.color, 8);
+                }
                 this.projectiles.splice(i, 1);
             }
         }
@@ -661,7 +1003,7 @@ export class CombatResolver {
                     defender.takeDamage(16);
                     defender.bleedTimer = 45;
                     defender.applyStun(16);
-                    fx.addText(defender.x, defender.y - 45, '🩸 CLEAVE (BÁT TRẢM)! -16', '#f43f5e', 24);
+                    fx.addText(defender.x, defender.y - 45, '🩸 CLEAVE! -16', '#f43f5e', 24);
                     fx.spawnHitSparks(defender.x, defender.y, '#f43f5e', 20);
                     attacker.signatureHits = 0;
                 } else {
@@ -672,7 +1014,7 @@ export class CombatResolver {
                     defender.takeDamage(15);
                     attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
                     defender.applyStun(16);
-                    fx.addText(defender.x, defender.y - 45, '⚡ HẮC THIỂM (BLACK FLASH)! -15', '#0284c7', 24);
+                    fx.addText(defender.x, defender.y - 45, '⚡ BLACK FLASH! -15', '#0284c7', 24);
                     fx.spawnHitSparks(defender.x, defender.y, '#ef4444', 22);
                     attacker.signatureHits = 0;
                 } else {
@@ -710,6 +1052,29 @@ export class CombatResolver {
                 } else {
                     fx.addText(attacker.x, attacker.y - 25, `🐞 MUDA [${hitCount}/3]`, '#facc15', 18);
                 }
+            } else if (attacker.characterId === 'saitama') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(28);
+                    defender.applyStun(22);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 22);
+                    fx.addText(defender.x, defender.y - 45, '💥 CONSECUTIVE NORMAL PUNCHES! -28', '#eab308', 26);
+                    fx.spawnHitSparks(defender.x, defender.y, '#eab308', 28);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🥊 SERIOUS [${hitCount}/3]`, '#eab308', 18);
+                }
+            } else if (attacker.characterId === 'tst26') {
+                if (hitCount >= 3) {
+                    defender.takeDamage(24);
+                    defender.applyStun(18);
+                    attacker.hp = Math.min(attacker.maxHp, attacker.hp + 20);
+                    physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 18);
+                    fx.addText(defender.x, defender.y - 45, '🎀 MAID ORDER EXECUTE! -24', '#ec4899', 24);
+                    fx.spawnHitSparks(defender.x, defender.y, '#ec4899', 24);
+                    attacker.signatureHits = 0;
+                } else {
+                    fx.addText(attacker.x, attacker.y - 25, `🎀 ORDER [${hitCount}/3]`, '#ec4899', 18);
+                }
             }
 
             sound.playHit(true);
@@ -732,11 +1097,17 @@ export class CombatResolver {
             const proj = this.projectiles[i];
             const attacker = players.find(p => p && p.index === proj.ownerIndex) || players[proj.ownerIndex] || null;
 
+<<<<<<< HEAD
             for (const defender of players) {
                 if (!defender || defender.isDead) continue;
                 // Friendly Fire OFF
                 if (attacker && defender.teamId === attacker.teamId) continue;
                 if (defender.index === proj.ownerIndex) continue;
+=======
+            // Capsule hitbox covering entire character body from head to feet
+            const targetY = Math.max(defender.y - 55, Math.min(defender.y + 30, proj.y));
+            const dist = Math.hypot(defender.x - proj.x, targetY - proj.y);
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
 
                 // Hitbox dạng hình con nhộng (Capsule) bao phủ toàn bộ cơ thể nhân vật từ đầu tới chân
                 const targetY = Math.max(defender.y - 55, Math.min(defender.y + 30, proj.y));
@@ -849,6 +1220,74 @@ export class CombatResolver {
                     this.projectiles.splice(i, 1);
                     break;
                 }
+<<<<<<< HEAD
+=======
+
+                // Direct hit!
+                let dmg = proj.damage;
+                if (attacker.hasLockOn) {
+                    dmg *= 1.4;
+                    attacker.hasLockOn = false;
+                    fx.addText(defender.x, targetY - 45, '🎯 LOCK-ON CRIT!', '#38bdf8', 22);
+                }
+                defender.takeDamage(dmg, false, proj.x, proj.y);
+                attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
+                defender.applyStun(14);
+                physics.applyKnockback(defender, proj.vx * 0.25, proj.vy * 0.25, 5);
+
+                if (proj.type === 'projection_frame') {
+                    defender.applyFrameFreeze(20);
+                    fx.spawnHitSparks(proj.x, proj.y, '#a3e635', 18);
+                    fx.addText(defender.x, targetY - 45, '🎞️ FRAME FREEZE!', '#a3e635', 20);
+                }
+
+                // Ranged Signature 3-hit passives
+                attacker.signatureHits = (attacker.signatureHits || 0) + 1;
+                const rHitCount = attacker.signatureHits;
+
+                if (attacker.characterId === 'velina') {
+                    if (rHitCount >= 3) {
+                        attacker.hp = Math.min(attacker.maxHp, attacker.hp + 18);
+                        defender.applyStun(16);
+                        fx.addText(attacker.x, attacker.y - 45, '🌸 BLOOM HEAL +18!', '#34d399', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `🌸 FLORA [${rHitCount}/3]`, '#34d399', 18);
+                    }
+                } else if (attacker.characterId === 'nicole') {
+                    if (rHitCount >= 3) {
+                        defender.takeDamage(14);
+                        physics.applyKnockback(defender, proj.vx * 0.4, proj.vy * 0.4, 8);
+                        fx.addText(defender.x, defender.y - 45, '💼 SUGAR BOMB! -14', '#f472b6', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `💼 SUGAR [${rHitCount}/3]`, '#f472b6', 18);
+                    }
+                } else if (attacker.characterId === 'trigger') {
+                    if (rHitCount >= 3) {
+                        attacker.hasLockOn = true;
+                        fx.addText(attacker.x, attacker.y - 45, '🎯 LOCK-ON CRIT READY!', '#38bdf8', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `🎯 LOCK-ON [${rHitCount}/3]`, '#38bdf8', 18);
+                    }
+                } else if (attacker.characterId === 'vivian') {
+                    if (rHitCount >= 3) {
+                        defender.takeDamage(14);
+                        defender.curseTimer = 90;
+                        fx.addText(defender.x, defender.y - 45, '🔮 BANSHEE CURSE! -14', '#c084fc', 24);
+                        attacker.signatureHits = 0;
+                    } else {
+                        fx.addText(attacker.x, attacker.y - 25, `🔮 FEATHER [${rHitCount}/3]`, '#c084fc', 18);
+                    }
+                }
+
+                sound.playHit(true);
+                fx.spawnHitSparks(proj.x, proj.y, proj.color, 18);
+                fx.addText(defender.x, targetY - 20, `-${Math.round(dmg)}`, attacker.color, 20);
+                triggerScreenShake(7, 10);
+                this.projectiles.splice(i, 1);
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
             }
         }
     }
@@ -858,21 +1297,21 @@ export class CombatResolver {
             if (user.isUsingUltimate && user.ultimateTimer > 15 && user.ultimateTimer < 65) {
                 const userWeapon = WEAPONS[user.characterId.toUpperCase()];
                 const normalDmg = userWeapon ? userWeapon.attackDmg : 30;
-                // Dame ulti = 3.5x dame 1 đòn đánh thường (chia đều qua 50 frame hoạt động)
+                // Ultimate damage = 3.5x normal attack damage (distributed over 50 active frames)
                 const ultDmgPerFrame = (normalDmg * 3.5) / 50;
 
                 if (user.characterId === 'yanagi') {
-                    // YANAGI: PHÁO LÔI QUANG (LIGHTNING CANNON BEAM)
+                    // YANAGI: LIGHTNING CANNON BEAM
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1500;
-                    const halfThickness = 28; // Khớp chính xác với bề rộng tia lôi quang hiển thị
+                    const halfThickness = 28; // Matches visual lightning beam width
 
-                    // Chỉ dính dame khi đối thủ thực sự nằm trong luồng tia lôi quang phía trước:
-                    // 1. Phải ở phía trước nòng pháo (từ 40px phía trước trở đi, không dính dame khi đứng sau lưng)
-                    // 2. Nằm trong chiều dài tia (<= 1500px)
-                    // 3. Khoảng cách vuông góc tới tia phải nhỏ hơn bán kính tia + bán kính nhân vật
+                    // Damage applies only when opponent is inside forward beam trajectory:
+                    // 1. Must be in front of barrel (>= 40px forward)
+                    // 2. Within beam length (<= 1500px)
+                    // 3. Perpendicular distance within beam radius + target radius
                     if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(8);
@@ -893,12 +1332,12 @@ export class CombatResolver {
                         triggerScreenShake(3, 5);
                     }
                 } else if (user.characterId === 'nicole') {
-                    // NICOLE: GRAVITATIONAL SINGULARITY (HỐ ĐEN TRỌNG LỰC)
+                    // NICOLE: GRAVITATIONAL SINGULARITY (BLACK HOLE)
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const hX = user.x + facingDir * 320;
                     const hY = user.y;
                     const dist = Math.hypot(target.x - hX, target.y - hY);
-                    // Bán kính hút hố đen chuẩn xác theo vòng xoáy đĩa bồi tụ (120px)
+                    // Singularity gravitational pull radius (120px accretion disk)
                     if (dist < target.radius + 95) {
                         // Sucking pull force towards black hole
                         const pullAngle = Math.atan2(hY - target.y, hX - target.x);
@@ -914,7 +1353,7 @@ export class CombatResolver {
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1600;
-                    const halfThickness = 18; // Bán kính đường đạn xuyên phá chuẩn xác
+                    const halfThickness = 18; // Precise piercing railgun radius
 
                     if (forwardDist >= 35 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
@@ -924,7 +1363,7 @@ export class CombatResolver {
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'vivian') {
-                    // VIVIAN: BANSHEE BLOOM (BÃO LÔNG VŨ ETHER) - Tăng phạm vi tác dụng lên 500px
+                    // VIVIAN: BANSHEE BLOOM (ETHER FEATHER STORM) - 500px effect range
                     const stormRadius = 460;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + stormRadius) {
@@ -954,9 +1393,9 @@ export class CombatResolver {
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1500;
-                    const halfThickness = 38; // Bán kính chuẩn cột sóng Kamehameha hoàng kim (bề rộng 76px)
+                    const halfThickness = 38; // Radius of golden Kamehameha beam (76px width)
 
-                    // Chỉ dính dame khi đối thủ thực sự nằm trong luồng sóng Kamehameha phía trước
+                    // Damage only when opponent is inside forward Kamehameha wave
                     if (forwardDist >= 40 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame, true, user.x, user.y);
                         target.applyStun(10);
@@ -978,16 +1417,16 @@ export class CombatResolver {
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'naoya') {
-                    // NAOYA: TỐC ĐỘ MACH 3 LIÊN HOÀN TRẢM (PROJECTION SORCERY 10 FPS)
-                    // 1. Tăng dame x1.25 lần: tổng dame = (normalDmg * 3.5) * 1.25
-                    // 2. Giảm lag xuống 10 FPS: chỉ đánh theo nhịp 10 FPS (1 hit mỗi 5 frames = 10 hits trọn vẹn trong 50 frames ult)
+                    // NAOYA: MACH 3 CONSECUTIVE STRIKES (PROJECTION SORCERY 10 FPS)
+                    // 1. 1.25x damage multiplier: total damage = (normalDmg * 3.5) * 1.25
+                    // 2. 10 FPS cadence: 1 hit every 5 frames = 10 full hits across 50 frames
                     const barrageRadius = 350;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
-                    const hitIndex = Math.floor((user.ultimateTimer - 15) / 5); // 0 đến 9 tương ứng 10 hits
+                    const hitIndex = Math.floor((user.ultimateTimer - 15) / 5); // 0 to 9 corresponds to 10 hits
                     if (hitIndex >= 0 && hitIndex < 10 && hitIndex > (user.lastNaoyaHitIndex ?? -1)) {
                         user.lastNaoyaHitIndex = hitIndex;
                         if (dist < target.radius + barrageRadius) {
-                            // Chia đều tổng dame x1.25 qua 10 hits -> nhận trọn vẹn 100% dame x1.25
+                            // Distribute 1.25x damage equally across 10 hits
                             const totalNaoyaUltDmg = (normalDmg * 3.5) * 1.25;
                             const perHitDmg = totalNaoyaUltDmg / 10;
                             target.takeDamage(perHitDmg, true, user.x, user.y);
@@ -1004,7 +1443,7 @@ export class CombatResolver {
                         }
                     }
                 } else if (user.characterId === 'luffy') {
-                    // LUFFY: GOMU GOMU NO BAJRANG GUN (NẮM ĐẤM HAKI HÓA THẦN NIKA KHỔNG LỒ)
+                    // LUFFY: GOMU GOMU NO BAJRANG GUN (GIANT NIKA HAKI FIST)
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const strikeX = user.x + facingDir * 180;
                     const strikeY = user.y;
@@ -1017,7 +1456,7 @@ export class CombatResolver {
                         triggerScreenShake(5, 8);
                     }
                 } else if (user.characterId === 'gojo') {
-                    // GOJO: BÀNH TRƯỚNG LÃNH ĐỊA - VÔ LƯỢNG KHÔNG XỨ (UNLIMITED VOID)
+                    // GOJO: DOMAIN EXPANSION - UNLIMITED VOID
                     const domainRadius = 450;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + domainRadius) {
@@ -1029,7 +1468,7 @@ export class CombatResolver {
                         triggerScreenShake(3, 6);
                     }
                 } else if (user.characterId === 'sukuna') {
-                    // SUKUNA: BÀNH TRƯỚNG LÃNH ĐỊA - PHỤC MA NGỰ KHẢM TỬ (MALEVOLENT SHRINE)
+                    // SUKUNA: DOMAIN EXPANSION - MALEVOLENT SHRINE
                     const shrineRadius = 420;
                     const dist = Math.hypot(target.x - user.x, target.y - user.y);
                     if (dist < target.radius + shrineRadius) {
@@ -1041,12 +1480,17 @@ export class CombatResolver {
                         triggerScreenShake(4, 7);
                     }
                 } else if (user.characterId === 'saitama') {
+<<<<<<< HEAD
                     // SAITAMA: SERIOUS SERIES - SERIOUS PUNCH! 👊
+=======
+                    // SAITAMA: SERIOUS PUNCH - DEATH IMPACT
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
                     const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                     const forwardDist = (target.x - user.x) * facingDir;
                     const verticalDist = Math.abs(target.y - user.y);
                     const beamLen = 1600;
                     const halfThickness = 55;
+<<<<<<< HEAD
 
                     if (forwardDist >= 30 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
                         target.takeDamage(ultDmgPerFrame * 1.25, true, user.x, user.y);
@@ -1077,6 +1521,25 @@ export class CombatResolver {
                         fx.spawnHitSparks(target.x, target.y, '#ef4444', 8);
                         // Lifesteal on ultimate
                         user.hp = Math.min(user.maxHp, user.hp + (ultDmgPerFrame * 0.25));
+=======
+                    if (forwardDist >= 30 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
+                        target.takeDamage(ultDmgPerFrame * 1.45, true, user.x, user.y);
+                        target.applyStun(18);
+                        physics.applyKnockback(target, facingDir * 1.8, -0.6, 4.5);
+                        fx.spawnHitSparks(target.x, target.y, '#eab308', 8);
+                        triggerScreenShake(7, 12);
+                    }
+                } else if (user.characterId === 'tst26') {
+                    // TST-26: MAXIMUM MAID SANITIZATION VORTEX
+                    const purgeRadius = 480;
+                    const dist = Math.hypot(target.x - user.x, target.y - user.y);
+                    if (dist < target.radius + purgeRadius) {
+                        target.takeDamage(ultDmgPerFrame * 1.3, true, user.x, user.y);
+                        target.applyStun(14);
+                        const angle = Math.atan2(target.y - user.y, target.x - user.x);
+                        physics.applyKnockback(target, Math.cos(angle), Math.sin(angle), 2.5);
+                        fx.spawnHitSparks(target.x, target.y, '#ec4899', 7);
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
                         triggerScreenShake(4, 8);
                     }
                 }

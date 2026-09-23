@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=75';
-import { fx } from './particles.js?v=75';
-import { physics } from './physics.js?v=75';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=75';
-import { input } from './input.js?v=75';
+import { sound } from './audio.js';
+import { fx } from './particles.js';
+import { physics } from './physics.js';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js';
+import { input } from './input.js';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -14,6 +14,7 @@ export class Cyborg {
         const charColors = {
             yanagi: '#a78bfa',
             velina: '#34d399',
+            verina: '#34d399',
             nicole: '#f472b6',
             trigger: '#38bdf8',
             vivian: '#c084fc',
@@ -24,13 +25,19 @@ export class Cyborg {
             luffy: '#ef4444',
             gojo: '#0284c7',
             sukuna: '#f43f5e',
+<<<<<<< HEAD
             saitama: '#f59e0b',
             megumi: '#38bdf8',
             mirai: '#ef4444'
+=======
+            saitama: '#eab308',
+            tst26: '#ec4899'
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         };
         const charStyles = {
             yanagi: 'melee',
             velina: 'ranged',
+            verina: 'ranged',
             nicole: 'ranged',
             trigger: 'ranged',
             vivian: 'ranged',
@@ -42,8 +49,12 @@ export class Cyborg {
             gojo: 'melee',
             sukuna: 'melee',
             saitama: 'melee',
+<<<<<<< HEAD
             megumi: 'melee',
             mirai: 'melee'
+=======
+            tst26: 'ranged'
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         };
         this.color = charColors[characterId] || color || '#a78bfa';
         this.combatStyle = charStyles[characterId] || 'melee';
@@ -77,7 +88,12 @@ export class Cyborg {
 
         // Core Vitals (Balanced across archetypes)
         const charHp = {
+<<<<<<< HEAD
             saitama: 535,
+=======
+            saitama: 650,
+            tst26: 600,
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
             jotaro: 525,
             luffy: 520,
             sukuna: 520,
@@ -89,6 +105,7 @@ export class Cyborg {
             megumi: 515,
             mirai: 510,
             velina: 510,
+            verina: 510,
             nicole: 510,
             naoya: 510,
             trigger: 505
@@ -150,12 +167,13 @@ export class Cyborg {
         this.vy = 0;
         this.ax = 0;
         this.ay = 0;
-        this.facingAngle = facing;
-        this.aimAngle = facing;
+        this.facingAngle = Number.isFinite(facing) ? facing : (this.index === 0 ? 0 : Math.PI);
+        this.aimAngle = this.facingAngle;
         this.isStrafing = false;
         this.hp = this.maxHp;
         this.energy = this.maxEnergy;
         this.isAttacking = false;
+        this.isShooting = false;
         this.attackCooldown = 0;
         this.isShielding = false;
         this.shieldTimer = 0;
@@ -230,7 +248,7 @@ export class Cyborg {
             this.energy = Math.min(this.maxEnergy, this.energy + 0.35 * dt);
         }
 
-        // Tự động hồi nộ chiêu cuối (Overdrive) theo thời gian (khi đứng im, né chạy, di chuyển)
+        // Automatically regenerate Overdrive over time (idling, dodging, repositioning)
         let isOpponentUltActive = false;
         if (typeof window !== 'undefined' && window.game) {
             const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
@@ -301,9 +319,14 @@ export class Cyborg {
         // Handle Attack animation & cooldown
         if (this.attackCooldown > 0) {
             this.attackCooldown -= dt;
+        } else if (!Number.isFinite(this.attackCooldown) || this.attackCooldown < 0) {
+            this.attackCooldown = 0;
         }
+
         if (this.spamDelayTimer > 0) {
             this.spamDelayTimer -= dt;
+        } else if (!Number.isFinite(this.spamDelayTimer) || this.spamDelayTimer < 0) {
+            this.spamDelayTimer = 0;
         }
 
         // Buffer attack execution for ultra-responsive controls (especially on mobile)
@@ -319,6 +342,7 @@ export class Cyborg {
             this.attackTimer += dt;
             if (this.attackTimer >= this.attackDuration) {
                 this.isAttacking = false;
+                this.isShooting = false;
                 this.hasClashed = false;
             }
         }
@@ -390,8 +414,10 @@ export class Cyborg {
     }
 
     setAimAngle(angle) {
-        this.aimAngle = angle;
-        this.facingAngle = angle;
+        if (Number.isFinite(angle)) {
+            this.aimAngle = angle;
+            this.facingAngle = angle;
+        }
     }
 
     canAttack() {
@@ -401,13 +427,22 @@ export class Cyborg {
     attack() {
         if (!this.canAttack()) return;
 
-        const weapon = WEAPONS[this.characterId.toUpperCase()];
+        if (!Number.isFinite(this.aimAngle)) {
+            this.aimAngle = (this.index === 0 ? 0 : Math.PI);
+        }
+
+        const weapon = WEAPONS[this.characterId.toUpperCase()] || {
+            attackDuration: 20,
+            attackRange: (this.combatStyle === 'ranged' ? 520 : 85),
+            attackDmg: 25,
+            attackCooldown: 22
+        };
         const now = performance.now();
         const isTouchPlayer = (this.index === 0 && ((typeof input !== 'undefined' && input.touchEnabled) || ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)));
 
-        // Giới hạn spam đòn đánh:
-        // Với tướng cận chiến: cửa sổ 3.75s (3750ms) cho 6 hits để hạn chế spam
-        // Với tướng tầm xa: cửa sổ 3.0s (3000ms)
+        // Attack spam restriction:
+        // For melee fighters: 3.75s (3750ms) window for 6 hits to restrict spamming
+        // For ranged fighters: 3.0s (3000ms) window
         const spamWindowMs = this.combatStyle === 'melee'
             ? 3750
             : Math.max(3000, (weapon.attackCooldown || 25) * 5.5 * (1000 / 60));
@@ -418,53 +453,114 @@ export class Cyborg {
         this.isAttacking = true;
         this.attackType = 'basic';
         this.attackTimer = 0;
-        this.attackDuration = weapon.attackDuration;
-        this.attackReach = weapon.attackRange;
-        this.currentAttackDamage = weapon.attackDmg;
+        this.attackDuration = weapon.attackDuration || 20;
+        this.attackReach = weapon.attackRange || 85;
+        this.currentAttackDamage = weapon.attackDmg || 25;
         this.attackHitRegistered = false;
         this.hasClashed = false;
 
-        // Giảm độ trễ đánh thường trên điện thoại:
-        // Giảm 20% cooldown hồi đòn đánh thường trên mobile để phản hồi nhạy bén và mượt mà
+        // Reduce attack latency on mobile devices:
+        // 20% cooldown reduction on touch devices for fluid responsiveness
         const baseCooldown = isTouchPlayer
-            ? Math.max(12, Math.round(weapon.attackCooldown * 0.8))
-            : weapon.attackCooldown;
+            ? Math.max(12, Math.round((weapon.attackCooldown || 22) * 0.8))
+            : (weapon.attackCooldown || 22);
 
-        // Phạt delay nếu đạt limit 6 đòn trong cửa sổ spam (3.75s cho cận chiến, 3s cho tầm xa)
-        if (this.recentAttackTimes.length >= 6) {
-            this.spamDelayTimer = weapon.attackDuration + 60; // Khóa đánh trọn vẹn 1s (60 frames) sau khi đòn thứ 6 kết thúc
-            this.attackCooldown = weapon.attackDuration + 60; // Thêm delay 1s sau đòn thứ 6
-            this.recentAttackTimes = []; // Reset sau khi kích hoạt phạt
+        // Anti-spam buffer: brief breather rather than harsh lockout so attacks never feel stuck
+        if (this.recentAttackTimes.length >= 8) {
+            this.spamDelayTimer = 16; // Brief 0.25s breather
+            this.recentAttackTimes = []; // Reset after trigger
         } else {
             this.attackCooldown = baseCooldown;
         }
 
         if (this.combatStyle === 'ranged') {
-            // FIRE PROJECTILE
+            // FIRE HIGH-VISIBILITY ENERGY PROJECTILE
             this.isShooting = true;
-            const speed = 14.5;
-            const spawnX = this.x + Math.cos(this.aimAngle) * (this.radius + 16);
-            const spawnY = this.y + Math.sin(this.aimAngle) * (this.radius + 16);
+            const speed = 15.5;
+            const spawnDist = this.radius + 32;
+            const spawnX = this.x + Math.cos(this.aimAngle) * spawnDist;
+            const spawnY = this.y + Math.sin(this.aimAngle) * spawnDist;
+
+            let projType = 'standard';
+            let projRadius = 18;
+            if (this.characterId === 'velina' || this.characterId === 'verina') {
+                projType = 'photonic_flora';
+                projRadius = 22;
+            } else if (this.characterId === 'nicole') {
+                projType = 'ether_cluster';
+                projRadius = 24;
+            } else if (this.characterId === 'trigger') {
+                projType = 'sniper_beam';
+                projRadius = 16;
+            } else if (this.characterId === 'vivian') {
+                projType = 'ether_feather';
+                projRadius = 20;
+            } else if (this.characterId === 'tst26') {
+                projType = 'maid_needle';
+                projRadius = 18;
+            }
+
             const proj = new Projectile(
                 this.index,
                 spawnX,
                 spawnY,
                 Math.cos(this.aimAngle) * speed,
                 Math.sin(this.aimAngle) * speed,
-                weapon.attackDmg,
+                weapon.attackDmg || 25,
                 this.color,
-                9
+                projRadius,
+                projType
             );
             combat.addProjectile(proj);
-            sound.playLaser();
+            try { sound.playLaser(); } catch (err) {}
+            // Dramatic muzzle flash & energy burst
+            fx.spawnHitSparks(spawnX, spawnY, this.color, 12);
+            fx.spawnClashShockwave(spawnX, spawnY);
             // Small recoil
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 4.5);
         } else {
-            // MELEE SLASH
+            // MELEE SLASH / STRIKE
             this.isShooting = false;
-            sound.playSlash(true);
+            try { sound.playSlash(true); } catch (err) {}
             // Lunging dash momentum
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 6.5);
+
+            // Emit signature energy blade / wave projectile so melee fighters can shoot moves at distance
+            const spawnX = this.x + Math.cos(this.aimAngle) * (this.radius + 18);
+            const spawnY = this.y + Math.sin(this.aimAngle) * (this.radius + 18);
+            const waveSpeed = 16.5;
+            const waveDmg = Math.round(weapon.attackDmg * 0.85);
+
+            let waveType = 'standard';
+            let waveColor = this.color;
+            let waveRadius = 9;
+
+            if (this.characterId === 'naoya') {
+                waveType = 'projection_frame';
+                waveColor = '#a3e635';
+                waveRadius = 11;
+            } else if (this.characterId === 'sukuna') {
+                waveType = 'fire_orb';
+                waveColor = '#f43f5e';
+                waveRadius = 10;
+            } else if (this.characterId === 'gojo') {
+                waveType = 'hollow_purple';
+                waveColor = '#0284c7';
+                waveRadius = 9;
+            }
+
+            const waveProj = new Projectile(
+                this.index,
+                spawnX,
+                spawnY,
+                Math.cos(this.aimAngle) * waveSpeed,
+                Math.sin(this.aimAngle) * waveSpeed,
+                waveDmg,
+                waveColor,
+                waveRadius,
+                waveType
+            );
+            combat.addProjectile(waveProj);
         }
     }
 
@@ -489,6 +585,7 @@ export class Cyborg {
         const skillMap = {
             yanagi: SKILLS.YANAGI_SKILL,
             velina: SKILLS.VERINA_SKILL,
+            verina: SKILLS.VERINA_SKILL,
             nicole: SKILLS.NICOLE_SKILL,
             trigger: SKILLS.TRIGGER_SKILL,
             vivian: SKILLS.VIVIAN_SKILL,
@@ -498,7 +595,9 @@ export class Cyborg {
             naoya: SKILLS.NAOYA_SKILL,
             luffy: SKILLS.LUFFY_SKILL,
             gojo: SKILLS.GOJO_SKILL,
-            sukuna: SKILLS.SUKUNA_SKILL
+            sukuna: SKILLS.SUKUNA_SKILL,
+            saitama: SKILLS.SAITAMA_SKILL,
+            tst26: SKILLS.TST26_SKILL
         };
         const skill = skillMap[this.characterId] || SKILLS.YANAGI_SKILL;
         this.skillCooldownTimer = skill.cooldown;
@@ -507,7 +606,7 @@ export class Cyborg {
 
         const weapon = WEAPONS[this.characterId.toUpperCase()];
         const normalDmg = weapon ? weapon.attackDmg : 30;
-        // Dame đòn skill bằng 2x dame 1 đòn đánh thường
+        // Skill damage equals 2x normal attack damage
         const skillDmg = normalDmg * 2;
 
         if (skill.id === 'PHASE_BLINK') {
@@ -517,7 +616,7 @@ export class Cyborg {
             this.y += Math.sin(this.aimAngle) * 160;
             fx.spawnParryBurst(this.x, this.y, '#ffffff');
             fx.addText(this.x, this.y - 30, '🌀 BLINK!', this.color, 22);
-            // Sóng điện gây 2x sát thương nếu đối thủ ở gần điểm xuất hiện
+            // Electric shockwave deals 2x damage if opponent is near appear point
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 140) {
                 opponent.takeDamage(skillDmg);
@@ -530,7 +629,7 @@ export class Cyborg {
         } else if (skill.id === 'PHOTOSYNTHESIS' || skill.id === 'EMP_BLAST') {
             sound.playEMP();
             fx.spawnClashShockwave(this.x, this.y);
-            // Quang Hợp (Photosynthesis): Hồi 25 HP & Sóng đẩy bảo hộ
+            // Photosynthesis: Restore 25 HP & trigger protective shockwave
             this.hp = Math.min(this.maxHp, this.hp + 25);
             fx.addText(this.x, this.y - 30, '+25 HP HEAL!', '#34d399', 24);
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
@@ -545,7 +644,7 @@ export class Cyborg {
             sound.playWallBounce();
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 12);
             fx.addText(this.x, this.y - 30, '💼 SUGAR SLIDE!', '#f472b6', 22);
-            // Bắn 2 viên ether, mỗi viên bằng 1x thường (tổng 2x đòn thường)
+            // Fire 2 ether bullets, each doing 1x normal damage
             for (let angleOff of [-0.15, 0.15]) {
                 const proj = new Projectile(
                     this.index,
@@ -562,7 +661,7 @@ export class Cyborg {
         } else if (skill.id === 'SNIPER_STANCE') {
             sound.playLaser();
             fx.addText(this.x, this.y - 30, '🎯 SNIPER SHOT!', '#38bdf8', 24);
-            // Đạn bắn tỉa xuyên giáp gây 2x sát thương đòn thường
+            // Piercing sniper round deals 2x normal damage
             const proj = new Projectile(
                 this.index,
                 this.x + Math.cos(this.aimAngle) * 35,
@@ -580,12 +679,12 @@ export class Cyborg {
             this.hp = Math.min(this.maxHp, this.hp + 16);
             fx.addText(this.x, this.y - 30, '🔮 ABLOOM BURST!', '#c084fc', 22);
 
-            // Tự động căn góc bắn chuẩn về phía đối thủ
+            // Automatically calibrate aim angle towards opponent
             const angleToOpponent = Math.atan2(opponent.y - this.y, opponent.x - this.x);
             const isFacingOpponent = Math.cos(this.aimAngle) * Math.cos(angleToOpponent) > 0;
             const baseAngle = isFacingOpponent ? angleToOpponent : this.aimAngle;
 
-            // 4 chùm lông vũ ether chụm góc, tốc độ cao 16, bán kính 10px để gây đủ 50 dmg
+            // 4 ether feather cluster, high speed 16, radius 10px to deal 50 total damage
             const spreadAngles = [-0.12, -0.04, 0.04, 0.12];
             for (let a of spreadAngles) {
                 const finalAngle = baseAngle + a;
@@ -676,6 +775,22 @@ export class Cyborg {
             fx.spawnParryBurst(this.x, this.y, '#a3e635');
             fx.addText(this.x, this.y - 35, '🎞️ PROJECTION STEP!', '#a3e635', 24);
 
+            // Launch 3 supersonic 24-FPS Projection Blades across the arena
+            for (const angleOff of [-0.08, 0, 0.08]) {
+                const proj = new Projectile(
+                    this.index,
+                    this.x + Math.cos(this.aimAngle + angleOff) * 35,
+                    this.y + Math.sin(this.aimAngle + angleOff) * 35,
+                    Math.cos(this.aimAngle + angleOff) * 20,
+                    Math.sin(this.aimAngle + angleOff) * 20,
+                    skillDmg / 2,
+                    '#a3e635',
+                    12,
+                    'projection_frame'
+                );
+                combat.addProjectile(proj);
+            }
+
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 230) {
                 opponent.takeDamage(skillDmg);
@@ -699,7 +814,7 @@ export class Cyborg {
                 sound.playHit(true);
             }
         } else if (skill.id === 'LAPSE_BLUE') {
-            // GOJO: CURSED TECHNIQUE LAPSE - BLUE (THUẬN CHUYỂN: THƯƠNG) 🌀
+            // GOJO: CURSED TECHNIQUE LAPSE - BLUE (INFINITY PULL) 🌀
             sound.playEMP();
             const pullX = this.x + Math.cos(this.aimAngle) * 200;
             const pullY = this.y + Math.sin(this.aimAngle) * 200;
@@ -717,7 +832,7 @@ export class Cyborg {
             sound.playHit(true);
             fx.spawnHitSparks(opponent.x, opponent.y, '#0284c7', 18);
         } else if (skill.id === 'KAMINO_FIRE_ARROW') {
-            // SUKUNA: KAMINO FUGA (HỎA KHAI / FLAME ARROW) 🔥
+            // SUKUNA: KAMINO FUGA (OPEN / FLAME ARROW) 🔥
             sound.playLaser();
             fx.addText(this.x, this.y - 35, '🔥 KAMINO: FUGA!', '#ef4444', 24);
             const proj = new Projectile(
@@ -734,6 +849,7 @@ export class Cyborg {
             combat.addProjectile(proj);
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 7);
         } else if (skill.id === 'CONSECUTIVE_PUNCHES') {
+<<<<<<< HEAD
             // SAITAMA: CONSECUTIVE NORMAL PUNCHES 👊
             sound.playHit(true);
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 9);
@@ -785,6 +901,36 @@ export class Cyborg {
                 'blood_crescent'
             );
             combat.addProjectile(proj);
+=======
+            // SAITAMA: CONSECUTIVE NORMAL PUNCHES
+            sound.playHit(true);
+            fx.spawnClashShockwave(this.x, this.y);
+            this.x += Math.cos(this.aimAngle) * 140;
+            this.y += Math.sin(this.aimAngle) * 140;
+            fx.addText(this.x, this.y - 35, '🥊 CONSECUTIVE NORMAL PUNCHES!', '#eab308', 24);
+            const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
+            if (dist < 200) {
+                opponent.takeDamage(skillDmg * 1.3);
+                opponent.applyStun(22);
+                physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 16);
+                fx.spawnHitSparks(opponent.x, opponent.y, '#eab308', 28);
+            }
+        } else if (skill.id === 'MAID_PURGE') {
+            // TST-26: ABSOLUTE SANITIZATION SWEEP
+            sound.playEMP();
+            fx.spawnClashShockwave(this.x, this.y);
+            this.hp = Math.min(this.maxHp, this.hp + 35);
+            fx.addText(this.x, this.y - 35, '✨ MAID CLEANSE! +35 HP', '#ec4899', 24);
+            const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
+            if (dist < 280) {
+                opponent.takeDamage(skillDmg * 1.15);
+                opponent.releaseShield();
+                opponent.applyStun(18);
+                const angle = Math.atan2(opponent.y - this.y, opponent.x - this.x);
+                physics.applyKnockback(opponent, Math.cos(angle), Math.sin(angle), 13);
+                fx.spawnHitSparks(opponent.x, opponent.y, '#ec4899', 22);
+            }
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         }
     }
 
@@ -831,6 +977,7 @@ export class Cyborg {
         const ultShouts = {
             yanagi: '⚡ LIGHTNING CANNON! ⚡',
             velina: '🌪️ LIFE BLOSSOM STORM! 🌪️',
+            verina: '🌪️ LIFE BLOSSOM STORM! 🌪️',
             nicole: '🕳️ GRAVITATIONAL BLACK HOLE! 🕳️',
             trigger: '🎯 SYNCHRONIZED FIREPOWER! 🎯',
             vivian: '🔮 FEATHER STORM HARBINGER! 🔮',
@@ -841,9 +988,14 @@ export class Cyborg {
             luffy: '🍖 GOMU GOMU NO BAJRANG GUN! 🍖',
             gojo: '🌌 DOMAIN EXPANSION: UNLIMITED VOID! 🌌',
             sukuna: '⛩️ DOMAIN EXPANSION: MALEVOLENT SHRINE! ⛩️',
+<<<<<<< HEAD
             saitama: '👊 SERIOUS SERIES: SERIOUS PUNCH! 👊',
             megumi: '⚔️ EIGHT-HANDLED SWORD: MAHORAGA! ⚔️',
             mirai: '🩸 BLOOD CATACLYSM: FUYUKAI DESU! 🩸'
+=======
+            saitama: '💥 SERIOUS PUNCH: DEATH IMPACT! 💥',
+            tst26: '✨ MAID ORDER: MAXIMUM SANITIZATION! ✨'
+>>>>>>> a5abf9f205de21426fb630f4942a94f1ec1219e0
         };
         const shout = ultShouts[this.characterId] || '🔥 OVERDRIVE ULTIMATE! 🔥';
         fx.addText(this.x, this.y - 45, shout, this.color, 28, 60);
@@ -864,14 +1016,14 @@ export class Cyborg {
 
         this.hp = Math.max(0, this.hp - amount);
 
-        // Failsafe: Kiểm tra xem đối thủ có đang tung chiêu cuối hay không
+        // Failsafe: Check whether opponent is currently executing ultimate
         let isAnyOpponentUltActive = false;
         if (typeof window !== 'undefined' && window.game) {
             const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
             if (opp && opp.isUsingUltimate) isAnyOpponentUltActive = true;
         }
 
-        // Chỉ giảm thời gian hồi ulti (tăng nộ Overdrive) khi nhận đòn từ đòn đánh thường/skill, KHÔNG nhận từ ulti đối thủ
+        // Only grant Overdrive charge from normal attacks/skills, NOT from enemy ultimate
         if (!isFromUltimate && !this.isUsingUltimate && !isAnyOpponentUltActive && this.overdrive < 100) {
             const damageOdGain = (amount * 0.48 + 3.0) * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + damageOdGain);
