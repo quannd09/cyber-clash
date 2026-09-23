@@ -421,10 +421,9 @@ export class Cyborg {
             ? Math.max(12, Math.round(weapon.attackCooldown * 0.8))
             : weapon.attackCooldown;
 
-        // Penalty delay if hitting 6-strike spam threshold (3.75s melee, 3s ranged)
-        if (this.recentAttackTimes.length >= 6) {
-            this.spamDelayTimer = weapon.attackDuration + 60; // Lock attack for 1.0s (60 frames) after 6th hit ends
-            this.attackCooldown = weapon.attackDuration + 60; // Add 1s lockout after 6th hit
+        // Anti-spam buffer: brief breather rather than harsh lockout so attacks never feel stuck
+        if (this.recentAttackTimes.length >= 8) {
+            this.spamDelayTimer = 16; // Brief 0.25s breather
             this.recentAttackTimes = []; // Reset after trigger
         } else {
             this.attackCooldown = baseCooldown;
@@ -451,11 +450,48 @@ export class Cyborg {
             // Small recoil
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 4.5);
         } else {
-            // MELEE SLASH
+            // MELEE SLASH / STRIKE
             this.isShooting = false;
             sound.playSlash(true);
             // Lunging dash momentum
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 6.5);
+
+            // Emit signature energy blade / wave projectile so melee fighters can shoot moves at distance
+            const spawnX = this.x + Math.cos(this.aimAngle) * (this.radius + 18);
+            const spawnY = this.y + Math.sin(this.aimAngle) * (this.radius + 18);
+            const waveSpeed = 16.5;
+            const waveDmg = Math.round(weapon.attackDmg * 0.85);
+
+            let waveType = 'standard';
+            let waveColor = this.color;
+            let waveRadius = 9;
+
+            if (this.characterId === 'naoya') {
+                waveType = 'projection_frame';
+                waveColor = '#a3e635';
+                waveRadius = 11;
+            } else if (this.characterId === 'sukuna') {
+                waveType = 'fire_orb';
+                waveColor = '#f43f5e';
+                waveRadius = 10;
+            } else if (this.characterId === 'gojo') {
+                waveType = 'hollow_purple';
+                waveColor = '#0284c7';
+                waveRadius = 9;
+            }
+
+            const waveProj = new Projectile(
+                this.index,
+                spawnX,
+                spawnY,
+                Math.cos(this.aimAngle) * waveSpeed,
+                Math.sin(this.aimAngle) * waveSpeed,
+                waveDmg,
+                waveColor,
+                waveRadius,
+                waveType
+            );
+            combat.addProjectile(waveProj);
         }
     }
 
@@ -668,6 +704,22 @@ export class Cyborg {
             this.y += Math.sin(this.aimAngle) * dashDist;
             fx.spawnParryBurst(this.x, this.y, '#a3e635');
             fx.addText(this.x, this.y - 35, '🎞️ PROJECTION STEP!', '#a3e635', 24);
+
+            // Launch 3 supersonic 24-FPS Projection Blades across the arena
+            for (const angleOff of [-0.08, 0, 0.08]) {
+                const proj = new Projectile(
+                    this.index,
+                    this.x + Math.cos(this.aimAngle + angleOff) * 35,
+                    this.y + Math.sin(this.aimAngle + angleOff) * 35,
+                    Math.cos(this.aimAngle + angleOff) * 20,
+                    Math.sin(this.aimAngle + angleOff) * 20,
+                    skillDmg / 2,
+                    '#a3e635',
+                    12,
+                    'projection_frame'
+                );
+                combat.addProjectile(proj);
+            }
 
             const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
             if (dist < 230) {

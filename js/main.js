@@ -606,7 +606,7 @@ class CyberClashGame {
             player.thrust(move.x, move.y);
         }
 
-        // 2b. Mouse & Touch Aiming for Player 1 (Only in BOT or ONLINE mode, NEVER in LOCAL 2-player mode)
+        // 2b. Mouse & Touch Aiming for Player 1 (Active in BOT and ONLINE modes)
         const isLocal2P = (this.gameMode === 'LOCAL');
         if (!isLocal2P && index === 0 && input && typeof input.isMouseActive === 'function' && input.isMouseActive()) {
             if (input.mouse && typeof input.mouse.x === 'number') {
@@ -616,8 +616,9 @@ class CyberClashGame {
                     player.setAimAngle(Math.atan2(dy, dx));
                 }
             }
-        } else if (index === 0 && opponent && input && input.touchEnabled && (!move || (move.x === 0 && move.y === 0))) {
-            // When playing on mobile with touch controls and not actively steering, auto-aim towards opponent
+        } else if (!isLocal2P && index === 0 && opponent) {
+            // In Single Player VS BOT or Online mode when mouse is idle:
+            // Auto-aim towards opponent so attacks, skills, and shots fire directly at the enemy
             const dx = opponent.x - player.x;
             const dy = opponent.y - player.y;
             if (Math.hypot(dx, dy) > 10) {

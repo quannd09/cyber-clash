@@ -197,6 +197,12 @@ export class Projectile {
                 const flameColor = Math.random() < 0.6 ? '#dc2626' : '#f97316';
                 fx.spawnHitSparks(this.x, this.y, flameColor, 2);
             }
+        } else if (this.type === 'projection_frame') {
+            // Lime green 24 FPS film shutter sparks
+            if (Math.random() < 0.7) {
+                const sparkColor = Math.random() < 0.5 ? '#a3e635' : '#bef264';
+                fx.spawnHitSparks(this.x, this.y, sparkColor, 1);
+            }
         } else {
             // Standard Spark tail
             if (Math.random() < 0.4) {
@@ -303,6 +309,42 @@ export class Projectile {
             ctx.moveTo(this.x, this.y);
             ctx.lineTo(this.x - Math.cos(angle) * 36, this.y - Math.sin(angle) * 36);
             ctx.stroke();
+
+        } else if (this.type === 'projection_frame') {
+            // NAOYA: 24 FPS PROJECTION FRAME BLADE / SORCERY FILM WAVE
+            const r = this.radius;
+            const angle = Math.atan2(this.vy, this.vx);
+
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+
+            ctx.shadowColor = '#a3e635';
+            ctx.shadowBlur = 24;
+
+            // Translucent glowing projection glass frame
+            ctx.fillStyle = 'rgba(163, 230, 53, 0.32)';
+            ctx.strokeStyle = '#a3e635';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-r * 1.5, -r, r * 3, r * 2);
+            ctx.fillRect(-r * 1.5, -r, r * 3, r * 2);
+
+            // Cinema film sprocket holes along the top and bottom edge
+            ctx.fillStyle = '#ffffff';
+            for (let i = -1; i <= 1; i++) {
+                ctx.fillRect(i * (r * 0.8) - 2, -r + 1, 4, 3);
+                ctx.fillRect(i * (r * 0.8) - 2, r - 4, 4, 3);
+            }
+
+            // High-speed center motion blade
+            ctx.strokeStyle = '#fef08a';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(-r * 1.8, 0);
+            ctx.lineTo(r * 1.8, 0);
+            ctx.stroke();
+
+            ctx.restore();
 
         } else {
             // Standard Projectile
@@ -646,6 +688,12 @@ export class CombatResolver {
                 attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
                 defender.applyStun(14);
                 physics.applyKnockback(defender, proj.vx * 0.25, proj.vy * 0.25, 5);
+
+                if (proj.type === 'projection_frame') {
+                    defender.applyFrameFreeze(20);
+                    fx.spawnHitSparks(proj.x, proj.y, '#a3e635', 18);
+                    fx.addText(defender.x, targetY - 45, '🎞️ FRAME FREEZE!', '#a3e635', 20);
+                }
 
                 // Ranged Signature 3-hit passives
                 attacker.signatureHits = (attacker.signatureHits || 0) + 1;

@@ -1,13 +1,13 @@
 export const DEFAULT_P1_BINDINGS = {
-    up: ['KeyW', 'keyw'],
-    left: ['KeyA', 'keya'],
-    down: ['KeyS', 'keys'],
-    right: ['KeyD', 'keyd'],
-    lightAttack: ['KeyF', 'keyf'],
+    up: ['KeyW', 'keyw', 'w', 'W'],
+    left: ['KeyA', 'keya', 'a', 'A'],
+    down: ['KeyS', 'keys', 's', 'S'],
+    right: ['KeyD', 'keyd', 'd', 'D'],
+    lightAttack: ['KeyF', 'keyf', 'f', 'F'],
     heavyAttack: [],
-    shield: ['KeyH', 'keyh'],
-    skill: ['KeyR', 'keyr'],
-    dash: ['ShiftLeft', 'KeyC', 'keyc'],
+    shield: ['KeyH', 'keyh', 'h', 'H'],
+    skill: ['KeyR', 'keyr', 'r', 'R'],
+    dash: ['ShiftLeft', 'KeyC', 'keyc', 'c', 'C'],
     ultimate: ['Space', ' ', 'Spacebar']
 };
 
@@ -16,12 +16,12 @@ export const DEFAULT_P2_BINDINGS = {
     left: ['ArrowLeft'],
     down: ['ArrowDown'],
     right: ['ArrowRight'],
-    lightAttack: ['Numpad1', 'KeyJ', 'keyj'],
+    lightAttack: ['Numpad1', 'KeyJ', 'keyj', 'j', 'J'],
     heavyAttack: [],
-    shield: ['Numpad3', 'KeyL', 'keyl'],
-    skill: ['Numpad5', 'KeyI', 'keyi'],
-    dash: ['Numpad0', 'KeyU', 'keyu', 'ControlRight', 'NumpadPeriod'],
-    ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo']
+    shield: ['Numpad3', 'KeyL', 'keyl', 'l', 'L'],
+    skill: ['Numpad5', 'KeyI', 'keyi', 'i', 'I'],
+    dash: ['Numpad0', 'KeyU', 'keyu', 'u', 'U', 'ControlRight', 'NumpadPeriod'],
+    ultimate: ['Enter', 'NumpadEnter', 'KeyO', 'keyo', 'o', 'O']
 };
 
 // Multi-player Input Manager with anti-ghosting Keyboard & Gamepad API support
@@ -96,15 +96,17 @@ export class InputManager {
             if (rect.width > 0 && rect.height > 0) {
                 const scaleX = 1280 / rect.width;
                 const scaleY = 720 / rect.height;
-                this.mouse.x = (e.clientX - rect.left) * scaleX;
-                this.mouse.y = (e.clientY - rect.top) * scaleY;
+                const rawX = (e.clientX - rect.left) * scaleX;
+                const rawY = (e.clientY - rect.top) * scaleY;
+                this.mouse.x = Math.max(0, Math.min(1280, rawX));
+                this.mouse.y = Math.max(0, Math.min(720, rawY));
                 this.mouse.hasMoved = true;
                 this.mouse.lastMoveTime = Date.now();
             }
         }
     }
 
-    isMouseActive(timeoutMs = 4000) {
+    isMouseActive(timeoutMs = 6000) {
         if (!this.mouseEnabled || !this.mouse) return false;
         return Boolean(this.mouse.hasMoved && (Date.now() - (this.mouse.lastMoveTime || 0) < timeoutMs));
     }
@@ -142,13 +144,8 @@ export class InputManager {
             if (!this.mouseEnabled) return;
             this.updateMousePosition(e);
 
-            // Ignore clicks on UI cards, overlays, modals, buttons
-            if (e.target.closest('#loadout-screen, #controls-modal, #disconnect-modal, #victory-screen, button, input, select, .char-card, a')) {
-                return;
-            }
-
-            // Only register combat attacks when directly on the game canvas
-            if (e.target.id !== 'gameCanvas' && e.target.tagName !== 'CANVAS') {
+            // Ignore clicks on UI cards, overlays, modals, buttons, inputs
+            if (e.target.closest('#loadout-screen, #controls-modal, #disconnect-modal, #victory-screen, #keybinds-modal, #secret-code-modal, button, input, select, .char-card, a')) {
                 return;
             }
 
@@ -211,15 +208,28 @@ export class InputManager {
 
     // Check keyboard key code
     isKeyDown(code) {
-        return !!this.keys[code];
+        if (!code) return false;
+        if (this.keys[code]) return true;
+        if (code.length === 1) {
+            return !!(this.keys[code.toLowerCase()] || this.keys[code.toUpperCase()]);
+        }
+        return false;
     }
 
     isKeyJustPressed(code) {
+        if (!code) return false;
         if (code === 'Space' || code === ' ') {
             return (!!this.keys['Space'] && !this.prevKeys['Space']) ||
                    (!!this.keys[' '] && !this.prevKeys[' ']);
         }
-        return !!this.keys[code] && !this.prevKeys[code];
+        if (this.keys[code] && !this.prevKeys[code]) return true;
+        if (code.length === 1) {
+            const lower = code.toLowerCase();
+            const upper = code.toUpperCase();
+            return (!!this.keys[lower] && !this.prevKeys[lower]) ||
+                   (!!this.keys[upper] && !this.prevKeys[upper]);
+        }
+        return false;
     }
 
     // High level action checks for Player 1 or 2
