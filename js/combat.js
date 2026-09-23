@@ -1042,18 +1042,86 @@ export class CombatResolver {
                     }
                 } else if (user.characterId === 'saitama') {
                     // SAITAMA: SERIOUS SERIES - SERIOUS PUNCH! 👊
-                    const facingDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
-                    const forwardDist = (target.x - user.x) * facingDir;
-                    const verticalDist = Math.abs(target.y - user.y);
-                    const beamLen = 1600;
-                    const halfThickness = 55;
+                    // 1. Instant Blink / Teleport in front of target
+                    if (!user.saitamaTeleported) {
+                        const facingTargetDir = (target.x >= user.x) ? 1 : -1;
+                        const blinkDist = 58;
+                        const destX = target.x - (facingTargetDir * blinkDist);
+                        const destY = target.y;
 
-                    if (forwardDist >= 30 && forwardDist <= beamLen + target.radius && verticalDist <= target.radius + halfThickness) {
-                        target.takeDamage(ultDmgPerFrame * 1.25, true, user.x, user.y);
+                        // Departure shockwave & dash trail
+                        fx.spawnDash(user.x, user.y, '#f59e0b');
+                        fx.spawnClashShockwave(user.x, user.y);
+                        if (user.afterimages) {
+                            user.afterimages.push({ x: user.x, y: user.y, radius: user.radius, color: '#f59e0b', alpha: 1, life: 30, maxLife: 30 });
+                        }
+
+                        // Teleport directly in front of target facing them
+                        user.x = destX;
+                        user.y = destY;
+                        user.vx = 0;
+                        user.vy = 0;
+                        user.aimAngle = (facingTargetDir === 1) ? 0 : Math.PI;
+
+                        // Clamp within arena bounds
+                        if (typeof window !== 'undefined' && window.game && window.game.bounds) {
+                            const b = window.game.bounds;
+                            user.x = Math.max(b.minX + 45, Math.min(b.maxX - 45, user.x));
+                            user.y = Math.max(b.minY + 45, Math.min(b.maxY - 45, user.y));
+                        }
+
+                        // Arrival shockwave, sparks, and sound
+                        fx.spawnClashShockwave(user.x, user.y);
+                        fx.spawnHitSparks(user.x, user.y, '#f59e0b', 16);
+                        fx.addText(user.x, user.y - 45, '⚡ INSTANT BLINK! ⚡', '#f59e0b', 24, 25);
+                        if (sound && sound.playPhaseBlink) sound.playPhaseBlink();
+
+                        user.saitamaTeleported = true;
+                        user.saitamaTarget = target;
+                    }
+
+                    // Pre-punch: Keep target pinned/frozen while Saitama winds up
+                    if (user.ultimateTimer < 22) {
                         target.applyStun(15);
-                        physics.applyKnockback(target, facingDir * 2.5, -0.8, 3.8);
-                        fx.spawnHitSparks(target.x, target.y, '#f59e0b', 8);
-                        triggerScreenShake(5, 9);
+                        target.vx *= 0.1;
+                        target.vy *= 0.1;
+                    }
+
+                    // 2. Deliver the ONE massive Serious Punch at frame 22
+                    if (user.ultimateTimer >= 22 && !user.saitamaPunchDelivered) {
+                        user.saitamaPunchDelivered = true;
+                        const punchDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
+                        const punchDmg = 125; // Massive single strike
+
+                        // Direct hit to primary target
+                        target.takeDamage(punchDmg, true, user.x, user.y);
+                        target.applyStun(60); // 1.0 second stun! (60 frames at 60fps)
+                        physics.applyKnockback(target, punchDir * 5.2, -1.2, 5.5);
+
+                        // Explosive kinetic effects
+                        fx.spawnDeathBurst(target.x, target.y, '#f59e0b');
+                        fx.spawnClashShockwave(target.x, target.y);
+                        fx.spawnHitSparks(target.x, target.y, '#ffffff', 28);
+                        fx.addText(target.x, target.y - 50, '👊 DEATH! 👊', '#f59e0b', 34, 60);
+
+                        sound.playHit(true);
+                        if (sound.playExplosion) sound.playExplosion();
+                        triggerScreenShake(10, 22);
+
+                        // Splash collateral shockwave to any nearby enemies in 2v2
+                        if (typeof window !== 'undefined' && window.game && window.game.players) {
+                            window.game.players.forEach(other => {
+                                if (other && other !== user && other !== target && !other.isDead && other.teamId !== user.teamId) {
+                                    const distToPunch = Math.hypot(other.x - user.x, other.y - user.y);
+                                    if (distToPunch < 180) {
+                                        other.takeDamage(65, true, user.x, user.y);
+                                        other.applyStun(35);
+                                        physics.applyKnockback(other, punchDir * 3.5, -1.0, 4.0);
+                                        fx.spawnHitSparks(other.x, other.y, '#f59e0b', 12);
+                                    }
+                                }
+                            });
+                        }
                     }
                 } else if (user.characterId === 'megumi') {
                     // MEGUMI: EIGHT-HANDLED SWORD DIVERGENT SILA MAHORAGA CLEAVE! ⚔️

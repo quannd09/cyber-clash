@@ -97,9 +97,8 @@ export class Cyborg {
         this.hp = this.maxHp;
         this.maxEnergy = 100;
         this.energy = 100;
-        this.overdrive = 0; // 0 to 100
-        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive
-        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : 1.0;
+        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive, Saitama takes 1.25x (+25% cooldown)
+        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : (characterId === 'saitama' ? (1 / 1.25) : 1.0);
         this.roundsWon = 0;
 
         // State Flags
@@ -123,6 +122,9 @@ export class Cyborg {
         this.skillCooldownTimer = 0;
         this.isUsingUltimate = false;
         this.ultimateTimer = 0;
+        this.saitamaTeleported = false;
+        this.saitamaPunchDelivered = false;
+        this.saitamaTarget = null;
 
         // Anti-spam Attack Mechanism
         this.recentAttackTimes = [];
@@ -168,6 +170,9 @@ export class Cyborg {
         this.skillActionTimer = 0;
         this.isUsingUltimate = false;
         this.ultimateTimer = 0;
+        this.saitamaTeleported = false;
+        this.saitamaPunchDelivered = false;
+        this.saitamaTarget = null;
         this.hasClashed = false;
         this.recentAttackTimes = [];
         this.spamDelayTimer = 0;
@@ -326,7 +331,8 @@ export class Cyborg {
         // Handle Ultimate
         if (this.isUsingUltimate) {
             this.ultimateTimer += dt;
-            if (this.ultimateTimer >= 75) {
+            const maxUltTime = (this.characterId === 'saitama') ? 50 : 75;
+            if (this.ultimateTimer >= maxUltTime) {
                 this.isUsingUltimate = false;
             }
         }
@@ -819,6 +825,9 @@ export class Cyborg {
         this.overdrive = 0;
         this.isUsingUltimate = true;
         this.ultimateTimer = 0;
+        this.saitamaTeleported = false;
+        this.saitamaPunchDelivered = false;
+        this.saitamaTarget = null;
         this.isAttacking = false;
         this.isShielding = false;
         this.isUsingSkill = false;

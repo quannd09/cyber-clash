@@ -177,12 +177,12 @@ const SKILL_DATA = {
         p1: [
             { key: 'Left Click / F (Melee)', name: 'Consecutive Normal Punches (Rapid Punch Barrage)', desc: '' },
             { key: 'R (Skill)', name: 'Serious Sidesteps ⚡ (Omnidirectional Afterimages)', desc: '' },
-            { key: 'Space (Ultimate)', name: 'Serious Punch 💥 (Devastating Death Blow)', desc: '' }
+            { key: 'Space (Ultimate)', name: 'Serious Punch 💥 (Blink Strike • 1s Stun • Massive Damage)', desc: '' }
         ],
         p2: [
             { key: 'J (Melee)', name: 'Consecutive Normal Punches (Rapid Punch Barrage)', desc: '' },
             { key: 'I (Skill)', name: 'Serious Sidesteps ⚡ (Omnidirectional Afterimages)', desc: '' },
-            { key: 'Enter (Ultimate)', name: 'Serious Punch 💥 (Devastating Death Blow)', desc: '' }
+            { key: 'Enter (Ultimate)', name: 'Serious Punch 💥 (Blink Strike • 1s Stun • Massive Damage)', desc: '' }
         ]
     },
     megumi: {

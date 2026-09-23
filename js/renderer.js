@@ -1217,49 +1217,93 @@ export class GameRenderer {
                 ctx.restore();
 
             } else if (c.characterId === 'saitama') {
-                // SAITAMA: SERIOUS SERIES - SERIOUS PUNCH! 👊
+                // SAITAMA: SERIOUS SERIES - SERIOUS PUNCH! 👊 (BLINK & KINETIC BLOW)
                 ctx.save();
-                const beamLen = 1600;
-                ctx.lineCap = 'round';
 
-                // Golden Punch Atmospheric Shockwave Cone
-                ctx.shadowColor = '#f59e0b';
-                ctx.shadowBlur = 50;
-                ctx.strokeStyle = '#f59e0b';
-                ctx.lineWidth = 120 + pulse * 2;
-                ctx.globalAlpha = 0.45;
-                ctx.beginPath();
-                ctx.moveTo(50, 0);
-                ctx.lineTo(beamLen, 0);
-                ctx.stroke();
+                const isPostPunch = (c.ultimateTimer >= 22);
+                const punchProgress = Math.min(1, Math.max(0, (c.ultimateTimer - 22) / 25));
 
-                // Core Blazing White/Gold Compression Tunnel
-                ctx.shadowBlur = 20;
-                ctx.strokeStyle = '#fef08a';
-                ctx.lineWidth = 60 + pulse;
-                ctx.globalAlpha = 0.85;
-                ctx.beginPath();
-                ctx.moveTo(50, 0);
-                ctx.lineTo(beamLen, 0);
-                ctx.stroke();
+                if (!isPostPunch) {
+                    // PRE-PUNCH WINDUP (Golden air suction & white-hot core at fist)
+                    const windupPulse = Math.sin(c.ultimateTimer * 0.4) * 8;
+                    const fistX = 25;
 
-                // Pure White Central Shockwave
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 26;
-                ctx.globalAlpha = 1.0;
-                ctx.beginPath();
-                ctx.moveTo(50, 0);
-                ctx.lineTo(beamLen, 0);
-                ctx.stroke();
-
-                // Atmospheric Compression Rings
-                for (let r = 80; r <= 800; r += 120) {
-                    const expand = ((c.ultimateTimer * 8 + r) % 800);
-                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.7)';
-                    ctx.lineWidth = 4;
+                    // Radiant Golden Aura converging on fist
+                    ctx.shadowColor = '#f59e0b';
+                    ctx.shadowBlur = 35 + windupPulse;
+                    ctx.fillStyle = '#f59e0b';
                     ctx.beginPath();
-                    ctx.ellipse(expand, 0, 30, 75, 0, 0, Math.PI * 2);
-                    ctx.stroke();
+                    ctx.arc(fistX, 0, 24 + windupPulse, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Blazing White Hot Core
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(fistX, 0, 12, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Air compression lines spiraling inward
+                    ctx.strokeStyle = 'rgba(254, 240, 138, 0.75)';
+                    ctx.lineWidth = 2.5;
+                    for (let i = 0; i < 4; i++) {
+                        const angle = c.ultimateTimer * 0.3 + (i * Math.PI / 2);
+                        const r = 35 + windupPulse * 0.5;
+                        ctx.beginPath();
+                        ctx.arc(fistX, 0, r, angle, angle + Math.PI * 0.4);
+                        ctx.stroke();
+                    }
+                } else {
+                    // POST-PUNCH: EXPLOSIVE CONICAL SHOCKWAVE BURST & ATMOSPHERE PARTING!
+                    const punchFade = 1 - punchProgress;
+                    const blastReach = 280 + punchProgress * 420;
+                    const blastWidth = 90 + punchProgress * 140;
+
+                    // 1. Conical Atmosphere Parting Shockwave
+                    ctx.save();
+                    ctx.globalAlpha = punchFade * 0.85;
+                    ctx.shadowColor = '#f59e0b';
+                    ctx.shadowBlur = 40;
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.35)';
+                    ctx.beginPath();
+                    ctx.moveTo(35, 0);
+                    ctx.lineTo(blastReach, -blastWidth);
+                    ctx.lineTo(blastReach + 60, 0);
+                    ctx.lineTo(blastReach, blastWidth);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 2. White-Hot Kinetic Impact Cone
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.beginPath();
+                    ctx.moveTo(35, 0);
+                    ctx.lineTo(blastReach * 0.7, -blastWidth * 0.5);
+                    ctx.lineTo(blastReach * 0.85, 0);
+                    ctx.lineTo(blastReach * 0.7, blastWidth * 0.5);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // 3. Expanding Sonic Boom Compression Rings
+                    for (let r = 0; r < 3; r++) {
+                        const ringOffset = 40 + r * 100 + punchProgress * 180;
+                        if (ringOffset < blastReach + 100) {
+                            ctx.strokeStyle = `rgba(254, 240, 138, ${punchFade * 0.9})`;
+                            ctx.lineWidth = 5 - r;
+                            ctx.beginPath();
+                            ctx.ellipse(ringOffset, 0, 25 + r * 10, 45 + r * 25 + punchProgress * 40, 0, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    }
+
+                    // 4. Fist Strike Burst Center
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowColor = '#ffffff';
+                    ctx.shadowBlur = 30;
+                    ctx.beginPath();
+                    ctx.arc(45, 0, 20 * punchFade + 8, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.restore();
                 }
 
                 ctx.restore();
