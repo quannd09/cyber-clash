@@ -1116,10 +1116,10 @@ class CyberClashGame {
         this.renderer.drawArena(this.bounds);
 
         if (this.state !== STATE_LOADOUT) {
-            combat.drawProjectiles(this.ctx);
-
             this.renderer.drawCyborg(this.p1);
             this.renderer.drawCyborg(this.p2);
+
+            combat.drawProjectiles(this.ctx);
 
             fx.draw(this.ctx);
 

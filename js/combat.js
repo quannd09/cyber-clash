@@ -363,36 +363,53 @@ export class Projectile {
             ctx.restore();
 
         } else if (this.type === 'photonic_flora') {
-            // VERINA: PHOTONIC FLORA BLOSSOM (Glowing emerald-mint flower petal energy sphere)
-            const r = this.radius;
-            const pulse = Math.sin(this.animTimer * 0.3) * 2;
+            // VERINA: PHOTONIC FLORA BLOSSOM (Radiant emerald-mint botanical energy orb)
+            const r = Math.max(18, this.radius);
+            const pulse = Math.sin(this.animTimer * 0.35) * 3;
+            const angle = Math.atan2(this.vy, this.vx);
 
+            // 1. Long radiant emerald motion tail (65px)
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 65, this.y - Math.sin(angle) * 65
+            );
+            tailGrad.addColorStop(0, 'rgba(52, 211, 153, 0.9)');
+            tailGrad.addColorStop(0.5, 'rgba(16, 185, 129, 0.45)');
+            tailGrad.addColorStop(1, 'rgba(5, 150, 105, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 65, this.y - Math.sin(angle) * 65);
+            ctx.stroke();
+
+            // 2. Wide glowing outer aura
+            ctx.shadowColor = '#10b981';
+            ctx.shadowBlur = 35;
+
+            // 3. Orbiting floral petals
             ctx.save();
             ctx.translate(this.x, this.y);
-            ctx.rotate(this.animTimer * 0.12);
+            ctx.rotate(this.animTimer * 0.16);
 
-            ctx.shadowColor = '#34d399';
-            ctx.shadowBlur = 24;
-
-            // 5 Orbiting Floral Petals
-            ctx.fillStyle = 'rgba(52, 211, 153, 0.75)';
-            ctx.strokeStyle = '#a7f3d0';
-            ctx.lineWidth = 1.8;
-            for (let i = 0; i < 5; i++) {
-                const angle = i * (Math.PI * 2 / 5);
-                const px = Math.cos(angle) * (r + 4 + pulse);
-                const py = Math.sin(angle) * (r + 4 + pulse);
+            ctx.fillStyle = 'rgba(167, 243, 208, 0.9)';
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 2.5;
+            for (let i = 0; i < 6; i++) {
+                const petalAngle = i * (Math.PI * 2 / 6);
+                const px = Math.cos(petalAngle) * (r + 6 + pulse);
+                const py = Math.sin(petalAngle) * (r + 6 + pulse);
                 ctx.beginPath();
-                ctx.arc(px, py, 4, 0, Math.PI * 2);
+                ctx.arc(px, py, 6, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
             }
 
             // Central radiant flora core
-            const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, r + 2);
+            const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, r + 4);
             grad.addColorStop(0, '#ffffff');
-            grad.addColorStop(0.35, '#a7f3d0');
-            grad.addColorStop(0.75, '#34d399');
+            grad.addColorStop(0.25, '#d1fae5');
+            grad.addColorStop(0.65, '#34d399');
             grad.addColorStop(1, '#059669');
 
             ctx.fillStyle = grad;
@@ -400,35 +417,208 @@ export class Projectile {
             ctx.arc(0, 0, r, 0, Math.PI * 2);
             ctx.fill();
 
+            // Diamond crystal highlight
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.55);
+            ctx.lineTo(r * 0.55, 0);
+            ctx.lineTo(0, r * 0.55);
+            ctx.lineTo(-r * 0.55, 0);
+            ctx.closePath();
+            ctx.fill();
+
             ctx.restore();
 
-            // Beam tail
+        } else if (this.type === 'ether_cluster') {
+            // NICOLE: ETHER CLUSTER EXPLOSIVE (Vibrant magenta/hot-pink ether vortex)
+            const r = Math.max(20, this.radius);
+            const pulse = Math.sin(this.animTimer * 0.4) * 4;
             const angle = Math.atan2(this.vy, this.vx);
-            ctx.strokeStyle = '#34d399';
-            ctx.lineWidth = 4;
+
+            // Gravitational distortion tail
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 75, this.y - Math.sin(angle) * 75
+            );
+            tailGrad.addColorStop(0, 'rgba(244, 114, 182, 0.95)');
+            tailGrad.addColorStop(0.5, 'rgba(219, 39, 119, 0.5)');
+            tailGrad.addColorStop(1, 'rgba(131, 24, 67, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 14;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x - Math.cos(angle) * 28, this.y - Math.sin(angle) * 28);
+            ctx.lineTo(this.x - Math.cos(angle) * 75, this.y - Math.sin(angle) * 75);
             ctx.stroke();
 
-        } else {
-            // Standard Projectile
-            ctx.shadowColor = this.color;
-            ctx.shadowBlur = 15;
-            ctx.fillStyle = '#ffffff';
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = 3;
+            ctx.shadowColor = '#f472b6';
+            ctx.shadowBlur = 40;
 
+            // Rotating vortex rings
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.animTimer * 0.22);
+            ctx.strokeStyle = 'rgba(251, 207, 232, 0.85)';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.ellipse(0, 0, r + 7 + pulse, (r + 7 + pulse) * 0.5, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Core
+            const grad = ctx.createRadialGradient(this.x, this.y, 2, this.x, this.y, r + 3);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, '#fbcfe8');
+            grad.addColorStop(0.7, '#ec4899');
+            grad.addColorStop(1, '#831843');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+            ctx.fill();
+
+        } else if (this.type === 'sniper_beam') {
+            // TRIGGER: ELECTROMAGNETIC PLASMA RAILGUN DART
+            const r = Math.max(16, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            // Piercing railgun beam line (110px)
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 110, this.y - Math.sin(angle) * 110
+            );
+            tailGrad.addColorStop(0, '#ffffff');
+            tailGrad.addColorStop(0.3, '#38bdf8');
+            tailGrad.addColorStop(0.7, '#0284c7');
+            tailGrad.addColorStop(1, 'rgba(2, 132, 199, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 110, this.y - Math.sin(angle) * 110);
+            ctx.stroke();
+
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 35;
+
+            // Sharp plasma arrowhead
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(r * 1.6, 0);
+            ctx.lineTo(-r, -r * 0.8);
+            ctx.lineTo(-r * 0.4, 0);
+            ctx.lineTo(-r, r * 0.8);
+            ctx.closePath();
             ctx.fill();
             ctx.stroke();
+            ctx.restore();
 
-            // Projectile direction beam tail
+        } else if (this.type === 'ether_feather') {
+            // VIVIAN: ABYSSAL BANSHEE ETHER FEATHER
+            const r = Math.max(18, this.radius);
             const angle = Math.atan2(this.vy, this.vx);
+
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 70, this.y - Math.sin(angle) * 70
+            );
+            tailGrad.addColorStop(0, 'rgba(192, 132, 252, 0.95)');
+            tailGrad.addColorStop(0.6, 'rgba(147, 51, 234, 0.45)');
+            tailGrad.addColorStop(1, 'rgba(88, 28, 135, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 10;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x - Math.cos(angle) * 22, this.y - Math.sin(angle) * 22);
+            ctx.lineTo(this.x - Math.cos(angle) * 70, this.y - Math.sin(angle) * 70);
+            ctx.stroke();
+
+            ctx.shadowColor = '#c084fc';
+            ctx.shadowBlur = 35;
+
+            // Feather shape
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, r + 4);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.35, '#e9d5ff');
+            grad.addColorStop(0.75, '#a855f7');
+            grad.addColorStop(1, '#581c87');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r * 1.4, r * 0.7, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+        } else if (this.type === 'maid_needle') {
+            // TST-26: ABSOLUTE PRECISION SANITIZATION NEEDLE
+            const r = Math.max(16, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 80, this.y - Math.sin(angle) * 80
+            );
+            tailGrad.addColorStop(0, '#ffffff');
+            tailGrad.addColorStop(0.4, '#ec4899');
+            tailGrad.addColorStop(1, 'rgba(236, 72, 153, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 80, this.y - Math.sin(angle) * 80);
+            ctx.stroke();
+
+            ctx.shadowColor = '#ec4899';
+            ctx.shadowBlur = 35;
+
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#f472b6';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(r * 1.5, 0);
+            ctx.lineTo(0, -r * 0.6);
+            ctx.lineTo(-r * 1.5, 0);
+            ctx.lineTo(0, r * 0.6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+
+        } else {
+            // Standard / Custom colored glowing energy orb
+            const r = Math.max(16, this.radius);
+            const angle = Math.atan2(this.vy, this.vx);
+
+            const tailGrad = ctx.createLinearGradient(
+                this.x, this.y,
+                this.x - Math.cos(angle) * 60, this.y - Math.sin(angle) * 60
+            );
+            tailGrad.addColorStop(0, '#ffffff');
+            tailGrad.addColorStop(0.5, this.color);
+            tailGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.strokeStyle = tailGrad;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - Math.cos(angle) * 60, this.y - Math.sin(angle) * 60);
+            ctx.stroke();
+
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 30;
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 3.5;
+
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+            ctx.fill();
             ctx.stroke();
         }
 

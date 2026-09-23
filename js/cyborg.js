@@ -451,17 +451,30 @@ export class Cyborg {
         }
 
         if (this.combatStyle === 'ranged') {
-            // FIRE PROJECTILE
+            // FIRE HIGH-VISIBILITY ENERGY PROJECTILE
             this.isShooting = true;
-            const speed = 15;
-            const spawnX = this.x + Math.cos(this.aimAngle) * (this.radius + 18);
-            const spawnY = this.y + Math.sin(this.aimAngle) * (this.radius + 18);
+            const speed = 15.5;
+            const spawnDist = this.radius + 32;
+            const spawnX = this.x + Math.cos(this.aimAngle) * spawnDist;
+            const spawnY = this.y + Math.sin(this.aimAngle) * spawnDist;
 
             let projType = 'standard';
-            let projRadius = 10;
+            let projRadius = 18;
             if (this.characterId === 'velina' || this.characterId === 'verina') {
                 projType = 'photonic_flora';
-                projRadius = 12;
+                projRadius = 22;
+            } else if (this.characterId === 'nicole') {
+                projType = 'ether_cluster';
+                projRadius = 24;
+            } else if (this.characterId === 'trigger') {
+                projType = 'sniper_beam';
+                projRadius = 16;
+            } else if (this.characterId === 'vivian') {
+                projType = 'ether_feather';
+                projRadius = 20;
+            } else if (this.characterId === 'tst26') {
+                projType = 'maid_needle';
+                projRadius = 18;
             }
 
             const proj = new Projectile(
@@ -477,7 +490,9 @@ export class Cyborg {
             );
             combat.addProjectile(proj);
             try { sound.playLaser(); } catch (err) {}
-            fx.spawnHitSparks(spawnX, spawnY, this.color, 6);
+            // Dramatic muzzle flash & energy burst
+            fx.spawnHitSparks(spawnX, spawnY, this.color, 12);
+            fx.spawnClashShockwave(spawnX, spawnY);
             // Small recoil
             physics.applyKnockback(this, -Math.cos(this.aimAngle), -Math.sin(this.aimAngle), 4.5);
         } else {

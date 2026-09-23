@@ -145,7 +145,7 @@ export class InputManager {
             this.updateMousePosition(e);
 
             // Ignore clicks on UI cards, overlays, modals, buttons, inputs
-            if (e.target.closest('#loadout-screen, #controls-modal, #disconnect-modal, #victory-screen, #keybinds-modal, #secret-code-modal, button, input, select, .char-card, a')) {
+            if (e.target && typeof e.target.closest === 'function' && e.target.closest('#loadout-screen, #controls-modal, #disconnect-modal, #victory-screen, #keybinds-modal, #secret-code-modal, button, input, select, .char-card, a')) {
                 return;
             }
 
@@ -168,7 +168,7 @@ export class InputManager {
         });
 
         window.addEventListener('contextmenu', (e) => {
-            if (e.target.id === 'gameCanvas' || e.target.closest('#game-container')) {
+            if (e.target && (e.target.id === 'gameCanvas' || (typeof e.target.closest === 'function' && e.target.closest('#game-container')))) {
                 e.preventDefault();
             }
         });
