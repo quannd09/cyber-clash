@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=80';
-import { fx } from './particles.js?v=80';
-import { physics } from './physics.js?v=80';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=80';
-import { input } from './input.js?v=80';
+import { sound } from './audio.js?v=82';
+import { fx } from './particles.js?v=82';
+import { physics } from './physics.js?v=82';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=82';
+import { input } from './input.js?v=82';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -97,8 +97,8 @@ export class Cyborg {
         this.hp = this.maxHp;
         this.maxEnergy = 100;
         this.energy = 100;
-        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive, Saitama takes 1.25x (+25% cooldown)
-        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : (characterId === 'saitama' ? (1 / 1.25) : 1.0);
+        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive, Saitama takes 1.75x (+75% cooldown)
+        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : (characterId === 'saitama' ? (1 / 1.75) : 1.0);
         this.overdrive = 0;
         this.roundsWon = 0;
 
@@ -791,14 +791,14 @@ export class Cyborg {
                 this.index,
                 this.x + Math.cos(launchAngle) * 35,
                 this.y + Math.sin(launchAngle) * 35,
-                Math.cos(launchAngle) * 18,
-                Math.sin(launchAngle) * 18,
+                Math.cos(launchAngle) * 14,
+                Math.sin(launchAngle) * 14,
                 skillDmg,
                 '#38bdf8',
-                22,
+                30,
                 'shadow_dog'
             );
-            proj.life = 220;
+            proj.life = 260;
             combat.addProjectile(proj);
         } else if (skill.id === 'BLOOD_CRESCENT') {
             // MIRAI: BLOOD CRESCENT WAVE 🩸

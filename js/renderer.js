@@ -1,7 +1,7 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=80';
-import { assets } from './assets.js?v=80';
-import { mapManager } from './maps.js?v=80';
+import { WEAPONS } from './combat.js?v=82';
+import { assets } from './assets.js?v=82';
+import { mapManager } from './maps.js?v=82';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -19,6 +19,13 @@ export class GameRenderer {
         this.gridOffset = 0;
         this.reactorAngle = 0;
         this.activeUltimateCutIn = null;
+
+        // Dynamic 2v2 Camera System (smooth panning & auto-framing)
+        this.camera = {
+            x: 640,
+            y: 360,
+            zoom: 1.0
+        };
     }
 
     triggerShake(intensity = 8, duration = 12) {
@@ -51,25 +58,65 @@ export class GameRenderer {
         this.reactorAngle += 0.015 * dt;
     }
 
-    // --- ARENA DRAWING (VIBRANT SCENIC BRAWLHALLA-STYLE STAGE) ---
-    drawArena(bounds, activeMap = null) {
+    updateCamera(players = [], bounds = null, is2v2Mode = false, dt = 1) {
+        if (!is2v2Mode || !players || players.length === 0) {
+            this.camera.x += (640 - this.camera.x) * (0.1 * dt);
+            this.camera.y += (360 - this.camera.y) * (0.1 * dt);
+            this.camera.zoom += (1.0 - this.camera.zoom) * (0.1 * dt);
+            return;
+        }
+
+        const alive = players.filter(p => p && !p.isDead && p.hp > 0);
+        const targets = alive.length > 0 ? alive : players.filter(Boolean);
+        if (targets.length === 0) return;
+
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        for (const p of targets) {
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        }
+
+        let centerX = (minX + maxX) / 2;
+        let centerY = (minY + maxY) / 2;
+
+        const spanX = Math.max(680, (maxX - minX) + 380);
+        const spanY = Math.max(450, (maxY - minY) + 260);
+
+        const zoomX = this.canvas.width / spanX;
+        const zoomY = this.canvas.height / spanY;
+        let targetZoom = Math.min(zoomX, zoomY);
+        targetZoom = Math.max(0.52, Math.min(1.0, targetZoom));
+
+        if (bounds) {
+            const halfW = (this.canvas.width / targetZoom) / 2;
+            const halfH = (this.canvas.height / targetZoom) / 2;
+            const bW = bounds.maxX - bounds.minX;
+            if (bW > halfW * 2) {
+                centerX = Math.max(bounds.minX + halfW, Math.min(bounds.maxX - halfW, centerX));
+            } else {
+                centerX = (bounds.minX + bounds.maxX) / 2;
+            }
+            const bH = bounds.maxY - bounds.minY;
+            if (bH > halfH * 2) {
+                centerY = Math.max(bounds.minY + halfH, Math.min(bounds.maxY - halfH, centerY));
+            } else {
+                centerY = (bounds.minY + bounds.maxY) / 2;
+            }
+        }
+
+        const lerpRate = 0.08 * dt;
+        this.camera.x += (centerX - this.camera.x) * lerpRate;
+        this.camera.y += (centerY - this.camera.y) * lerpRate;
+        this.camera.zoom += (targetZoom - this.camera.zoom) * lerpRate;
+    }
+
+    drawBackground(activeMap = null) {
         const ctx = this.ctx;
         const w = this.canvas.width;
         const h = this.canvas.height;
 
-        ctx.save();
-
-        // Screen Shake offset
-        if (this.shakeTimer > 0) {
-            const rx = (Math.random() - 0.5) * this.shakeIntensity * 2;
-            const ry = (Math.random() - 0.5) * this.shakeIntensity * 2;
-            ctx.translate(rx, ry);
-        }
-
-        const arenaW = bounds.maxX - bounds.minX;
-        const arenaH = bounds.maxY - bounds.minY;
-
-        // 1. Draw Full-Screen Scenic Background Art
         const map = activeMap || (window.game && window.game.is2v2Mode ? mapManager.currentMap : null);
         let bgImg = null;
         if (map && map.bgKey) {
@@ -85,13 +132,19 @@ export class GameRenderer {
             ctx.fillStyle = '#0f172a';
             ctx.fillRect(0, 0, w, h);
         }
+    }
 
-        // Draw terrain platforms if in a map with platforms
+    drawArenaWorld(bounds, activeMap = null) {
+        const ctx = this.ctx;
+        const arenaW = bounds.maxX - bounds.minX;
+        const arenaH = bounds.maxY - bounds.minY;
+
+        const map = activeMap || (window.game && window.game.is2v2Mode ? mapManager.currentMap : null);
         if (map && map.platforms) {
             this.drawPlatforms(map.platforms);
         }
 
-        // 2. Subtle Stage Combat Area Boundary Line (Clean dashed border)
+        // Subtle Stage Combat Area Boundary Line (Clean dashed border)
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([8, 8]);
@@ -112,7 +165,22 @@ export class GameRenderer {
             ctx.arc(cx, cy, 4, 0, Math.PI * 2);
             ctx.fill();
         });
+    }
 
+    // --- ARENA DRAWING (VIBRANT SCENIC BRAWLHALLA-STYLE STAGE) ---
+    drawArena(bounds, activeMap = null) {
+        const ctx = this.ctx;
+        ctx.save();
+
+        // Screen Shake offset
+        if (this.shakeTimer > 0) {
+            const rx = (Math.random() - 0.5) * this.shakeIntensity * 2;
+            const ry = (Math.random() - 0.5) * this.shakeIntensity * 2;
+            ctx.translate(rx, ry);
+        }
+
+        this.drawBackground(activeMap);
+        this.drawArenaWorld(bounds, activeMap);
         ctx.restore();
     }
 
@@ -1853,26 +1921,27 @@ export class GameRenderer {
     triggerUltimateCutIn(user) {
         if (!user) return;
         const ultTitles = {
-            yanagi: { tag: '✦ ELECTRIC EXCEED ✦', title: 'LIGHTNING CANNON', sub: 'TSUKISHIRO YANAGI' },
-            velina: { tag: '✦ LIFE BLOOM HARMONY ✦', title: 'LIFE BLOSSOM STORM', sub: 'VERINA AIRGID' },
-            nicole: { tag: '✦ ZERO GRAVITY COLLAPSE ✦', title: 'GRAVITATIONAL BLACK HOLE', sub: 'NICOLE DEMARA' },
-            trigger: { tag: '✦ TACTICAL LOCK-ON ✦', title: 'SYNCHRONIZED FIREPOWER', sub: 'TRIGGER' },
-            vivian: { tag: '✦ ETHER WING DESCENT ✦', title: 'FEATHER STORM HARBINGER', sub: 'VIVIAN BANSHEE' },
-            jotaro: { tag: '✦ STAND PROUD: THE WORLD ✦', title: 'ORA ORA ORA: TIME STOP', sub: 'JOTARO KUJO' },
-            goku: { tag: '✦ SUPER SAIYAN BURST ✦', title: 'SUPER KAMEHAMEHA', sub: 'SON GOKU' },
-            giorno: { tag: '✦ GOLDEN EXPERIENCE REQUIEM ✦', title: 'RETURN TO ZERO', sub: 'GIORNO GIOVANNA' },
-            naoya: { tag: '✦ 24 FPS PROJECTION SORCERY ✦', title: 'MACH 3 PROJECTION BARRAGE', sub: "NAOYA ZEN'IN" },
-            luffy: { tag: '✦ GEAR 5 SUN GOD NIKA ✦', title: 'GOMU GOMU NO BAJRANG GUN', sub: 'MONKEY D. LUFFY' },
-            gojo: { tag: '✦ INNATE DOMAIN EXPANSION ✦', title: 'UNLIMITED VOID', sub: 'SATORU GOJO' },
-            sukuna: { tag: '✦ INNATE DOMAIN EXPANSION ✦', title: 'MALEVOLENT SHRINE', sub: 'RYOMEN SUKUNA' },
-            saitama: { tag: '✦ SERIOUS SERIES SPECIAL MOVE ✦', title: 'SERIOUS PUNCH: DEATH', sub: 'SAITAMA' },
-            megumi: { tag: '✦ TEN SHADOWS SACRED TECHNIQUE ✦', title: 'EIGHT-HANDLED SWORD: MAHORAGA', sub: 'FUSHIGURO MEGUMI' },
-            mirai: { tag: '✦ SPIRIT WORLD BLOOD CATACLYSM ✦', title: 'BLOOD WEAPON: FUYUKAI DESU', sub: 'KURIYAMA MIRAI' }
+            yanagi: { tag: '✦ ELECTRIC EXCEED ✦', title: 'LIGHTNING CANNON', sub: 'TSUKISHIRO YANAGI', icon: '⚡' },
+            velina: { tag: '✦ LIFE BLOOM HARMONY ✦', title: 'LIFE BLOSSOM STORM', sub: 'VERINA AIRGID', icon: '🌸' },
+            nicole: { tag: '✦ ZERO GRAVITY COLLAPSE ✦', title: 'GRAVITATIONAL BLACK HOLE', sub: 'NICOLE DEMARA', icon: '💼' },
+            trigger: { tag: '✦ TACTICAL LOCK-ON ✦', title: 'SYNCHRONIZED FIREPOWER', sub: 'TRIGGER', icon: '🎯' },
+            vivian: { tag: '✦ ETHER WING DESCENT ✦', title: 'FEATHER STORM HARBINGER', sub: 'VIVIAN BANSHEE', icon: '🔮' },
+            jotaro: { tag: '✦ STAND PROUD: THE WORLD ✦', title: 'ORA ORA ORA: TIME STOP', sub: 'JOTARO KUJO', icon: '👊' },
+            goku: { tag: '✦ SUPER SAIYAN BURST ✦', title: 'SUPER KAMEHAMEHA', sub: 'SON GOKU', icon: '🥋' },
+            giorno: { tag: '✦ GOLDEN EXPERIENCE REQUIEM ✦', title: 'RETURN TO ZERO', sub: 'GIORNO GIOVANNA', icon: '🐞' },
+            naoya: { tag: '✦ 24 FPS PROJECTION SORCERY ✦', title: 'MACH 3 PROJECTION BARRAGE', sub: "NAOYA ZEN'IN", icon: '🎞️' },
+            luffy: { tag: '✦ GEAR 5 SUN GOD NIKA ✦', title: 'GOMU GOMU NO BAJRANG GUN', sub: 'MONKEY D. LUFFY', icon: '🍖' },
+            gojo: { tag: '✦ INNATE DOMAIN EXPANSION ✦', title: 'UNLIMITED VOID', sub: 'SATORU GOJO', icon: '🌀' },
+            sukuna: { tag: '✦ INNATE DOMAIN EXPANSION ✦', title: 'MALEVOLENT SHRINE', sub: 'RYOMEN SUKUNA', icon: '🔥' },
+            saitama: { tag: '✦ SERIOUS SERIES SPECIAL MOVE ✦', title: 'SERIOUS PUNCH: DEATH', sub: 'SAITAMA', icon: '🥊' },
+            megumi: { tag: '✦ TEN SHADOWS SACRED TECHNIQUE ✦', title: 'EIGHT-HANDLED SWORD: MAHORAGA', sub: 'FUSHIGURO MEGUMI', icon: '🐺' },
+            mirai: { tag: '✦ SPIRIT WORLD BLOOD CATACLYSM ✦', title: 'BLOOD WEAPON: FUYUKAI DESU', sub: 'KURIYAMA MIRAI', icon: '🩸' }
         };
         const info = ultTitles[user.characterId] || {
             tag: '✦ MAXIMUM OVERDRIVE FINISHER ✦',
             title: 'OVERDRIVE ULTIMATE',
-            sub: user.name || 'FIGHTER'
+            sub: user.name || 'FIGHTER',
+            icon: '⚡'
         };
 
         this.activeUltimateCutIn = {
@@ -1881,169 +1950,125 @@ export class GameRenderer {
             tag: info.tag,
             title: info.title,
             sub: info.sub,
+            icon: info.icon || '⚡',
             color: user.color || '#38bdf8',
-            timer: 55,
-            maxTimer: 55
+            timer: 36,
+            maxTimer: 36
         };
-        this.triggerFlash(user.color || '#ffffff', 0.55);
-        this.triggerShake(12, 18);
+        this.triggerFlash(user.color || '#ffffff', 0.25);
+        this.triggerShake(7, 10);
     }
 
     drawUltimateCutIn(ctx) {
         if (!this.activeUltimateCutIn) return;
         const cut = this.activeUltimateCutIn;
         const w = this.canvas.width;
-        const h = this.canvas.height;
         const p = 1 - (cut.timer / cut.maxTimer);
 
-        // Alpha envelope: fade in first 8 frames, sustain, fade out last 8 frames
+        // Alpha envelope: snappy fade in 6 frames, sustain, fade out last 6 frames
         let alpha = 1;
-        if (cut.timer > cut.maxTimer - 8) {
-            alpha = (cut.maxTimer - cut.timer) / 8;
-        } else if (cut.timer < 8) {
-            alpha = cut.timer / 8;
+        if (cut.timer > cut.maxTimer - 6) {
+            alpha = (cut.maxTimer - cut.timer) / 6;
+        } else if (cut.timer < 6) {
+            alpha = cut.timer / 6;
         }
 
         ctx.save();
         ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
 
-        // 1. Cinematic Dark Backdrop
-        ctx.fillStyle = 'rgba(3, 7, 18, 0.72)';
-        ctx.fillRect(0, 0, w, h);
+        // NON-INTRUSIVE TOP BROADCAST RIBBON (Leaves 100% of battlefield & characters visible)
+        const bannerW = 620;
+        const bannerH = 46;
+        const bannerX = (w - bannerW) / 2;
+        // Slide down gently from top
+        const slideY = (1 - Math.sin(Math.min(1, p * 3.5) * Math.PI * 0.5)) * -60;
+        const bannerY = 64 + slideY;
 
-        // 2. Cinematic Black Letterbox Bars (Top & Bottom)
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, w, 46);
-        ctx.fillRect(0, h - 46, w, 46);
+        // Glowing backdrop container
+        const grad = ctx.createLinearGradient(bannerX, bannerY, bannerX + bannerW, bannerY);
+        grad.addColorStop(0, 'rgba(15, 23, 42, 0.92)');
+        grad.addColorStop(0.5, 'rgba(2, 6, 23, 0.96)');
+        grad.addColorStop(1, 'rgba(15, 23, 42, 0.92)');
 
-        // Border neon glow lines on letterbox
+        ctx.fillStyle = grad;
         ctx.strokeStyle = cut.color;
-        ctx.shadowColor = cut.color;
-        ctx.shadowBlur = 15;
         ctx.lineWidth = 2.5;
+        ctx.shadowColor = cut.color;
+        ctx.shadowBlur = 18;
+
+        // Rounded chamfered cyber banner box
         ctx.beginPath();
-        ctx.moveTo(0, 46);
-        ctx.lineTo(w, 46);
-        ctx.moveTo(0, h - 46);
-        ctx.lineTo(w, h - 46);
-        ctx.stroke();
-
-        // 3. Dynamic Angled Slash Banner across screen center
-        const bannerH = 175;
-        const bannerY = h * 0.42;
-        const slideOffset = (1 - Math.sin(Math.min(1, p * 4) * Math.PI * 0.5)) * -220;
-
-        ctx.save();
-        ctx.translate(slideOffset, 0);
-
-        // Banner Polygon
-        const polyTopY = bannerY - bannerH * 0.5;
-        const polyBotY = bannerY + bannerH * 0.5;
-
-        // Banner gradient
-        const bgGrad = ctx.createLinearGradient(0, polyTopY, w, polyBotY);
-        bgGrad.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
-        bgGrad.addColorStop(0.35, 'rgba(2, 6, 23, 0.98)');
-        bgGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.95)');
-        bgGrad.addColorStop(1, 'rgba(2, 6, 23, 0.98)');
-
-        ctx.fillStyle = bgGrad;
-        ctx.beginPath();
-        ctx.moveTo(-100, polyTopY - 12);
-        ctx.lineTo(w + 100, polyTopY + 12);
-        ctx.lineTo(w + 100, polyBotY + 12);
-        ctx.lineTo(-100, polyBotY - 12);
+        const r = 8;
+        ctx.moveTo(bannerX + r, bannerY);
+        ctx.lineTo(bannerX + bannerW - r, bannerY);
+        ctx.quadraticCurveTo(bannerX + bannerW, bannerY, bannerX + bannerW, bannerY + r);
+        ctx.lineTo(bannerX + bannerW, bannerY + bannerH - r);
+        ctx.quadraticCurveTo(bannerX + bannerW, bannerY + bannerH, bannerX + bannerW - r, bannerY + bannerH);
+        ctx.lineTo(bannerX + r, bannerY + bannerH);
+        ctx.quadraticCurveTo(bannerX, bannerY + bannerH, bannerX, bannerY + bannerH - r);
+        ctx.lineTo(bannerX, bannerY + r);
+        ctx.quadraticCurveTo(bannerX, bannerY, bannerX + r, bannerY);
         ctx.closePath();
         ctx.fill();
-
-        // Glowing border stripes
-        ctx.strokeStyle = cut.color;
-        ctx.lineWidth = 4;
-        ctx.shadowColor = cut.color;
-        ctx.shadowBlur = 24;
-        ctx.beginPath();
-        ctx.moveTo(-100, polyTopY - 12);
-        ctx.lineTo(w + 100, polyTopY + 12);
-        ctx.moveTo(-100, polyBotY - 12);
-        ctx.lineTo(w + 100, polyBotY + 12);
         ctx.stroke();
 
-        // Animated neon speed lines passing across banner
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-        for (let i = 0; i < 6; i++) {
-            const lineX = ((p * 2500 + i * 280) % (w + 400)) - 200;
-            const lineY = polyTopY + (i / 5) * bannerH;
-            ctx.beginPath();
-            ctx.moveTo(lineX, lineY);
-            ctx.lineTo(lineX + 180, lineY + 6);
-            ctx.stroke();
-        }
-
-        // 4. Character Portrait Cut-In
-        const avatar = assets.getCharacterAvatar ? assets.getCharacterAvatar(cut.charId) : null;
-        const portX = 220;
-        const portY = bannerY;
-        const portR = 64;
+        // Left Avatar Badge
+        const portX = bannerX + 32;
+        const portY = bannerY + bannerH / 2;
+        const portR = 18;
 
         ctx.save();
         ctx.shadowColor = cut.color;
-        ctx.shadowBlur = 30;
-
-        // Portrait glowing backdrop shield
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = '#0f172a';
         ctx.strokeStyle = cut.color;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(portX, portY, portR + 4, 0, Math.PI * 2);
+        ctx.arc(portX, portY, portR, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        // Draw Avatar inside circle
+        const avatar = assets.getCharacterAvatar ? assets.getCharacterAvatar(cut.charId) : null;
         if (avatar && avatar.complete && avatar.naturalWidth > 0) {
             ctx.save();
             ctx.beginPath();
-            ctx.arc(portX, portY, portR, 0, Math.PI * 2);
+            ctx.arc(portX, portY, portR - 1, 0, Math.PI * 2);
             ctx.clip();
             ctx.drawImage(avatar, portX - portR, portY - portR, portR * 2, portR * 2);
             ctx.restore();
+        } else {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Orbitron, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(cut.icon || '⚡', portX, portY);
         }
         ctx.restore();
 
-        // 5. Stylized Typography & Titles
-        const textX = 320;
+        // Texts inside the top banner
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
 
-        // Tagline (Category / Domain)
-        ctx.font = 'bold 15px Rajdhani, monospace';
+        // Tagline
+        ctx.font = 'bold 11px Orbitron, monospace';
         ctx.fillStyle = cut.color;
         ctx.shadowColor = cut.color;
-        ctx.shadowBlur = 12;
-        ctx.fillText(cut.tag, textX, bannerY - 42);
-
-        // Main Ultimate Title
-        ctx.font = '900 36px Orbitron, Rajdhani, sans-serif';
-        // Outer dark glow
-        ctx.shadowColor = '#000000';
-        ctx.shadowBlur = 18;
-        ctx.shadowOffsetX = 3;
-        ctx.shadowOffsetY = 3;
-        ctx.strokeStyle = cut.color;
-        ctx.lineWidth = 5;
-        ctx.strokeText(cut.title, textX, bannerY);
-        // Inner white/bright fill
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(cut.title, textX, bannerY);
-
-        // Subtitle / Fighter Name
-        ctx.font = 'bold 17px Rajdhani, sans-serif';
         ctx.shadowBlur = 8;
-        ctx.shadowColor = '#000000';
-        ctx.fillStyle = '#cbd5e1';
-        ctx.fillText(`◆ ${cut.sub} ◆`, textX, bannerY + 40);
+        ctx.fillText(cut.tag, bannerX + 62, bannerY + 14);
 
-        ctx.restore();
+        // Main Skill Title
+        ctx.font = '900 18px Orbitron, sans-serif';
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(cut.title, bannerX + 62, bannerY + 31);
+
+        // Right side: Fighter name pill
+        ctx.textAlign = 'right';
+        ctx.font = 'bold 12px Rajdhani, sans-serif';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText(`◆ ${cut.sub} ◆`, bannerX + bannerW - 16, bannerY + bannerH / 2);
+
         ctx.restore();
     }
 }

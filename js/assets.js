@@ -92,6 +92,10 @@ export class AssetManager {
 
         return null;
     }
+
+    getCharacterAvatar(characterId) {
+        return this.getCharacterSprite(characterId, 'idle');
+    }
 }
 
 export const assets = new AssetManager();

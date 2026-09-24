@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=80';
-import { fx } from './particles.js?v=80';
-import { physics } from './physics.js?v=80';
+import { sound } from './audio.js?v=82';
+import { fx } from './particles.js?v=82';
+import { physics } from './physics.js?v=82';
 
 export const WEAPONS = {
     YANAGI: {
@@ -168,7 +168,7 @@ export const SKILLS = {
     LUFFY_SKILL: { id: 'GIGANT_STOMP', name: 'Gigant Stomp', cooldown: 210, icon: '🍖' },
     GOJO_SKILL: { id: 'LAPSE_BLUE', name: 'Lapse Blue', cooldown: 210, icon: '🌀' },
     SUKUNA_SKILL: { id: 'KAMINO_FIRE_ARROW', name: 'Kamino: Fuga', cooldown: 210, icon: '🔥' },
-    SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 210, icon: '🥊' },
+    SAITAMA_SKILL: { id: 'CONSECUTIVE_PUNCHES', name: 'Consecutive Normal Punches', cooldown: 368, icon: '🥊' },
     MEGUMI_SKILL: { id: 'DIVINE_DOG', name: 'Divine Dog: Totality', cooldown: 220, icon: '🐺' },
     MIRAI_SKILL: { id: 'BLOOD_CRESCENT', name: 'Blood Crescent Wave', cooldown: 200, icon: '🩸' }
 };
@@ -226,8 +226,8 @@ export class Projectile {
                 const step = Math.sign(diffAngle) * Math.min(Math.abs(diffAngle), turnRate);
                 const newAngle = currentAngle + step;
 
-                // Aggressive chase speed, surge during pounce range
-                const speed = bestDist < 140 ? 21 : 18;
+                // Visible, stalking chase speed; surge during pounce range
+                const speed = bestDist < 160 ? 17 : 13;
                 this.vx = Math.cos(newAngle) * speed;
                 this.vy = Math.sin(newAngle) * speed;
             }
@@ -373,11 +373,12 @@ export class Projectile {
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(angle);
-            ctx.shadowColor = '#38bdf8';
-            ctx.shadowBlur = 24;
+            ctx.scale(1.45, 1.45); // Enlarged 1.45x for unmistakable visual clarity
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 26;
 
             // 1. Dark Shadow Fur & Smoke Billowing Behind
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
             ctx.beginPath();
             ctx.moveTo(-12, -12);
             ctx.quadraticCurveTo(-28, -16 + pulse, -44, -6);
@@ -387,7 +388,7 @@ export class Projectile {
             ctx.fill();
 
             // 2. Trailing Cursed Energy Wisps
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
             ctx.lineWidth = 4;
             ctx.beginPath();
             ctx.moveTo(-10, -6);
@@ -398,7 +399,7 @@ export class Projectile {
 
             // 3. Main Muscular Wolf Head & Body (Dark Obsidian Shadow)
             ctx.fillStyle = '#090d16';
-            ctx.strokeStyle = '#38bdf8';
+            ctx.strokeStyle = '#00f0ff';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
             ctx.moveTo(26, -2);       // Upper snout
@@ -440,10 +441,10 @@ export class Projectile {
             // 6. Glowing Predatory Cyan Eyes
             ctx.fillStyle = '#38bdf8';
             ctx.shadowColor = '#00f0ff';
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur = 14;
             ctx.beginPath();
-            ctx.arc(8, -6, 2.8, 0, Math.PI * 2);
-            ctx.arc(8, 6, 2.8, 0, Math.PI * 2);
+            ctx.arc(8, -6, 3.0, 0, Math.PI * 2);
+            ctx.arc(8, 6, 3.0, 0, Math.PI * 2);
             ctx.fill();
 
             // Eye specular highlight
@@ -469,6 +470,17 @@ export class Projectile {
             ctx.lineTo(24, 18);
             ctx.stroke();
 
+            ctx.restore();
+
+            // 8. Overhead Text Tag (Never miss the Divine Dog on screen)
+            ctx.save();
+            ctx.font = 'bold 11px Orbitron, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.shadowColor = '#000000';
+            ctx.shadowBlur = 6;
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText('🐺 DIVINE DOG', this.x, this.y - 34);
             ctx.restore();
 
         } else if (this.type === 'blood_crescent') {
@@ -922,10 +934,10 @@ export class CombatResolver {
                             fx.addText(attacker.x, attacker.y - 25, `+${Math.round(healAmount)} HP`, '#ef4444', 20);
                         }
                     } else if (proj.type === 'shadow_dog') {
-                        defender.applyStun(55); // 0.95s Stun lock
-                        fx.addText(defender.x, targetY - 45, '🐺 SHADOW POUNCE & PIN!', '#38bdf8', 26);
+                        defender.applyStun(60); // 1.0s Stun lock
+                        fx.addText(defender.x, targetY - 45, '🐺 DIVINE DOG BITE! (STUN 1s)', '#38bdf8', 26);
                         fx.spawnHitSparks(defender.x, targetY, '#38bdf8', 28);
-                        fx.spawnHitSparks(defender.x, targetY, '#ffffff', 12);
+                        fx.spawnHitSparks(defender.x, targetY, '#ffffff', 14);
                         if (sound.playWolfBite) sound.playWolfBite();
                         else sound.playHit(true);
                         if (typeof triggerScreenShake === 'function') triggerScreenShake(9);

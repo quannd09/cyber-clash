@@ -96,8 +96,17 @@ export class InputManager {
             if (rect.width > 0 && rect.height > 0) {
                 const scaleX = 1280 / rect.width;
                 const scaleY = 720 / rect.height;
-                this.mouse.x = (e.clientX - rect.left) * scaleX;
-                this.mouse.y = (e.clientY - rect.top) * scaleY;
+                const screenX = (e.clientX - rect.left) * scaleX;
+                const screenY = (e.clientY - rect.top) * scaleY;
+
+                if (window.game && window.game.renderer && window.game.renderer.camera) {
+                    const cam = window.game.renderer.camera;
+                    this.mouse.x = (screenX - 1280 / 2) / (cam.zoom || 1.0) + cam.x;
+                    this.mouse.y = (screenY - 720 / 2) / (cam.zoom || 1.0) + cam.y;
+                } else {
+                    this.mouse.x = screenX;
+                    this.mouse.y = screenY;
+                }
                 this.mouse.hasMoved = true;
                 this.mouse.lastMoveTime = Date.now();
             }

@@ -1,15 +1,15 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=80';
-import { input } from './input.js?v=80';
-import { fx } from './particles.js?v=80';
-import { combat, Projectile } from './combat.js?v=80';
-import { Cyborg } from './cyborg.js?v=80';
-import { GameRenderer } from './renderer.js?v=80';
-import { UIManager } from './ui.js?v=80';
-import { network } from './network.js?v=80';
-import { BotController } from './bot.js?v=80';
-import { physics } from './physics.js?v=80';
-import { mapManager, MAPS } from './maps.js?v=80';
+import { sound } from './audio.js?v=82';
+import { input } from './input.js?v=82';
+import { fx } from './particles.js?v=82';
+import { combat, Projectile } from './combat.js?v=82';
+import { Cyborg } from './cyborg.js?v=82';
+import { GameRenderer } from './renderer.js?v=82';
+import { UIManager } from './ui.js?v=82';
+import { network } from './network.js?v=82';
+import { BotController } from './bot.js?v=82';
+import { physics } from './physics.js?v=82';
+import { mapManager, MAPS } from './maps.js?v=82';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -843,8 +843,11 @@ class CyberClashGame {
         // Gravity Platformer Jump & Drop
         if (physics.gravityEnabled || player.gravityEnabled) {
             const upAction = input.getActionState(index, 'up');
+            const ultAction = input.getActionState(index, 'ultimate');
             const touchJump = (index === 0 && input.touchMove && input.touchMove.y < -0.55);
-            if ((upAction && upAction.justDown) || touchJump) {
+            // Allow W / ArrowUp to jump, AND allow Space / Enter to jump if Overdrive is not full
+            const canSpaceJump = (ultAction && ultAction.justDown && player.overdrive < 100);
+            if ((upAction && upAction.justDown) || canSpaceJump || touchJump) {
                 physics.executeJump(player);
             }
             const downAction = input.getActionState(index, 'down');
@@ -1518,26 +1521,58 @@ class CyberClashGame {
     }
 
     render() {
-        this.renderer.drawArena(this.bounds, this.is2v2Mode ? mapManager.currentMap : null);
+        const ctx = this.ctx;
+        const is2v2 = Boolean(this.is2v2Mode && this.players2v2.length > 0);
+        const map = is2v2 ? mapManager.currentMap : null;
+
+        // Dynamic 2v2 Camera update
+        this.renderer.updateCamera(is2v2 ? this.players2v2 : [this.p1, this.p2], this.bounds, is2v2, 1);
+        const cam = this.renderer.camera;
+
+        // 1. Draw Static / Canvas-fitted Background
+        this.renderer.drawBackground(map);
+
+        // 2. World Space Rendering with Camera Transform
+        ctx.save();
+        if (this.renderer.shakeTimer > 0) {
+            const rx = (Math.random() - 0.5) * this.renderer.shakeIntensity * 2;
+            const ry = (Math.random() - 0.5) * this.renderer.shakeIntensity * 2;
+            ctx.translate(rx, ry);
+        }
+
+        ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+        ctx.scale(cam.zoom, cam.zoom);
+        ctx.translate(-cam.x, -cam.y);
+
+        this.renderer.drawArenaWorld(this.bounds, map);
 
         if (this.state !== STATE_LOADOUT) {
-            combat.drawProjectiles(this.ctx);
+            combat.drawProjectiles(ctx);
 
-            if (this.is2v2Mode && this.players2v2.length > 0) {
+            if (is2v2) {
                 for (const p of this.players2v2) {
                     if (p) this.renderer.drawCyborg(p);
                 }
-                fx.draw(this.ctx);
-                this.renderer.drawHUD(this.players2v2, this.matchTimer, this.roundMessage);
             } else {
                 this.renderer.drawCyborg(this.p1);
                 this.renderer.drawCyborg(this.p2);
-                fx.draw(this.ctx);
+            }
+
+            fx.draw(ctx);
+        }
+
+        ctx.restore();
+
+        // 3. Screen Space Rendering (Fixed HUD & Ultimate Banner)
+        if (this.state !== STATE_LOADOUT) {
+            if (is2v2) {
+                this.renderer.drawHUD(this.players2v2, this.matchTimer, this.roundMessage);
+            } else {
                 this.renderer.drawHUD(this.p1, this.p2, this.matchTimer, this.roundMessage);
             }
 
-            // Universal Cinematic Ultimate Cut-In Banner
-            this.renderer.drawUltimateCutIn(this.ctx);
+            // Universal Non-Intrusive Ultimate Broadcast Ribbon
+            this.renderer.drawUltimateCutIn(ctx);
         }
     }
 }

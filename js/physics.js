@@ -10,8 +10,8 @@ export class PhysicsEngine {
         this.gravityEnabled = false; // Toggled on for 2v2 Platformer mode
         this.gravity = 0.46;
         this.terminalVelocity = 14.0;
-        this.jumpSpeed = -10.8;
-        this.doubleJumpSpeed = -9.8;
+        this.jumpSpeed = -13.2;      // Reaches ~190px single jump height to easily land on obstacles
+        this.doubleJumpSpeed = -11.5;
     }
 
     updateBody(body, dt = 1) {
@@ -87,19 +87,23 @@ export class PhysicsEngine {
             const bottom = plat.y + plat.height;
 
             // Check horizontal overlap with player
-            if (body.x + radius * 0.65 < left || body.x - radius * 0.65 > right) {
+            if (body.x + radius * 0.75 < left || body.x - radius * 0.75 > right) {
                 continue;
             }
 
             if (plat.type === 'soft') {
-                // One-way platform:
+                // One-way soft platform:
                 // Pass-through when rising or when dropping down intentionally
                 if (body.dropCooldown > 0 || body.vy < 0) {
                     continue;
                 }
 
-                // If feet crossed the top surface this frame or are resting right on it
-                if (feetPrevY <= top + 8 && feetCurrY >= top - 2) {
+                // Landing or standing firmly on top surface
+                const maxStep = Math.max(16, body.vy + 8);
+                const canLand = (feetCurrY >= top - 4 && feetCurrY <= top + maxStep && feetPrevY <= top + 18);
+                const alreadyStanding = (Math.abs(feetCurrY - top) <= 4 && body.vy >= 0);
+
+                if (canLand || alreadyStanding) {
                     body.y = top - radius;
                     body.vy = 0;
                     body.isGrounded = true;
@@ -108,9 +112,11 @@ export class PhysicsEngine {
                     break;
                 }
             } else if (plat.type === 'solid') {
-                // Solid platform: blocks from top, bottom, and sides
-                // 1. Landing on top surface
-                if (feetPrevY <= top + 10 && feetCurrY >= top - 2) {
+                // Solid platform: blocks from top, underside, and sides
+                const maxStep = Math.max(16, body.vy + 8);
+
+                // 1. Landing or standing on top surface
+                if (body.vy >= 0 && ((feetCurrY >= top - 4 && feetCurrY <= top + maxStep && feetPrevY <= top + 18) || Math.abs(feetCurrY - top) <= 4)) {
                     body.y = top - radius;
                     body.vy = 0;
                     body.isGrounded = true;
@@ -119,16 +125,16 @@ export class PhysicsEngine {
                     break;
                 }
                 // 2. Hitting underside while jumping up
-                else if (body.prevY - radius >= bottom - 8 && body.y - radius <= bottom) {
+                else if (body.vy < 0 && body.prevY - radius >= bottom - 14 && body.y - radius <= bottom + 4) {
                     body.y = bottom + radius;
-                    body.vy = Math.max(0, -body.vy * 0.3);
+                    body.vy = Math.max(0, -body.vy * 0.2);
                 }
                 // 3. Side collisions
-                else if (body.y + radius > top + 6 && body.y - radius < bottom - 6) {
-                    if (body.prevX + radius <= left + 6 && body.x + radius >= left) {
+                else if (body.y + radius > top + 6 && body.y - radius < bottom - 4) {
+                    if (body.prevX + radius <= left + 8 && body.x + radius >= left) {
                         body.x = left - radius;
                         body.vx = 0;
-                    } else if (body.prevX - radius >= right - 6 && body.x - radius <= right) {
+                    } else if (body.prevX - radius >= right - 8 && body.x - radius <= right) {
                         body.x = right + radius;
                         body.vx = 0;
                     }
@@ -148,6 +154,7 @@ export class PhysicsEngine {
 
         if (body.isGrounded) {
             body.vy = this.jumpSpeed;
+            body.y -= 2; // initial lift to cleanly unstick from platform
             body.isGrounded = false;
             body.jumpCount = 1;
             return true;
@@ -207,6 +214,8 @@ export class PhysicsEngine {
             if (this.gravityEnabled || body.gravityEnabled) {
                 body.isGrounded = true;
                 body.jumpCount = 0;
+                body.vy = 0;
+                return true; // In gravity mode, landing on arena floor firmly lands without bouncing
             }
         }
 
