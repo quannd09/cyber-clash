@@ -10,7 +10,7 @@ export class AssetManager {
     }
 
     tryAutoLoadDefaults() {
-        const v = '10';
+        const v = '80';
         // Background
         this.loadImage('background', `assets/background.png?v=${v}`);
 

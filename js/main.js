@@ -1,15 +1,15 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=76';
-import { input } from './input.js?v=76';
-import { fx } from './particles.js?v=76';
-import { combat, Projectile } from './combat.js?v=76';
-import { Cyborg } from './cyborg.js?v=76';
-import { GameRenderer } from './renderer.js?v=76';
-import { UIManager } from './ui.js?v=76';
-import { network } from './network.js?v=76';
-import { BotController } from './bot.js?v=76';
-import { physics } from './physics.js?v=76';
-import { mapManager, MAPS } from './maps.js?v=76';
+import { sound } from './audio.js?v=80';
+import { input } from './input.js?v=80';
+import { fx } from './particles.js?v=80';
+import { combat, Projectile } from './combat.js?v=80';
+import { Cyborg } from './cyborg.js?v=80';
+import { GameRenderer } from './renderer.js?v=80';
+import { UIManager } from './ui.js?v=80';
+import { network } from './network.js?v=80';
+import { BotController } from './bot.js?v=80';
+import { physics } from './physics.js?v=80';
+import { mapManager, MAPS } from './maps.js?v=80';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -1185,7 +1185,7 @@ class CyberClashGame {
             maxHp: c.maxHp,
             energy: c.energy,
             maxEnergy: c.maxEnergy,
-            overdrive: c.overdrive,
+            overdrive: (typeof c.overdrive === 'number' && !isNaN(c.overdrive)) ? c.overdrive : 0,
             roundsWon: c.roundsWon,
             isAttacking: c.isAttacking,
             attackType: c.attackType,
@@ -1222,7 +1222,9 @@ class CyberClashGame {
         c.maxHp = data.maxHp;
         c.energy = data.energy;
         c.maxEnergy = data.maxEnergy;
-        c.overdrive = data.overdrive;
+        if (typeof data.overdrive === 'number' && !isNaN(data.overdrive)) {
+            c.overdrive = data.overdrive;
+        }
         c.roundsWon = data.roundsWon;
         c.isAttacking = data.isAttacking;
         c.attackType = data.attackType;

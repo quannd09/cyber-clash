@@ -1,16 +1,16 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=76';
-import { fx } from './particles.js?v=76';
-import { physics } from './physics.js?v=76';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=76';
-import { input } from './input.js?v=76';
+import { sound } from './audio.js?v=80';
+import { fx } from './particles.js?v=80';
+import { physics } from './physics.js?v=80';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=80';
+import { input } from './input.js?v=80';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
         this.index = index;
         this.color = color;
         this.name = name;
-        this.characterId = characterId;
+        this.characterId = (characterId || 'yanagi').toLowerCase().trim();
         const charColors = {
             yanagi: '#a78bfa',
             velina: '#34d399',
@@ -171,6 +171,7 @@ export class Cyborg {
         this.skillActionTimer = 0;
         this.isUsingUltimate = false;
         this.ultimateTimer = 0;
+        this.overdrive = (typeof this.overdrive === 'number' && !isNaN(this.overdrive)) ? this.overdrive : 0;
         this.saitamaTeleported = false;
         this.saitamaPunchDelivered = false;
         this.saitamaTarget = null;
@@ -247,8 +248,12 @@ export class Cyborg {
             }
         }
 
+        if (typeof this.overdrive !== 'number' || isNaN(this.overdrive)) {
+            this.overdrive = 0;
+        }
+
         if (!this.isUsingUltimate && !isOpponentUltActive && this.overdrive < 100) {
-            const passiveGain = 0.08 * this.overdriveChargeRate;
+            const passiveGain = 0.12 * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + passiveGain * dt);
         }
 
@@ -497,6 +502,7 @@ export class Cyborg {
     activateSkill(opponent) {
         if (this.isStunned || this.skillCooldownTimer > 0 || this.isUsingUltimate) return;
 
+        const charKey = (this.characterId || 'yanagi').toLowerCase().trim();
         const skillMap = {
             yanagi: SKILLS.YANAGI_SKILL,
             velina: SKILLS.VERINA_SKILL,
@@ -512,14 +518,19 @@ export class Cyborg {
             sukuna: SKILLS.SUKUNA_SKILL,
             saitama: SKILLS.SAITAMA_SKILL,
             megumi: SKILLS.MEGUMI_SKILL,
-            mirai: SKILLS.MIRAI_SKILL
+            mirai: SKILLS.MIRAI_SKILL,
+            // Aliases & safeguards
+            fushiguro: SKILLS.MEGUMI_SKILL,
+            kuriyama: SKILLS.MIRAI_SKILL,
+            onepunch: SKILLS.SAITAMA_SKILL,
+            opm: SKILLS.SAITAMA_SKILL
         };
-        const skill = skillMap[this.characterId] || SKILLS.YANAGI_SKILL;
+        const skill = skillMap[charKey] || (charKey.includes('saitama') ? SKILLS.SAITAMA_SKILL : (charKey.includes('megumi') ? SKILLS.MEGUMI_SKILL : (charKey.includes('mirai') ? SKILLS.MIRAI_SKILL : SKILLS.YANAGI_SKILL)));
         this.skillCooldownTimer = skill.cooldown;
         this.isUsingSkill = true;
         this.skillActionTimer = 30;
 
-        const weapon = WEAPONS[this.characterId.toUpperCase()];
+        const weapon = WEAPONS[charKey.toUpperCase()] || WEAPONS.YANAGI;
         const normalDmg = weapon ? weapon.attackDmg : 30;
         // Skill damage equals 2x basic attack damage
         const skillDmg = normalDmg * 2;
@@ -753,8 +764,8 @@ export class Cyborg {
             physics.applyKnockback(this, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 9);
             fx.spawnClashShockwave(this.x, this.y);
             fx.addText(this.x, this.y - 35, '👊 CONSECUTIVE NORMAL PUNCHES!', '#f59e0b', 24);
-            const dist = Math.hypot(opponent.x - this.x, opponent.y - this.y);
-            if (dist < 180) {
+            const dist = (opponent && typeof opponent.x === 'number') ? Math.hypot(opponent.x - this.x, opponent.y - this.y) : Infinity;
+            if (opponent && dist < 180) {
                 opponent.takeDamage(skillDmg);
                 opponent.applyStun(22);
                 physics.applyKnockback(opponent, Math.cos(this.aimAngle), Math.sin(this.aimAngle), 12);

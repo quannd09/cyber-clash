@@ -1,7 +1,7 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=76';
-import { assets } from './assets.js?v=76';
-import { mapManager } from './maps.js?v=76';
+import { WEAPONS } from './combat.js?v=80';
+import { assets } from './assets.js?v=80';
+import { mapManager } from './maps.js?v=80';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -1734,6 +1734,16 @@ export class GameRenderer {
             ctx.fillText(`${Math.round(player.hp)} / ${player.maxHp}`, x + barW / 2, y + 21);
         }
 
+        // Overdrive mini-meter (Bottom thin bar at y + 29)
+        const odVal = Math.max(0, Math.min(100, (typeof player.overdrive === 'number' && !isNaN(player.overdrive)) ? player.overdrive : 0));
+        const odW = barW * (odVal / 100);
+        const odX = isRight ? (x + barW - odW) : x;
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(x, y + 29, barW, 4);
+        const isOdReady = odVal >= 100;
+        ctx.fillStyle = isOdReady ? ((Date.now() % 400 < 200) ? '#ffffff' : '#fbbf24') : '#f59e0b';
+        ctx.fillRect(odX, y + 29, odW, 4);
+
         ctx.restore();
     }
 
@@ -1800,9 +1810,10 @@ export class GameRenderer {
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(startX, odY, barWidth, odHeight);
 
-        const odPercent = p.overdrive / 100;
+        const odVal = Math.max(0, Math.min(100, (typeof p.overdrive === 'number' && !isNaN(p.overdrive)) ? p.overdrive : 0));
+        const odPercent = odVal / 100;
         const odFillWidth = barWidth * odPercent;
-        const isOdReady = p.overdrive >= 100;
+        const isOdReady = odVal >= 100;
 
         ctx.fillStyle = isOdReady ? (Date.now() % 400 < 200 ? '#ffffff' : '#f59e0b') : '#d97706';
 
@@ -1812,11 +1823,16 @@ export class GameRenderer {
             ctx.fillRect(x, odY, odFillWidth, odHeight);
         }
 
+        // Draw Overdrive text
+        ctx.font = `700 10px 'Orbitron', sans-serif`;
         if (isOdReady) {
-            ctx.font = `700 11px 'Orbitron', sans-serif`;
-            ctx.fillStyle = '#fbbf24';
+            ctx.fillStyle = (Date.now() % 400 < 200) ? '#ffffff' : '#fbbf24';
             ctx.textAlign = isRightSide ? 'left' : 'right';
             ctx.fillText('⚡ OVERDRIVE READY (SPACE) ⚡', isRightSide ? startX : startX + barWidth, odY + 20);
+        } else {
+            ctx.fillStyle = '#fbbf24';
+            ctx.textAlign = isRightSide ? 'left' : 'right';
+            ctx.fillText(`⚡ OVERDRIVE: ${Math.floor(odVal)}%`, isRightSide ? startX : startX + barWidth, odY + 19);
         }
     }
 

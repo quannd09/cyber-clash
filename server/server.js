@@ -79,10 +79,15 @@ const server = http.createServer((req, res) => {
         const ext = path.extname(safeFilePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
+        const isCodeAsset = (ext === '.html' || ext === '.js' || ext === '.mjs' || ext === '.css' || ext === '.json');
+        const cacheControl = isCodeAsset ? 'no-cache, no-store, must-revalidate, max-age=0' : 'public, max-age=86400';
+
         res.writeHead(200, {
             'Content-Type': contentType,
             'Content-Length': stats.size,
-            'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600'
+            'Cache-Control': cacheControl,
+            'Pragma': 'no-cache',
+            'Expires': '0'
         });
 
         const stream = fs.createReadStream(safeFilePath);

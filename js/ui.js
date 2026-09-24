@@ -1,6 +1,6 @@
-import { assets } from './assets.js?v=76';
-import { network } from './network.js?v=76';
-import { input } from './input.js?v=76';
+import { assets } from './assets.js?v=80';
+import { network } from './network.js?v=80';
+import { input } from './input.js?v=80';
 
 const SKILL_DATA = {
     yanagi: {
@@ -175,13 +175,13 @@ const SKILL_DATA = {
         title: '👊 SAITAMA (HERO • 535 HP)',
         color: '#f59e0b',
         p1: [
-            { key: 'Left Click / F (Melee)', name: 'Consecutive Normal Punches (Rapid Punch Barrage)', desc: '' },
-            { key: 'R (Skill)', name: 'Serious Sidesteps ⚡ (Omnidirectional Afterimages)', desc: '' },
+            { key: 'Left Click / F (Melee)', name: 'Normal Punches (Fast 3-Hit Combo)', desc: '' },
+            { key: 'R (Skill)', name: 'Consecutive Normal Punches 👊 (Rapid Punches • Stun & Knockback)', desc: '' },
             { key: 'Space (Ultimate)', name: 'Serious Punch 💥 (Blink Strike • 1s Stun • Massive Damage)', desc: '' }
         ],
         p2: [
-            { key: 'J (Melee)', name: 'Consecutive Normal Punches (Rapid Punch Barrage)', desc: '' },
-            { key: 'I (Skill)', name: 'Serious Sidesteps ⚡ (Omnidirectional Afterimages)', desc: '' },
+            { key: 'J (Melee)', name: 'Normal Punches (Fast 3-Hit Combo)', desc: '' },
+            { key: 'I (Skill)', name: 'Consecutive Normal Punches 👊 (Rapid Punches • Stun & Knockback)', desc: '' },
             { key: 'Enter (Ultimate)', name: 'Serious Punch 💥 (Blink Strike • 1s Stun • Massive Damage)', desc: '' }
         ]
     },
@@ -1105,7 +1105,7 @@ export class UIManager {
         if (!slot) return;
         const thumbEl = document.getElementById(`thumb-slot-${slotIndex}`);
         const nameEl = document.getElementById(`name-slot-${slotIndex}`);
-        if (thumbEl) thumbEl.src = `assets/${slot.char}/avatar.png?v=76`;
+        if (thumbEl) thumbEl.src = `assets/${slot.char}/avatar.png?v=80`;
         if (nameEl) nameEl.textContent = this.getCharDisplayName(slot.char);
 
         const isBlue = (slotIndex === 0 || slotIndex === 1);
@@ -1126,7 +1126,7 @@ export class UIManager {
         const btnClearBlue = document.getElementById('btn-blue-no-ban');
 
         if (blueBan !== 'none') {
-            if (thumbBlue) { thumbBlue.src = `assets/${blueBan}/avatar.png?v=76`; thumbBlue.classList.remove('hidden'); }
+            if (thumbBlue) { thumbBlue.src = `assets/${blueBan}/avatar.png?v=80`; thumbBlue.classList.remove('hidden'); }
             if (thumbBlueNone) thumbBlueNone.classList.add('hidden');
             if (nameBlue) nameBlue.textContent = this.getCharDisplayName(blueBan);
         } else {
@@ -1142,7 +1142,7 @@ export class UIManager {
         const btnClearRed = document.getElementById('btn-red-no-ban');
 
         if (redBan !== 'none') {
-            if (thumbRed) { thumbRed.src = `assets/${redBan}/avatar.png?v=76`; thumbRed.classList.remove('hidden'); }
+            if (thumbRed) { thumbRed.src = `assets/${redBan}/avatar.png?v=80`; thumbRed.classList.remove('hidden'); }
             if (thumbRedNone) thumbRedNone.classList.add('hidden');
             if (nameRed) nameRed.textContent = this.getCharDisplayName(redBan);
         } else {
