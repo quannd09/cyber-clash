@@ -1207,7 +1207,7 @@ export class CombatResolver {
                         fx.spawnClashShockwave(user.x, user.y);
                         fx.spawnHitSparks(user.x, user.y, '#f59e0b', 16);
                         fx.addText(user.x, user.y - 45, '⚡ INSTANT BLINK! ⚡', '#f59e0b', 24, 25);
-                        if (sound && sound.playPhaseBlink) sound.playPhaseBlink();
+                        if (sound && sound.playBlink) sound.playBlink();
 
                         user.saitamaTeleported = true;
                         user.saitamaTarget = target;
@@ -1224,7 +1224,7 @@ export class CombatResolver {
                     if (user.ultimateTimer >= 22 && !user.saitamaPunchDelivered) {
                         user.saitamaPunchDelivered = true;
                         const punchDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
-                        const punchDmg = 125; // Massive single strike
+                        const punchDmg = 175; // Massive single strike
 
                         // Direct hit to primary target
                         target.takeDamage(punchDmg, true, user.x, user.y);
@@ -1232,25 +1232,28 @@ export class CombatResolver {
                         physics.applyKnockback(target, punchDir * 5.2, -1.2, 5.5);
 
                         // Explosive kinetic effects
-                        fx.spawnDeathBurst(target.x, target.y, '#f59e0b');
                         fx.spawnClashShockwave(target.x, target.y);
-                        fx.spawnHitSparks(target.x, target.y, '#ffffff', 28);
+                        fx.spawnHitSparks(target.x, target.y, '#ffffff', 32);
+                        fx.spawnHitSparks(target.x, target.y, '#f59e0b', 36);
                         fx.addText(target.x, target.y - 50, '👊 DEATH! 👊', '#f59e0b', 34, 60);
+                        fx.addText(target.x, target.y - 20, `-${punchDmg} HP`, '#ef4444', 28, 60);
 
                         sound.playHit(true);
                         if (sound.playExplosion) sound.playExplosion();
                         triggerScreenShake(10, 22);
 
                         // Splash collateral shockwave to any nearby enemies in 2v2
-                        if (typeof window !== 'undefined' && window.game && window.game.players) {
-                            window.game.players.forEach(other => {
+                        const playerPool = (typeof window !== 'undefined' && window.game) ? (window.game.is2v2Mode ? window.game.players2v2 : [window.game.p1, window.game.p2]) : [];
+                        if (Array.isArray(playerPool)) {
+                            playerPool.forEach(other => {
                                 if (other && other !== user && other !== target && !other.isDead && other.teamId !== user.teamId) {
                                     const distToPunch = Math.hypot(other.x - user.x, other.y - user.y);
-                                    if (distToPunch < 180) {
-                                        other.takeDamage(65, true, user.x, user.y);
+                                    if (distToPunch < 200) {
+                                        other.takeDamage(85, true, user.x, user.y);
                                         other.applyStun(35);
                                         physics.applyKnockback(other, punchDir * 3.5, -1.0, 4.0);
-                                        fx.spawnHitSparks(other.x, other.y, '#f59e0b', 12);
+                                        fx.spawnHitSparks(other.x, other.y, '#f59e0b', 16);
+                                        fx.addText(other.x, other.y - 25, '-85 HP', '#ef4444', 22, 45);
                                     }
                                 }
                             });

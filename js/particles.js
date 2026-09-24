@@ -140,6 +140,15 @@ export class ParticleSystem {
         }
     }
 
+    spawnDash(x, y, color = '#00f0ff') {
+        this.particles.push(new Particle(x, y, 0, 0, color, 42, 20, 'ring', 0.9));
+        for (let i = 0; i < 10; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * 6;
+            this.particles.push(new Particle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, color, 3, 16, 'spark'));
+        }
+    }
+
     spawnWallBounce(x, y, normalX, normalY, color = '#00f0ff') {
         const baseAngle = Math.atan2(normalY, normalX);
         this.particles.push(new Particle(x, y, 0, 0, color, 40, 20, 'ring', 0.9));
