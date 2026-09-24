@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=82';
-import { fx } from './particles.js?v=82';
-import { physics } from './physics.js?v=82';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=82';
-import { input } from './input.js?v=82';
+import { sound } from './audio.js?v=83';
+import { fx } from './particles.js?v=83';
+import { physics } from './physics.js?v=83';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=83';
+import { input } from './input.js?v=83';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -96,9 +96,17 @@ export class Cyborg {
         this.maxHp = charHp[characterId] || 515;
         this.hp = this.maxHp;
         this.maxEnergy = 100;
-        this.energy = 100;
-        // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive, Saitama takes 1.75x (+75% cooldown)
-        this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : (characterId === 'saitama' ? (1 / 1.75) : 1.0);
+        // Ultimate recharge cooldown scaling:
+        // Saitama: 225% cooldown (1 / 2.25)
+        // Megumi, Sukuna, Gojo: 175% cooldown (1 / 1.75)
+        // Others: 100% cooldown (1.0)
+        if (characterId === 'saitama') {
+            this.overdriveChargeRate = 1 / 2.25;
+        } else if (characterId === 'megumi' || characterId === 'sukuna' || characterId === 'gojo') {
+            this.overdriveChargeRate = 1 / 1.75;
+        } else {
+            this.overdriveChargeRate = 1.0;
+        }
         this.overdrive = 0;
         this.roundsWon = 0;
 
@@ -956,6 +964,7 @@ export class Cyborg {
     }
 
     applyStun(frames) {
+        if (this.isUsingUltimate) return; // Ultimate has Super Armor! Unstoppable!
         this.isStunned = true;
         this.stunTimer = frames;
         this.isAttacking = false;

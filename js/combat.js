@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=82';
-import { fx } from './particles.js?v=82';
-import { physics } from './physics.js?v=82';
+import { sound } from './audio.js?v=83';
+import { fx } from './particles.js?v=83';
+import { physics } from './physics.js?v=83';
 
 export const WEAPONS = {
     YANAGI: {
@@ -1227,9 +1227,12 @@ export class CombatResolver {
 
                     // Pre-punch: Keep target pinned/frozen while Saitama winds up
                     if (user.ultimateTimer < 22) {
-                        target.applyStun(15);
-                        target.vx *= 0.1;
-                        target.vy *= 0.1;
+                        const windupTarget = (user.saitamaTarget && !user.saitamaTarget.isDead) ? user.saitamaTarget : target;
+                        if (windupTarget) {
+                            windupTarget.applyStun(15);
+                            windupTarget.vx *= 0.1;
+                            windupTarget.vy *= 0.1;
+                        }
                     }
 
                     // 2. Deliver the ONE massive Serious Punch at frame 22
@@ -1238,17 +1241,20 @@ export class CombatResolver {
                         const punchDir = Math.cos(user.aimAngle) >= 0 ? 1 : -1;
                         const punchDmg = 175; // Massive single strike
 
-                        // Direct hit to primary target
-                        target.takeDamage(punchDmg, true, user.x, user.y);
-                        target.applyStun(60); // 1.0 second stun! (60 frames at 60fps)
-                        physics.applyKnockback(target, punchDir * 5.2, -1.2, 5.5);
+                        // Direct hit to primary target (prefer locked target, fallback to current target)
+                        const hitTarget = (user.saitamaTarget && !user.saitamaTarget.isDead) ? user.saitamaTarget : target;
+                        if (hitTarget && !hitTarget.isDead) {
+                            hitTarget.takeDamage(punchDmg, true, user.x, user.y);
+                            hitTarget.applyStun(60); // 1.0 second stun! (60 frames at 60fps)
+                            physics.applyKnockback(hitTarget, punchDir * 5.2, -1.2, 5.5);
 
-                        // Explosive kinetic effects
-                        fx.spawnClashShockwave(target.x, target.y);
-                        fx.spawnHitSparks(target.x, target.y, '#ffffff', 32);
-                        fx.spawnHitSparks(target.x, target.y, '#f59e0b', 36);
-                        fx.addText(target.x, target.y - 50, '👊 DEATH! 👊', '#f59e0b', 34, 60);
-                        fx.addText(target.x, target.y - 20, `-${punchDmg} HP`, '#ef4444', 28, 60);
+                            // Explosive kinetic effects
+                            fx.spawnClashShockwave(hitTarget.x, hitTarget.y);
+                            fx.spawnHitSparks(hitTarget.x, hitTarget.y, '#ffffff', 32);
+                            fx.spawnHitSparks(hitTarget.x, hitTarget.y, '#f59e0b', 36);
+                            fx.addText(hitTarget.x, hitTarget.y - 50, '👊 DEATH! 👊', '#f59e0b', 34, 60);
+                            fx.addText(hitTarget.x, hitTarget.y - 20, `-${punchDmg} HP`, '#ef4444', 28, 60);
+                        }
 
                         sound.playHit(true);
                         if (sound.playExplosion) sound.playExplosion();
@@ -1258,9 +1264,9 @@ export class CombatResolver {
                         const playerPool = (typeof window !== 'undefined' && window.game) ? (window.game.is2v2Mode ? window.game.players2v2 : [window.game.p1, window.game.p2]) : [];
                         if (Array.isArray(playerPool)) {
                             playerPool.forEach(other => {
-                                if (other && other !== user && other !== target && !other.isDead && other.teamId !== user.teamId) {
+                                if (other && other !== user && other !== hitTarget && !other.isDead && other.teamId !== user.teamId) {
                                     const distToPunch = Math.hypot(other.x - user.x, other.y - user.y);
-                                    if (distToPunch < 200) {
+                                    if (distToPunch < 220) {
                                         other.takeDamage(85, true, user.x, user.y);
                                         other.applyStun(35);
                                         physics.applyKnockback(other, punchDir * 3.5, -1.0, 4.0);
