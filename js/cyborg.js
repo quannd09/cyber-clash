@@ -930,8 +930,9 @@ export class Cyborg {
         }
 
         // Only gain Overdrive from basic attacks/skills, NOT from opponent ultimates
+        // Giảm 30% hiệu quả hồi ulti khi nhận sát thương (* 0.7)
         if (!isFromUltimate && !this.isUsingUltimate && !isAnyOpponentUltActive && this.overdrive < 100) {
-            const damageOdGain = (amount * 0.48 + 3.0) * this.overdriveChargeRate;
+            const damageOdGain = (amount * 0.48 + 3.0) * 0.7 * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + damageOdGain);
         }
         if (this.hp <= 0) {

@@ -722,9 +722,9 @@ export class CombatResolver {
                 fx.addText(attacker.x, attacker.y - 25, `+${Math.round(healAmount)} HP`, '#ef4444', 18);
             }
 
-            // Direct unshielded hit!
+            // Direct unshielded hit! (Giảm 30% hồi ulti khi gây sát thương: 14 -> 9.8)
             defender.takeDamage(baseDmg, false, attacker.x, attacker.y);
-            attacker.overdrive = Math.min(100, attacker.overdrive + 14 * (attacker.overdriveChargeRate || 1.0));
+            attacker.overdrive = Math.min(100, attacker.overdrive + 9.8 * (attacker.overdriveChargeRate || 1.0));
             defender.applyStun(16);
             physics.applyKnockback(defender, Math.cos(aimAngle), Math.sin(aimAngle), 9);
 
@@ -810,7 +810,8 @@ export class CombatResolver {
             } else if (attacker.characterId === 'gojo') {
                 if (hitCount >= 3) {
                     defender.takeDamage(15);
-                    attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
+                    // Giảm 30% hồi ulti khi gây sát thương: 12 -> 8.4
+                    attacker.overdrive = Math.min(100, attacker.overdrive + 8.4 * (attacker.overdriveChargeRate || 1.0));
                     defender.applyStun(16);
                     fx.addText(defender.x, defender.y - 45, '⚡ BLACK FLASH! -15', '#0284c7', 24);
                     fx.spawnHitSparks(defender.x, defender.y, '#ef4444', 22);
@@ -919,7 +920,8 @@ export class CombatResolver {
                     }
                     defender.takeDamage(dmg, false, proj.x, proj.y);
                     if (attacker) {
-                        attacker.overdrive = Math.min(100, attacker.overdrive + 12 * (attacker.overdriveChargeRate || 1.0));
+                        // Giảm 30% hồi ulti khi gây sát thương: 12 -> 8.4
+                        attacker.overdrive = Math.min(100, attacker.overdrive + 8.4 * (attacker.overdriveChargeRate || 1.0));
                     }
                     defender.applyStun(14);
                     physics.applyKnockback(defender, proj.vx * 0.25, proj.vy * 0.25, 5);
