@@ -99,6 +99,7 @@ export class Cyborg {
         this.energy = 100;
         // Ultimate recharge cooldown scaling: Gojo & Sukuna take 1.4x longer to charge overdrive, Saitama takes 1.25x (+25% cooldown)
         this.overdriveChargeRate = (characterId === 'gojo' || characterId === 'sukuna') ? (1 / 1.4) : (characterId === 'saitama' ? (1 / 1.25) : 1.0);
+        this.overdrive = 0;
         this.roundsWon = 0;
 
         // State Flags
@@ -238,8 +239,12 @@ export class Cyborg {
         // Passive Overdrive meter accumulation over time (standing, dashing, moving)
         let isOpponentUltActive = false;
         if (typeof window !== 'undefined' && window.game) {
-            const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
-            if (opp && opp.isUsingUltimate) isOpponentUltActive = true;
+            if (window.game.is2v2Mode && Array.isArray(window.game.players2v2)) {
+                isOpponentUltActive = window.game.players2v2.some(p => p && p.teamId !== this.teamId && p.isUsingUltimate);
+            } else {
+                const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
+                if (opp && opp.isUsingUltimate) isOpponentUltActive = true;
+            }
         }
 
         if (!this.isUsingUltimate && !isOpponentUltActive && this.overdrive < 100) {
@@ -504,7 +509,10 @@ export class Cyborg {
             naoya: SKILLS.NAOYA_SKILL,
             luffy: SKILLS.LUFFY_SKILL,
             gojo: SKILLS.GOJO_SKILL,
-            sukuna: SKILLS.SUKUNA_SKILL
+            sukuna: SKILLS.SUKUNA_SKILL,
+            saitama: SKILLS.SAITAMA_SKILL,
+            megumi: SKILLS.MEGUMI_SKILL,
+            mirai: SKILLS.MIRAI_SKILL
         };
         const skill = skillMap[this.characterId] || SKILLS.YANAGI_SKILL;
         this.skillCooldownTimer = skill.cooldown;
@@ -891,8 +899,12 @@ export class Cyborg {
         // Failsafe: Check if any opponent is executing an ultimate
         let isAnyOpponentUltActive = false;
         if (typeof window !== 'undefined' && window.game) {
-            const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
-            if (opp && opp.isUsingUltimate) isAnyOpponentUltActive = true;
+            if (window.game.is2v2Mode && Array.isArray(window.game.players2v2)) {
+                isAnyOpponentUltActive = window.game.players2v2.some(p => p && p.teamId !== this.teamId && p.isUsingUltimate);
+            } else {
+                const opp = (this.index === 0) ? window.game.p2 : window.game.p1;
+                if (opp && opp.isUsingUltimate) isAnyOpponentUltActive = true;
+            }
         }
 
         // Only gain Overdrive from basic attacks/skills, NOT from opponent ultimates
