@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=83">
+    <link rel="stylesheet" href="style.css?v=84">
 </head>
 <body>
     <div class="scanlines"></div>
@@ -125,18 +125,24 @@
 
                 <!-- ONLINE 2V2 ROOM BAR (Hidden in local practice) -->
                 <div id="online-2v2-bar" class="online-2v2-bar hidden">
+                    <div class="online-2v2-engine-row">
+                        <button id="btn-2v2-engine-ws" class="engine-switch-btn active engine-ws" title="Connect via central relay server">🌐 ONLINE 1 (WEBSOCKET RELAY)</button>
+                        <button id="btn-2v2-engine-rtc" class="engine-switch-btn engine-rtc" title="Direct P2P WebRTC connection via PeerJS">📡 ONLINE 2 (P2P WEBRTC)</button>
+                    </div>
                     <div class="online-2v2-room-controls">
-                        <button id="btn-create-2v2-room" class="lobby-btn host-action-btn" style="padding: 6px 14px; font-size: 12px;">⚡ CREATE 2V2 ROOM</button>
+                        <button id="btn-create-2v2-room" class="lobby-btn host-action-btn" style="padding: 6px 12px; font-size: 12px; flex: 1; min-width: 140px;">⚡ CREATE (ONLINE 1)</button>
+                        <button id="btn-create-2v2-room-rtc" class="lobby-btn host-action-btn-rtc" style="padding: 6px 12px; font-size: 12px; flex: 1; min-width: 140px;">📡 CREATE (ONLINE 2)</button>
                         <div id="box-2v2-room-code" class="code-pill hidden">
+                            <span id="lbl-2v2-provider-badge" style="font-size: 10px; margin-right: 6px; color: #38bdf8; font-weight: 700;">[ONLINE 1]</span>
                             CODE: <strong id="lbl-2v2-room-code" style="color: #f59e0b;">CLASH-XXXX</strong>
                             <button id="btn-copy-2v2-code" class="copy-btn" style="margin-left: 6px; padding: 2px 6px;">📋</button>
                         </div>
                         <div class="join-inline-row">
-                            <input type="text" id="input-2v2-room-code" class="room-input" placeholder="Room code..." maxlength="12" style="width: 130px; padding: 5px 8px; font-size: 12px;">
+                            <input type="text" id="input-2v2-room-code" class="room-input" placeholder="Room code..." maxlength="12" style="width: 120px; padding: 5px 8px; font-size: 12px;" autocomplete="off" spellcheck="false">
                             <button id="btn-join-2v2-room" class="lobby-btn client-action-btn" style="padding: 6px 12px; font-size: 12px;">🚀 JOIN</button>
                         </div>
                     </div>
-                    <div id="status-2v2-online" class="lobby-status-msg" style="margin-top: 4px; font-size: 12px;"></div>
+                    <div id="status-2v2-online" class="lobby-status-msg" style="margin-top: 5px; font-size: 12px;"></div>
                 </div>
 
                 <!-- MAP SELECTION ROW -->
@@ -174,7 +180,7 @@
                         <!-- Slot / Ban Selector Tabs for Blue -->
                         <div class="slot-tabs-row">
                             <div class="slot-tab active" id="tab-blue-slot-0" data-team="blue" data-target="slot-0">
-                                <img src="assets/yanagi/avatar.png?v=83" id="thumb-slot-0" class="slot-tab-thumb" alt="P1">
+                                <img src="assets/yanagi/avatar.png?v=84" id="thumb-slot-0" class="slot-tab-thumb" alt="P1">
                                 <div class="slot-tab-info">
                                     <div class="slot-tab-role">P1 (HOST / YOU)</div>
                                     <div class="slot-tab-name" id="name-slot-0">Yanagi</div>
@@ -183,7 +189,7 @@
                             </div>
 
                             <div class="slot-tab" id="tab-blue-slot-1" data-team="blue" data-target="slot-1">
-                                <img src="assets/velina/avatar.png?v=83" id="thumb-slot-1" class="slot-tab-thumb" alt="P2">
+                                <img src="assets/velina/avatar.png?v=84" id="thumb-slot-1" class="slot-tab-thumb" alt="P2">
                                 <div class="slot-tab-info">
                                     <div class="slot-tab-role">P2 (TEAMMATE)</div>
                                     <div class="slot-tab-name" id="name-slot-1">Verina</div>
@@ -212,77 +218,77 @@
                         <!-- 15 Character Grid for Blue -->
                         <div class="char-grid" id="blue-char-grid">
                             <div class="char-card selected selected-yanagi" data-team="blue" data-char="yanagi">
-                                <img src="assets/yanagi/avatar.png?v=83" class="char-avatar" alt="Yanagi">
+                                <img src="assets/yanagi/avatar.png?v=84" class="char-avatar" alt="Yanagi">
                                 <div class="char-title">Yanagi</div>
                                 <span class="char-type type-yanagi">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="velina">
-                                <img src="assets/velina/avatar.png?v=83" class="char-avatar" alt="Verina">
+                                <img src="assets/velina/avatar.png?v=84" class="char-avatar" alt="Verina">
                                 <div class="char-title">Verina</div>
                                 <span class="char-type type-velina">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="nicole">
-                                <img src="assets/nicole/avatar.png?v=83" class="char-avatar" alt="Nicole">
+                                <img src="assets/nicole/avatar.png?v=84" class="char-avatar" alt="Nicole">
                                 <div class="char-title">Nicole</div>
                                 <span class="char-type type-nicole">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="trigger">
-                                <img src="assets/trigger/avatar.png?v=83" class="char-avatar" alt="Trigger">
+                                <img src="assets/trigger/avatar.png?v=84" class="char-avatar" alt="Trigger">
                                 <div class="char-title">Trigger</div>
                                 <span class="char-type type-trigger">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="vivian">
-                                <img src="assets/vivian/avatar.png?v=83" class="char-avatar" alt="Vivian">
+                                <img src="assets/vivian/avatar.png?v=84" class="char-avatar" alt="Vivian">
                                 <div class="char-title">Vivian</div>
                                 <span class="char-type type-vivian">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="jotaro">
-                                <img src="assets/jotaro/avatar.png?v=83" class="char-avatar" alt="Jotaro">
+                                <img src="assets/jotaro/avatar.png?v=84" class="char-avatar" alt="Jotaro">
                                 <div class="char-title">Jotaro</div>
                                 <span class="char-type type-jotaro">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="goku">
-                                <img src="assets/goku/avatar.png?v=83" class="char-avatar" alt="Goku">
+                                <img src="assets/goku/avatar.png?v=84" class="char-avatar" alt="Goku">
                                 <div class="char-title">Goku</div>
                                 <span class="char-type type-goku">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="giorno">
-                                <img src="assets/giorno/avatar.png?v=83" class="char-avatar" alt="Giorno">
+                                <img src="assets/giorno/avatar.png?v=84" class="char-avatar" alt="Giorno">
                                 <div class="char-title">Giorno</div>
                                 <span class="char-type type-giorno">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="naoya">
-                                <img src="assets/naoya/avatar.png?v=83" class="char-avatar" alt="Naoya">
+                                <img src="assets/naoya/avatar.png?v=84" class="char-avatar" alt="Naoya">
                                 <div class="char-title">Naoya</div>
                                 <span class="char-type type-naoya">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="luffy">
-                                <img src="assets/luffy/avatar.png?v=83" class="char-avatar" alt="Luffy">
+                                <img src="assets/luffy/avatar.png?v=84" class="char-avatar" alt="Luffy">
                                 <div class="char-title">Luffy</div>
                                 <span class="char-type type-luffy">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="gojo">
-                                <img src="assets/gojo/avatar.png?v=83" class="char-avatar" alt="Gojo">
+                                <img src="assets/gojo/avatar.png?v=84" class="char-avatar" alt="Gojo">
                                 <div class="char-title">Gojo</div>
                                 <span class="char-type type-gojo">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="sukuna">
-                                <img src="assets/sukuna/avatar.png?v=83" class="char-avatar" alt="Sukuna">
+                                <img src="assets/sukuna/avatar.png?v=84" class="char-avatar" alt="Sukuna">
                                 <div class="char-title">Sukuna</div>
                                 <span class="char-type type-sukuna">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="saitama">
-                                <img src="assets/saitama/avatar.png?v=83" class="char-avatar" alt="Saitama">
+                                <img src="assets/saitama/avatar.png?v=84" class="char-avatar" alt="Saitama">
                                 <div class="char-title">Saitama</div>
                                 <span class="char-type type-saitama">👊 MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="megumi">
-                                <img src="assets/megumi/avatar.png?v=83" class="char-avatar" alt="Megumi">
+                                <img src="assets/megumi/avatar.png?v=84" class="char-avatar" alt="Megumi">
                                 <div class="char-title">Megumi</div>
                                 <span class="char-type type-megumi">🐺 MELEE</span>
                             </div>
                             <div class="char-card" data-team="blue" data-char="mirai">
-                                <img src="assets/mirai/avatar.png?v=83" class="char-avatar" alt="Mirai">
+                                <img src="assets/mirai/avatar.png?v=84" class="char-avatar" alt="Mirai">
                                 <div class="char-title">Mirai</div>
                                 <span class="char-type type-mirai">🩸 MELEE</span>
                             </div>
@@ -302,7 +308,7 @@
                         <!-- Slot / Ban Selector Tabs for Red -->
                         <div class="slot-tabs-row">
                             <div class="slot-tab active" id="tab-red-slot-2" data-team="red" data-target="slot-2">
-                                <img src="assets/saitama/avatar.png?v=83" id="thumb-slot-2" class="slot-tab-thumb" alt="P3">
+                                <img src="assets/saitama/avatar.png?v=84" id="thumb-slot-2" class="slot-tab-thumb" alt="P3">
                                 <div class="slot-tab-info">
                                     <div class="slot-tab-role">P3 (OPPONENT 1)</div>
                                     <div class="slot-tab-name" id="name-slot-2">Saitama</div>
@@ -311,7 +317,7 @@
                             </div>
 
                             <div class="slot-tab" id="tab-red-slot-3" data-team="red" data-target="slot-3">
-                                <img src="assets/sukuna/avatar.png?v=83" id="thumb-slot-3" class="slot-tab-thumb" alt="P4">
+                                <img src="assets/sukuna/avatar.png?v=84" id="thumb-slot-3" class="slot-tab-thumb" alt="P4">
                                 <div class="slot-tab-info">
                                     <div class="slot-tab-role">P4 (OPPONENT 2)</div>
                                     <div class="slot-tab-name" id="name-slot-3">Sukuna</div>
@@ -340,77 +346,77 @@
                         <!-- 15 Character Grid for Red -->
                         <div class="char-grid" id="red-char-grid">
                             <div class="char-card" data-team="red" data-char="yanagi">
-                                <img src="assets/yanagi/avatar.png?v=83" class="char-avatar" alt="Yanagi">
+                                <img src="assets/yanagi/avatar.png?v=84" class="char-avatar" alt="Yanagi">
                                 <div class="char-title">Yanagi</div>
                                 <span class="char-type type-yanagi">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="velina">
-                                <img src="assets/velina/avatar.png?v=83" class="char-avatar" alt="Verina">
+                                <img src="assets/velina/avatar.png?v=84" class="char-avatar" alt="Verina">
                                 <div class="char-title">Verina</div>
                                 <span class="char-type type-velina">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="nicole">
-                                <img src="assets/nicole/avatar.png?v=83" class="char-avatar" alt="Nicole">
+                                <img src="assets/nicole/avatar.png?v=84" class="char-avatar" alt="Nicole">
                                 <div class="char-title">Nicole</div>
                                 <span class="char-type type-nicole">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="trigger">
-                                <img src="assets/trigger/avatar.png?v=83" class="char-avatar" alt="Trigger">
+                                <img src="assets/trigger/avatar.png?v=84" class="char-avatar" alt="Trigger">
                                 <div class="char-title">Trigger</div>
                                 <span class="char-type type-trigger">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="vivian">
-                                <img src="assets/vivian/avatar.png?v=83" class="char-avatar" alt="Vivian">
+                                <img src="assets/vivian/avatar.png?v=84" class="char-avatar" alt="Vivian">
                                 <div class="char-title">Vivian</div>
                                 <span class="char-type type-vivian">🏹 RANGED</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="jotaro">
-                                <img src="assets/jotaro/avatar.png?v=83" class="char-avatar" alt="Jotaro">
+                                <img src="assets/jotaro/avatar.png?v=84" class="char-avatar" alt="Jotaro">
                                 <div class="char-title">Jotaro</div>
                                 <span class="char-type type-jotaro">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="goku">
-                                <img src="assets/goku/avatar.png?v=83" class="char-avatar" alt="Goku">
+                                <img src="assets/goku/avatar.png?v=84" class="char-avatar" alt="Goku">
                                 <div class="char-title">Goku</div>
                                 <span class="char-type type-goku">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="giorno">
-                                <img src="assets/giorno/avatar.png?v=83" class="char-avatar" alt="Giorno">
+                                <img src="assets/giorno/avatar.png?v=84" class="char-avatar" alt="Giorno">
                                 <div class="char-title">Giorno</div>
                                 <span class="char-type type-giorno">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="naoya">
-                                <img src="assets/naoya/avatar.png?v=83" class="char-avatar" alt="Naoya">
+                                <img src="assets/naoya/avatar.png?v=84" class="char-avatar" alt="Naoya">
                                 <div class="char-title">Naoya</div>
                                 <span class="char-type type-naoya">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="luffy">
-                                <img src="assets/luffy/avatar.png?v=83" class="char-avatar" alt="Luffy">
+                                <img src="assets/luffy/avatar.png?v=84" class="char-avatar" alt="Luffy">
                                 <div class="char-title">Luffy</div>
                                 <span class="char-type type-luffy">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="gojo">
-                                <img src="assets/gojo/avatar.png?v=83" class="char-avatar" alt="Gojo">
+                                <img src="assets/gojo/avatar.png?v=84" class="char-avatar" alt="Gojo">
                                 <div class="char-title">Gojo</div>
                                 <span class="char-type type-gojo">⚔️ MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="sukuna">
-                                <img src="assets/sukuna/avatar.png?v=83" class="char-avatar" alt="Sukuna">
+                                <img src="assets/sukuna/avatar.png?v=84" class="char-avatar" alt="Sukuna">
                                 <div class="char-title">Sukuna</div>
                                 <span class="char-type type-sukuna">⚔️ MELEE</span>
                             </div>
                             <div class="char-card selected selected-saitama" data-team="red" data-char="saitama">
-                                <img src="assets/saitama/avatar.png?v=83" class="char-avatar" alt="Saitama">
+                                <img src="assets/saitama/avatar.png?v=84" class="char-avatar" alt="Saitama">
                                 <div class="char-title">Saitama</div>
                                 <span class="char-type type-saitama">👊 MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="megumi">
-                                <img src="assets/megumi/avatar.png?v=83" class="char-avatar" alt="Megumi">
+                                <img src="assets/megumi/avatar.png?v=84" class="char-avatar" alt="Megumi">
                                 <div class="char-title">Megumi</div>
                                 <span class="char-type type-megumi">🐺 MELEE</span>
                             </div>
                             <div class="char-card" data-team="red" data-char="mirai">
-                                <img src="assets/mirai/avatar.png?v=83" class="char-avatar" alt="Mirai">
+                                <img src="assets/mirai/avatar.png?v=84" class="char-avatar" alt="Mirai">
                                 <div class="char-title">Mirai</div>
                                 <span class="char-type type-mirai">🩸 MELEE</span>
                             </div>
@@ -498,17 +504,17 @@
                             <span class="char-type type-sukuna">⚔️ MELEE</span>
                         </div>
                         <div class="char-card" data-player="p1" data-char="saitama">
-                            <img src="assets/saitama/avatar.png?v=83" class="char-avatar" alt="Saitama">
+                            <img src="assets/saitama/avatar.png?v=84" class="char-avatar" alt="Saitama">
                             <div class="char-title">Saitama</div>
                             <span class="char-type type-saitama">👊 MELEE</span>
                         </div>
                         <div class="char-card" data-player="p1" data-char="megumi">
-                            <img src="assets/megumi/avatar.png?v=83" class="char-avatar" alt="Megumi">
+                            <img src="assets/megumi/avatar.png?v=84" class="char-avatar" alt="Megumi">
                             <div class="char-title">Megumi</div>
                             <span class="char-type type-megumi">🐺 MELEE</span>
                         </div>
                         <div class="char-card" data-player="p1" data-char="mirai">
-                            <img src="assets/mirai/avatar.png?v=83" class="char-avatar" alt="Mirai">
+                            <img src="assets/mirai/avatar.png?v=84" class="char-avatar" alt="Mirai">
                             <div class="char-title">Mirai</div>
                             <span class="char-type type-mirai">🩸 MELEE</span>
                         </div>
@@ -610,17 +616,17 @@
                             <span class="char-type type-sukuna">⚔️ MELEE</span>
                         </div>
                         <div class="char-card" data-player="p2" data-char="saitama">
-                            <img src="assets/saitama/avatar.png?v=83" class="char-avatar" alt="Saitama">
+                            <img src="assets/saitama/avatar.png?v=84" class="char-avatar" alt="Saitama">
                             <div class="char-title">Saitama</div>
                             <span class="char-type type-saitama">👊 MELEE</span>
                         </div>
                         <div class="char-card" data-player="p2" data-char="megumi">
-                            <img src="assets/megumi/avatar.png?v=83" class="char-avatar" alt="Megumi">
+                            <img src="assets/megumi/avatar.png?v=84" class="char-avatar" alt="Megumi">
                             <div class="char-title">Megumi</div>
                             <span class="char-type type-megumi">🐺 MELEE</span>
                         </div>
                         <div class="char-card" data-player="p2" data-char="mirai">
-                            <img src="assets/mirai/avatar.png?v=83" class="char-avatar" alt="Mirai">
+                            <img src="assets/mirai/avatar.png?v=84" class="char-avatar" alt="Mirai">
                             <div class="char-title">Mirai</div>
                             <span class="char-type type-mirai">🩸 MELEE</span>
                         </div>
@@ -830,6 +836,6 @@
     </script>
     <!-- WebRTC PeerJS Library -->
     <script src="js/peerjs.min.js"></script>
-    <script type="module" src="js/main.js?v=83"></script>
+    <script type="module" src="js/main.js?v=84"></script>
 </body>
 </html>

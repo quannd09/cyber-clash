@@ -948,6 +948,19 @@ canvas {
     box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
 }
 
+.host-action-btn-rtc {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
+    border: 1px solid #c084fc;
+}
+
+.host-action-btn-rtc:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 6px 18px rgba(168, 85, 247, 0.6);
+    transform: translateY(-1px);
+}
+
 .host-action-btn:hover {
     filter: brightness(1.15);
     transform: translateY(-1px);
@@ -1769,11 +1782,52 @@ body.mobile-fullscreen-active {
 }
 
 .online-2v2-bar {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid #334155;
     border-radius: 8px;
     padding: 8px 12px;
     text-align: center;
+}
+
+.online-2v2-engine-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.engine-switch-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 14px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.engine-switch-btn:hover {
+    color: #f8fafc;
+    border-color: #64748b;
+}
+
+.engine-switch-btn.active.engine-ws {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+}
+
+.engine-switch-btn.active.engine-rtc {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border-color: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.35);
 }
 
 .online-2v2-room-controls {

@@ -729,10 +729,20 @@ export class UIManager {
             if (mode === '2v2' || this.gameMode === '2V2') {
                 const box = document.getElementById('box-2v2-room-code');
                 const lbl = document.getElementById('lbl-2v2-room-code');
+                const badge = document.getElementById('lbl-2v2-provider-badge');
                 const status = document.getElementById('status-2v2-online');
+                const isRtc = (network.activeMode === 'WEBRTC' || network.mode === 'WEBRTC');
                 if (box) box.classList.remove('hidden');
                 if (lbl) lbl.textContent = code;
-                if (status) status.textContent = `2V2 Room [${code}] ready! Share code with teammates & opponents.`;
+                if (badge) {
+                    badge.textContent = isRtc ? '[ONLINE 2 - P2P]' : '[ONLINE 1 - WS]';
+                    badge.style.color = isRtc ? '#c084fc' : '#38bdf8';
+                }
+                if (status) {
+                    status.textContent = isRtc
+                        ? `2V2 P2P Room [${code}] ready via Online 2! Share code with players.`
+                        : `2V2 Relay Room [${code}] ready via Online 1! Share code with players.`;
+                }
                 return;
             }
             if (hostCodeBox) hostCodeBox.classList.remove('hidden');
@@ -765,7 +775,15 @@ export class UIManager {
             if (roomMode === '2v2' || this.gameMode === '2V2') {
                 this.my2v2Slot = slotIndex || 0;
                 const status = document.getElementById('status-2v2-online');
-                if (status) status.textContent = `✅ Connected to 2V2 Room [${code}] (Slot ${this.my2v2Slot + 1} - ${role})!`;
+                const badge = document.getElementById('lbl-2v2-provider-badge');
+                const isRtc = (network.activeMode === 'WEBRTC' || network.mode === 'WEBRTC');
+                if (badge) {
+                    badge.textContent = isRtc ? '[ONLINE 2 - P2P]' : '[ONLINE 1 - WS]';
+                    badge.style.color = isRtc ? '#c084fc' : '#38bdf8';
+                }
+                if (status) {
+                    status.textContent = `✅ Connected to 2V2 Room [${code}] via ${isRtc ? 'Online 2 (P2P RTC)' : 'Online 1 (WS)'} (Slot ${this.my2v2Slot + 1} - ${role})!`;
+                }
                 if (this.onNetworkConnected) {
                     this.onNetworkConnected(role, code, slotIndex, roomMode);
                 }
@@ -973,6 +991,24 @@ export class UIManager {
         } else if (data.type === '2V2_BAN_UPDATE') {
             this.bans2v2 = data.bans || this.bans2v2;
             this.update2v2BanVisual();
+        } else if (data.type === '2V2_LOBBY_SYNC') {
+            if (Array.isArray(data.slots)) {
+                this.slots2v2 = data.slots;
+                for (let i = 0; i < 4; i++) {
+                    this.update2v2SlotVisual(i);
+                }
+            }
+            if (data.bans) {
+                this.bans2v2 = data.bans;
+                this.update2v2BanVisual();
+            }
+            if (data.map) {
+                this.selected2v2Map = data.map;
+                const cardBrawlhaven = document.getElementById('map-card-brawlhaven');
+                const cardGreatHall = document.getElementById('map-card-great-hall');
+                if (cardBrawlhaven) cardBrawlhaven.classList.toggle('active', data.map === 'brawlhaven');
+                if (cardGreatHall) cardGreatHall.classList.toggle('active', data.map === 'great_hall');
+            }
         } else if (this.onNetworkGameData) {
             this.onNetworkGameData(data);
         }
@@ -1195,11 +1231,15 @@ export class UIManager {
         const btnLocal = document.getElementById('btn-2v2-local-mode');
         const btnOnline = document.getElementById('btn-2v2-online-mode');
         const onlineBar = document.getElementById('online-2v2-bar');
+        const btnEngineWs = document.getElementById('btn-2v2-engine-ws');
+        const btnEngineRtc = document.getElementById('btn-2v2-engine-rtc');
         const btnCreateRoom = document.getElementById('btn-create-2v2-room');
+        const btnCreateRoomRtc = document.getElementById('btn-create-2v2-room-rtc');
         const btnJoinRoom = document.getElementById('btn-join-2v2-room');
         const inputRoomCode = document.getElementById('input-2v2-room-code');
         const boxRoomCode = document.getElementById('box-2v2-room-code');
         const lblRoomCode = document.getElementById('lbl-2v2-room-code');
+        const lblProviderBadge = document.getElementById('lbl-2v2-provider-badge');
         const btnCopyCode = document.getElementById('btn-copy-2v2-code');
         const statusOnline = document.getElementById('status-2v2-online');
         const btnStart2v2 = document.getElementById('btn-start-2v2-match');
@@ -1410,6 +1450,32 @@ export class UIManager {
         if (cardBrawlhaven) cardBrawlhaven.addEventListener('click', () => setMap('brawlhaven', true));
         if (cardGreatHall) cardGreatHall.addEventListener('click', () => setMap('great_hall', true));
 
+        // Engine switch helper for 2V2 Online
+        const set2v2Engine = (engine) => {
+            network.setMode(engine);
+            const isWs = (engine === 'WEBSOCKET');
+            if (btnEngineWs) btnEngineWs.classList.toggle('active', isWs);
+            if (btnEngineRtc) btnEngineRtc.classList.toggle('active', !isWs);
+            if (lblProviderBadge) {
+                lblProviderBadge.textContent = isWs ? '[ONLINE 1 - WS]' : '[ONLINE 2 - P2P]';
+                lblProviderBadge.style.color = isWs ? '#38bdf8' : '#c084fc';
+            }
+            if (statusOnline) {
+                statusOnline.textContent = isWs
+                    ? 'Switched to Online 1 (WebSocket Relay Server).'
+                    : 'Switched to Online 2 (WebRTC P2P Direct).';
+                statusOnline.classList.remove('error');
+            }
+        };
+
+        if (btnEngineWs) {
+            btnEngineWs.addEventListener('click', () => set2v2Engine('WEBSOCKET'));
+        }
+
+        if (btnEngineRtc) {
+            btnEngineRtc.addEventListener('click', () => set2v2Engine('WEBRTC'));
+        }
+
         // Submode switch: Local vs Online
         if (btnLocal) {
             btnLocal.addEventListener('click', () => {
@@ -1417,6 +1483,7 @@ export class UIManager {
                 btnLocal.classList.add('active');
                 if (btnOnline) btnOnline.classList.remove('active');
                 if (onlineBar) onlineBar.classList.add('hidden');
+                if (boxRoomCode) boxRoomCode.classList.add('hidden');
                 network.disconnect();
                 if (statusOnline) statusOnline.textContent = '';
             });
@@ -1428,28 +1495,57 @@ export class UIManager {
                 btnOnline.classList.add('active');
                 if (btnLocal) btnLocal.classList.remove('active');
                 if (onlineBar) onlineBar.classList.remove('hidden');
-                network.setMode('WEBSOCKET');
+                set2v2Engine(network.activeMode || 'WEBSOCKET');
             });
         }
 
-        // Create Room in Online 2v2
+        // Create Room in Online 1 (WebSocket Relay Server)
         if (btnCreateRoom) {
             btnCreateRoom.addEventListener('click', () => {
+                set2v2Engine('WEBSOCKET');
                 network.createRoom('2v2');
-                if (statusOnline) statusOnline.textContent = 'Initializing 2v2 room...';
+                if (statusOnline) {
+                    statusOnline.textContent = '⚡ Initializing 2V2 room via Online 1 (WebSocket)...';
+                    statusOnline.classList.remove('error');
+                }
+            });
+        }
+
+        // Create Room in Online 2 (WebRTC P2P Direct)
+        if (btnCreateRoomRtc) {
+            btnCreateRoomRtc.addEventListener('click', () => {
+                set2v2Engine('WEBRTC');
+                network.createRoom('2v2');
+                if (statusOnline) {
+                    statusOnline.textContent = '📡 Initializing 2V2 room via Online 2 (PeerJS P2P)...';
+                    statusOnline.classList.remove('error');
+                }
             });
         }
 
         // Join Room in Online 2v2
         if (btnJoinRoom && inputRoomCode) {
             btnJoinRoom.addEventListener('click', () => {
-                const code = inputRoomCode.value.trim();
+                const code = inputRoomCode.value.trim().toUpperCase();
                 if (!code) {
-                    if (statusOnline) statusOnline.textContent = 'Please enter room code!';
+                    if (statusOnline) {
+                        statusOnline.textContent = 'Please enter room code!';
+                        statusOnline.classList.add('error');
+                    }
                     return;
                 }
+                const engineName = (network.activeMode === 'WEBRTC') ? 'Online 2 (P2P)' : 'Online 1 (WebSocket)';
                 network.joinRoom(code);
-                if (statusOnline) statusOnline.textContent = `Connecting to room [${code}]...`;
+                if (statusOnline) {
+                    statusOnline.textContent = `Connecting via ${engineName} to room [${code}]...`;
+                    statusOnline.classList.remove('error');
+                }
+            });
+
+            inputRoomCode.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    btnJoinRoom.click();
+                }
             });
         }
 
@@ -1468,6 +1564,14 @@ export class UIManager {
             if (this.gameMode !== '2V2') return;
             if (statusOnline) {
                 statusOnline.textContent = `Room connected ${info.playerCount} / ${info.maxPlayers || 4} players!`;
+            }
+            if (network.role === 'HOST' && network.isConnected) {
+                network.send({
+                    type: '2V2_LOBBY_SYNC',
+                    slots: this.slots2v2,
+                    bans: this.bans2v2,
+                    map: this.selected2v2Map
+                });
             }
         };
 

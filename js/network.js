@@ -275,7 +275,11 @@ export class WebRTCNetworkProvider {
         this.manager = manager;
         this.peer = null;
         this.conn = null;
+        this.conns = [];
         this.role = null; // 'HOST' | 'CLIENT' | null
+        this.slotIndex = 0;
+        this.roomMode = '1v1';
+        this.maxPlayers = 2;
         this.roomCode = null;
         this.isConnected = false;
         this.connectionTimeout = null;
@@ -313,13 +317,17 @@ export class WebRTCNetworkProvider {
         }
     }
 
-    createRoom() {
+    createRoom(mode = '1v1') {
         this.disconnect();
         this.role = 'HOST';
+        this.slotIndex = 0;
+        this.roomMode = mode;
+        this.maxPlayers = (mode === '2v2') ? 4 : 2;
+        this.conns = [];
         this.roomCode = generateRoomCode();
         const peerId = this.getPeerIdFromCode(this.roomCode);
 
-        this.manager.notifyStatus(`[Online 2] Initializing P2P room [${this.roomCode}]...`);
+        this.manager.notifyStatus(`[Online 2] Initializing P2P ${mode.toUpperCase()} room [${this.roomCode}]...`);
 
         try {
             if (typeof Peer === 'undefined') {
@@ -336,8 +344,8 @@ export class WebRTCNetworkProvider {
 
             this.peer.on('open', () => {
                 this.startHeartbeat();
-                this.manager.notifyStatus(`[Online 2] Room [${this.roomCode}] ready! Waiting for opponent...`);
-                this.manager.notifyRoomCreated(this.roomCode);
+                this.manager.notifyStatus(`[Online 2] ${this.roomMode.toUpperCase()} Room [${this.roomCode}] ready! Waiting for players...`);
+                this.manager.notifyRoomCreated(this.roomCode, 0, this.roomMode);
             });
 
             this.peer.on('disconnected', () => {
@@ -349,15 +357,27 @@ export class WebRTCNetworkProvider {
             });
 
             this.peer.on('connection', (conn) => {
-                this.manager.notifyStatus(`[Online 2] Opponent establishing P2P handshake...`);
-                this.conn = conn;
-                this.setupConnection(conn, true);
+                this.manager.notifyStatus(`[Online 2] Peer establishing P2P handshake...`);
+                if (this.role === 'HOST') {
+                    if (this.conns.length >= (this.maxPlayers - 1)) {
+                        console.warn('[Online 2] Room is full!');
+                        conn.close();
+                        return;
+                    }
+                    this.conns.push(conn);
+                    conn.slotIndex = this.conns.length; // slot 1, 2, or 3
+                    this.conn = conn; // backward compat
+                    this.setupConnection(conn, true);
+                } else {
+                    this.conn = conn;
+                    this.setupConnection(conn, false);
+                }
             });
 
             this.peer.on('error', (err) => {
                 console.error('[WebRTC Host Error]', err);
                 if (err.type === 'unavailable-id') {
-                    this.createRoom();
+                    this.createRoom(this.roomMode);
                 } else if (err.type === 'network') {
                     this.manager.notifyStatus('[Online 2] Signaling network error. Retrying...', true);
                 } else {
@@ -446,11 +466,34 @@ export class WebRTCNetworkProvider {
         }
 
         const handleOpen = () => {
-            if (this.isConnected) return;
             this.clearConnectionTimeout();
             this.isConnected = true;
-            this.manager.notifyStatus(`[Online 2] ✅ P2P connection established! Entering arena...`);
-            this.manager.notifyConnected(this.role, this.roomCode);
+            if (isHost) {
+                const assignedSlot = conn.slotIndex || 1;
+                this.manager.notifyStatus(`[Online 2] ✅ Player joined P2P room! (Slot ${assignedSlot + 1})`);
+                
+                // Immediately send slot assignment packet to the joined client!
+                try {
+                    conn.send({
+                        type: 'PEER_SLOT_ASSIGN',
+                        slotIndex: assignedSlot,
+                        roomMode: this.roomMode,
+                        roomCode: this.roomCode,
+                        playerCount: this.conns.length + 1,
+                        maxPlayers: this.maxPlayers
+                    });
+                } catch (e) {}
+
+                this.manager.notifyConnected(this.role, this.roomCode, 0, this.roomMode);
+                this.manager.notifyMembersUpdate({
+                    playerCount: this.conns.length + 1,
+                    maxPlayers: this.maxPlayers,
+                    roomCode: this.roomCode
+                });
+            } else {
+                this.manager.notifyStatus(`[Online 2] ✅ P2P connection established!`);
+                this.manager.notifyConnected(this.role, this.roomCode, this.slotIndex, this.roomMode);
+            }
         };
 
         if (conn.open) {
@@ -460,14 +503,63 @@ export class WebRTCNetworkProvider {
         }
 
         conn.on('data', (data) => {
-            this.manager.notifyData(data);
+            if (!data) return;
+
+            if (data.type === 'PEER_SLOT_ASSIGN') {
+                this.slotIndex = data.slotIndex || 1;
+                this.roomMode = data.roomMode || '1v1';
+                this.roomCode = data.roomCode || this.roomCode;
+                this.manager.notifyStatus(`[Online 2] ✅ Connected to ${this.roomMode.toUpperCase()} Room [${this.roomCode}] (Slot ${this.slotIndex + 1})!`);
+                this.manager.notifyConnected('CLIENT', this.roomCode, this.slotIndex, this.roomMode);
+                this.manager.notifyMembersUpdate({
+                    playerCount: data.playerCount,
+                    maxPlayers: data.maxPlayers,
+                    roomCode: this.roomCode
+                });
+                return;
+            }
+
+            const senderSlot = isHost ? (conn.slotIndex || 1) : 0;
+            this.manager.notifyData(data, senderSlot);
+
+            // In 2v2, if host receives lobby sync packets from a client, relay to all other clients!
+            if (isHost && this.roomMode === '2v2' && (
+                data.type === '2V2_SLOT_UPDATE' ||
+                data.type === '2V2_BAN_UPDATE' ||
+                data.type === '2V2_READY' ||
+                data.type === '2V2_MAP_SELECT' ||
+                data.type === '2V2_LOBBY_SYNC' ||
+                data.type === 'CHAR_SELECT'
+            )) {
+                this.conns.forEach(otherConn => {
+                    if (otherConn !== conn && otherConn.open) {
+                        try { otherConn.send(data); } catch(e) {}
+                    }
+                });
+            }
         });
 
         conn.on('close', () => {
-            this.isConnected = false;
-            this.clearConnectionTimeout();
-            this.manager.notifyStatus(`[Online 2] ⚠️ Lost P2P connection with opponent!`, true);
-            this.manager.notifyDisconnected();
+            if (isHost) {
+                const idx = this.conns.indexOf(conn);
+                if (idx !== -1) {
+                    this.conns.splice(idx, 1);
+                }
+                this.manager.notifyStatus(`[Online 2] ⚠️ Player disconnected from P2P room.`);
+                this.manager.notifyMembersUpdate({
+                    playerCount: this.conns.length + 1,
+                    maxPlayers: this.maxPlayers,
+                    roomCode: this.roomCode
+                });
+                if (this.conns.length === 0) {
+                    this.isConnected = false;
+                }
+            } else {
+                this.isConnected = false;
+                this.clearConnectionTimeout();
+                this.manager.notifyStatus(`[Online 2] ⚠️ Lost P2P connection with host!`, true);
+                this.manager.notifyDisconnected();
+            }
         });
 
         conn.on('error', (err) => {
@@ -478,12 +570,25 @@ export class WebRTCNetworkProvider {
     }
 
     send(data) {
-        if (!this.conn) return;
-        if (this.conn.open) {
-            try {
-                this.conn.send(data);
-            } catch (e) {
-                console.error('[WebRTC send error]', e);
+        if (this.role === 'HOST') {
+            if (this.conns && this.conns.length > 0) {
+                this.conns.forEach(conn => {
+                    if (conn && conn.open) {
+                        try { conn.send(data); } catch (e) {
+                            console.error('[WebRTC send error]', e);
+                        }
+                    }
+                });
+            } else if (this.conn && this.conn.open) {
+                try { this.conn.send(data); } catch (e) {
+                    console.error('[WebRTC send error]', e);
+                }
+            }
+        } else {
+            if (this.conn && this.conn.open) {
+                try { this.conn.send(data); } catch (e) {
+                    console.error('[WebRTC send error]', e);
+                }
             }
         }
     }
@@ -492,6 +597,12 @@ export class WebRTCNetworkProvider {
         this.isConnected = false;
         this.clearConnectionTimeout();
         this.stopHeartbeat();
+        if (this.conns) {
+            this.conns.forEach(c => {
+                try { c.close(); } catch(e) {}
+            });
+            this.conns = [];
+        }
         if (this.conn) {
             try { this.conn.close(); } catch(e) {}
             this.conn = null;
@@ -501,6 +612,8 @@ export class WebRTCNetworkProvider {
             this.peer = null;
         }
         this.role = null;
+        this.slotIndex = 0;
+        this.roomMode = '1v1';
     }
 }
 
@@ -531,6 +644,10 @@ export class NetworkManager {
         
         const modeLabel = target === 'WEBSOCKET' ? 'ONLINE 1 (WebSocket Server)' : 'ONLINE 2 (WebRTC P2P)';
         this.notifyStatus(`Selected mode: ${modeLabel}`);
+    }
+
+    get activeMode() {
+        return this.mode;
     }
 
     get role() {
