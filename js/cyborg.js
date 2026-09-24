@@ -97,15 +97,17 @@ export class Cyborg {
         this.hp = this.maxHp;
         this.maxEnergy = 100;
         // Ultimate recharge cooldown scaling:
-        // Saitama: 225% cooldown (1 / 2.25)
-        // Megumi, Sukuna, Gojo: 175% cooldown (1 / 1.75)
-        // Others: 100% cooldown (1.0)
+        // Base cooldown increased by +50% (cooldown time x1.5 -> charge rate / 1.5)
+        // Saitama: 225% cooldown (1 / (2.25 * 1.5))
+        // Megumi, Sukuna, Gojo: 175% cooldown (1 / (1.75 * 1.5))
+        // Others: 100% cooldown (1 / (1.0 * 1.5))
+        const baseUltCooldownMult = 1.5;
         if (characterId === 'saitama') {
-            this.overdriveChargeRate = 1 / 2.25;
+            this.overdriveChargeRate = 1 / (2.25 * baseUltCooldownMult);
         } else if (characterId === 'megumi' || characterId === 'sukuna' || characterId === 'gojo') {
-            this.overdriveChargeRate = 1 / 1.75;
+            this.overdriveChargeRate = 1 / (1.75 * baseUltCooldownMult);
         } else {
-            this.overdriveChargeRate = 1.0;
+            this.overdriveChargeRate = 1 / (1.0 * baseUltCooldownMult);
         }
         this.overdrive = 0;
         this.roundsWon = 0;
@@ -261,7 +263,8 @@ export class Cyborg {
         }
 
         if (!this.isUsingUltimate && !isOpponentUltActive && this.overdrive < 100) {
-            const passiveGain = 0.12 * this.overdriveChargeRate;
+            // Giảm 50% hiệu quả hồi ulti thụ động (0.12 -> 0.06)
+            const passiveGain = 0.06 * this.overdriveChargeRate;
             this.overdrive = Math.min(100, this.overdrive + passiveGain * dt);
         }
 
