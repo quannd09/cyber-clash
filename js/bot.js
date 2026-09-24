@@ -1,7 +1,7 @@
 // AI Bot Controller for Cyber Clash: Zero-G Arena
 // Features 4 Difficulties: Easy, Normal, Master, and Impossible (God AI)
-import { WEAPONS, combat } from './combat.js?v=75';
-import { physics } from './physics.js?v=75';
+import { WEAPONS, combat } from './combat.js?v=76';
+import { physics } from './physics.js?v=76';
 
 export class BotController {
     constructor(difficulty = 'normal') {

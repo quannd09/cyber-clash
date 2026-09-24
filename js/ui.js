@@ -1,6 +1,6 @@
-import { assets } from './assets.js?v=75';
-import { network } from './network.js?v=75';
-import { input } from './input.js?v=75';
+import { assets } from './assets.js?v=76';
+import { network } from './network.js?v=76';
+import { input } from './input.js?v=76';
 
 const SKILL_DATA = {
     yanagi: {
@@ -1105,7 +1105,7 @@ export class UIManager {
         if (!slot) return;
         const thumbEl = document.getElementById(`thumb-slot-${slotIndex}`);
         const nameEl = document.getElementById(`name-slot-${slotIndex}`);
-        if (thumbEl) thumbEl.src = `assets/${slot.char}/avatar.png?v=75`;
+        if (thumbEl) thumbEl.src = `assets/${slot.char}/avatar.png?v=76`;
         if (nameEl) nameEl.textContent = this.getCharDisplayName(slot.char);
 
         const isBlue = (slotIndex === 0 || slotIndex === 1);
@@ -1126,7 +1126,7 @@ export class UIManager {
         const btnClearBlue = document.getElementById('btn-blue-no-ban');
 
         if (blueBan !== 'none') {
-            if (thumbBlue) { thumbBlue.src = `assets/${blueBan}/avatar.png?v=75`; thumbBlue.classList.remove('hidden'); }
+            if (thumbBlue) { thumbBlue.src = `assets/${blueBan}/avatar.png?v=76`; thumbBlue.classList.remove('hidden'); }
             if (thumbBlueNone) thumbBlueNone.classList.add('hidden');
             if (nameBlue) nameBlue.textContent = this.getCharDisplayName(blueBan);
         } else {
@@ -1142,7 +1142,7 @@ export class UIManager {
         const btnClearRed = document.getElementById('btn-red-no-ban');
 
         if (redBan !== 'none') {
-            if (thumbRed) { thumbRed.src = `assets/${redBan}/avatar.png?v=75`; thumbRed.classList.remove('hidden'); }
+            if (thumbRed) { thumbRed.src = `assets/${redBan}/avatar.png?v=76`; thumbRed.classList.remove('hidden'); }
             if (thumbRedNone) thumbRedNone.classList.add('hidden');
             if (nameRed) nameRed.textContent = this.getCharDisplayName(redBan);
         } else {

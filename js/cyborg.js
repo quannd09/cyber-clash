@@ -1,9 +1,9 @@
 // Cyborg Fighter Entity Class
-import { sound } from './audio.js?v=75';
-import { fx } from './particles.js?v=75';
-import { physics } from './physics.js?v=75';
-import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=75';
-import { input } from './input.js?v=75';
+import { sound } from './audio.js?v=76';
+import { fx } from './particles.js?v=76';
+import { physics } from './physics.js?v=76';
+import { WEAPONS, SKILLS, Projectile, combat } from './combat.js?v=76';
+import { input } from './input.js?v=76';
 
 export class Cyborg {
     constructor(index, startX, startY, color, name = 'CYBORG', characterId = 'yanagi') {
@@ -47,7 +47,7 @@ export class Cyborg {
         };
         this.color = charColors[characterId] || color || '#a78bfa';
         this.combatStyle = charStyles[characterId] || 'melee';
-        this.teamId = index < 2 ? 0 : 1; // Team 0 = Blue, Team 1 = Red
+        this.teamId = (index === 0) ? 0 : 1; // Default: P1 is Team 0, P2 is Team 1 (2v2 overrides explicitly)
         this.gravityEnabled = false;
         this.isGrounded = false;
         this.jumpCount = 0;
@@ -848,6 +848,9 @@ export class Cyborg {
 
         sound.playUltimate();
         fx.spawnClashShockwave(this.x, this.y);
+        if (typeof window !== 'undefined' && window.game && window.game.renderer) {
+            window.game.renderer.triggerUltimateCutIn(this);
+        }
         
         const ultShouts = {
             yanagi: '⚡ LIGHTNING CANNON! ⚡',

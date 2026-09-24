@@ -1,15 +1,15 @@
 // Main Game Controller & 60 FPS RequestAnimationFrame Loop
-import { sound } from './audio.js?v=75';
-import { input } from './input.js?v=75';
-import { fx } from './particles.js?v=75';
-import { combat, Projectile } from './combat.js?v=75';
-import { Cyborg } from './cyborg.js?v=75';
-import { GameRenderer } from './renderer.js?v=75';
-import { UIManager } from './ui.js?v=75';
-import { network } from './network.js?v=75';
-import { BotController } from './bot.js?v=75';
-import { physics } from './physics.js?v=75';
-import { mapManager, MAPS } from './maps.js?v=75';
+import { sound } from './audio.js?v=76';
+import { input } from './input.js?v=76';
+import { fx } from './particles.js?v=76';
+import { combat, Projectile } from './combat.js?v=76';
+import { Cyborg } from './cyborg.js?v=76';
+import { GameRenderer } from './renderer.js?v=76';
+import { UIManager } from './ui.js?v=76';
+import { network } from './network.js?v=76';
+import { BotController } from './bot.js?v=76';
+import { physics } from './physics.js?v=76';
+import { mapManager, MAPS } from './maps.js?v=76';
 
 const STATE_LOADOUT = 'LOADOUT';
 const STATE_COUNTDOWN = 'COUNTDOWN';
@@ -353,6 +353,8 @@ class CyberClashGame {
 
         this.p1 = new Cyborg(0, 240, 390, p1Color, p1Name, p1Char);
         this.p2 = new Cyborg(1, 1040, 390, p2Color, p2Name, p2Char);
+        this.p1.teamId = 0;
+        this.p2.teamId = 1;
 
         this.p1.roundsWon = 0;
         this.p2.roundsWon = 0;
@@ -1351,6 +1353,7 @@ class CyberClashGame {
                 fx.spawnClashShockwave(this.p2.x, this.p2.y);
                 const shout = this.getUltimateShout(this.p2.characterId);
                 fx.addText(this.p2.x, this.p2.y - 45, shout, this.p2.color, 28, 60);
+                this.renderer.triggerUltimateCutIn(this.p2);
                 this.renderer.triggerShake(15, 25);
             }
             if (this.p1 && this.p1.isUsingUltimate && !prevP1Ult) {
@@ -1358,6 +1361,7 @@ class CyberClashGame {
                 fx.spawnClashShockwave(this.p1.x, this.p1.y);
                 const shout = this.getUltimateShout(this.p1.characterId);
                 fx.addText(this.p1.x, this.p1.y - 45, shout, this.p1.color, 28, 60);
+                this.renderer.triggerUltimateCutIn(this.p1);
                 this.renderer.triggerShake(15, 25);
             }
 
@@ -1529,6 +1533,9 @@ class CyberClashGame {
                 fx.draw(this.ctx);
                 this.renderer.drawHUD(this.p1, this.p2, this.matchTimer, this.roundMessage);
             }
+
+            // Universal Cinematic Ultimate Cut-In Banner
+            this.renderer.drawUltimateCutIn(this.ctx);
         }
     }
 }

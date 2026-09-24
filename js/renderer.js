@@ -1,7 +1,7 @@
 // Cyberpunk Neon Glow Canvas Renderer
-import { WEAPONS } from './combat.js?v=75';
-import { assets } from './assets.js?v=75';
-import { mapManager } from './maps.js?v=75';
+import { WEAPONS } from './combat.js?v=76';
+import { assets } from './assets.js?v=76';
+import { mapManager } from './maps.js?v=76';
 
 export class GameRenderer {
     constructor(canvas, ctx) {
@@ -18,6 +18,7 @@ export class GameRenderer {
 
         this.gridOffset = 0;
         this.reactorAngle = 0;
+        this.activeUltimateCutIn = null;
     }
 
     triggerShake(intensity = 8, duration = 12) {
@@ -39,6 +40,12 @@ export class GameRenderer {
         }
         if (this.flashAlpha > 0) {
             this.flashAlpha = Math.max(0, this.flashAlpha - 0.04 * dt);
+        }
+        if (this.activeUltimateCutIn) {
+            this.activeUltimateCutIn.timer -= dt;
+            if (this.activeUltimateCutIn.timer <= 0) {
+                this.activeUltimateCutIn = null;
+            }
         }
         this.gridOffset = (this.gridOffset + 0.4 * dt) % 40;
         this.reactorAngle += 0.015 * dt;
@@ -1309,45 +1316,146 @@ export class GameRenderer {
                 ctx.restore();
 
             } else if (c.characterId === 'megumi') {
-                // MEGUMI: EIGHT-HANDLED SWORD MAHORAGA CLEAVE ⚔️
+                // MEGUMI: EIGHT-HANDLED SWORD DIVERGENT SILA DIVINE GENERAL MAHORAGA ⚔️
                 ctx.save();
-                // 1. Dharmachakra (Eight-spoked wheel floating behind Megumi)
+
+                // 1. Divine General Mahoraga Titan Winged Silhouette Rising from Shadows
                 ctx.save();
-                ctx.translate(-40, -50);
-                ctx.rotate(c.ultimateTimer * 0.1);
-                ctx.strokeStyle = '#38bdf8';
-                ctx.shadowColor = '#0284c7';
-                ctx.shadowBlur = 35;
-                ctx.lineWidth = 4;
+                ctx.translate(-20, -60);
+                const titanFade = Math.min(1, c.ultimateTimer / 12);
+                ctx.globalAlpha = 0.55 * titanFade;
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 45;
+
+                // Wing canopy (feathered wings spreading wide behind Megumi)
+                ctx.fillStyle = '#f8fafc';
                 ctx.beginPath();
-                ctx.arc(0, 0, 50, 0, Math.PI * 2);
+                // Left wing
+                ctx.moveTo(-10, 0);
+                ctx.quadraticCurveTo(-100, -110, -210, -50);
+                ctx.quadraticCurveTo(-140, 20, -10, 35);
+                // Right wing
+                ctx.moveTo(10, 0);
+                ctx.quadraticCurveTo(100, -110, 210, -50);
+                ctx.quadraticCurveTo(140, 20, 10, 35);
+                ctx.fill();
+
+                // Muscular shadow titan torso & shoulders
+                ctx.fillStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.moveTo(-55, 40);
+                ctx.lineTo(-45, -45);
+                ctx.lineTo(-15, -75);
+                ctx.lineTo(15, -75);
+                ctx.lineTo(45, -45);
+                ctx.lineTo(55, 40);
+                ctx.closePath();
+                ctx.fill();
+
+                // Mahoraga glowing eyes
+                ctx.fillStyle = '#38bdf8';
+                ctx.shadowColor = '#00f0ff';
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(-16, -55, 4, 0, Math.PI * 2);
+                ctx.arc(16, -55, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // 2. The Sacred Eight-Spoked Dharmachakra Wheel (八握の法輪) Hovering Above
+                ctx.save();
+                ctx.translate(-30, -82);
+                ctx.rotate(c.ultimateTimer * 0.14); // Ratchet rotation
+
+                // Divine halo aura
+                ctx.shadowColor = '#fbbf24';
+                ctx.shadowBlur = 35;
+
+                // Outer golden ring (heavy ornate bevel)
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.arc(0, 0, 56, 0, Math.PI * 2);
                 ctx.stroke();
 
-                // 8 spokes
+                ctx.strokeStyle = '#fbbf24';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(0, 0, 56, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                ctx.arc(0, 0, 56, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Inner ring
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(0, 0, 32, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Central golden hub
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.arc(0, 0, 14, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.arc(0, 0, 7, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 8 Ornate Spokes with Diamond Arrowheads poking outward
                 for (let k = 0; k < 8; k++) {
-                    const angle = k * (Math.PI / 4);
+                    const spkAngle = k * (Math.PI / 4);
+                    ctx.save();
+                    ctx.rotate(spkAngle);
+
+                    // Spoke bar
+                    ctx.strokeStyle = '#fbbf24';
+                    ctx.lineWidth = 4;
                     ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(Math.cos(angle) * 50, Math.sin(angle) * 50);
+                    ctx.moveTo(0, 14);
+                    ctx.lineTo(0, 56);
                     ctx.stroke();
+
+                    // Diamond spearhead extending past outer rim
+                    ctx.fillStyle = '#ffffff';
+                    ctx.strokeStyle = '#d97706';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 72);
+                    ctx.lineTo(6, 56);
+                    ctx.lineTo(0, 50);
+                    ctx.lineTo(-6, 56);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.restore();
                 }
                 ctx.restore();
 
-                // 2. Colossal Divine Blade Slash sweeping forward
-                const slashProgress = Math.min(1, (c.ultimateTimer - 10) / 25);
-                const slashAngle = -Math.PI * 0.4 + slashProgress * Math.PI * 0.8;
+                // 3. Sword of Extermination (退魔の剣) & Colossal Cleave Arc
+                const slashProgress = Math.min(1, (c.ultimateTimer - 8) / 26);
+                const slashAngle = -Math.PI * 0.45 + slashProgress * Math.PI * 0.9;
                 ctx.shadowColor = '#38bdf8';
-                ctx.shadowBlur = 40;
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 14;
+                ctx.shadowBlur = 45;
+
+                // Outer sacred blade aura
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+                ctx.lineWidth = 36;
                 ctx.beginPath();
-                ctx.arc(60, 0, 280, slashAngle - 0.5, slashAngle + 0.5);
+                ctx.arc(70, 0, 310, slashAngle - 0.55, slashAngle + 0.55);
                 ctx.stroke();
 
-                ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
-                ctx.lineWidth = 32;
+                // Searing white positive energy core blade
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 16;
                 ctx.beginPath();
-                ctx.arc(60, 0, 280, slashAngle - 0.5, slashAngle + 0.5);
+                ctx.arc(70, 0, 310, slashAngle - 0.55, slashAngle + 0.55);
                 ctx.stroke();
 
                 ctx.restore();
@@ -1724,5 +1832,202 @@ export class GameRenderer {
             ctx.fill();
             ctx.stroke();
         }
+    }
+
+    triggerUltimateCutIn(user) {
+        if (!user) return;
+        const ultTitles = {
+            yanagi: { tag: '✦ ELECTRIC EXCEED ✦', title: 'LIGHTNING CANNON', sub: 'TSUKISHIRO YANAGI' },
+            velina: { tag: '✦ LIFE BLOOM HARMONY ✦', title: 'LIFE BLOSSOM STORM', sub: 'VERINA AIRGID' },
+            nicole: { tag: '✦ ZERO GRAVITY COLLAPSE ✦', title: 'GRAVITATIONAL BLACK HOLE', sub: 'NICOLE DEMARA' },
+            trigger: { tag: '✦ TACTICAL LOCK-ON ✦', title: 'SYNCHRONIZED FIREPOWER', sub: 'TRIGGER' },
+            vivian: { tag: '✦ ETHER WING DESCENT ✦', title: 'FEATHER STORM HARBINGER', sub: 'VIVIAN BANSHEE' },
+            jotaro: { tag: '✦ STAND PROUD: THE WORLD ✦', title: 'ORA ORA ORA: TIME STOP', sub: 'JOTARO KUJO' },
+            goku: { tag: '✦ SUPER SAIYAN BURST ✦', title: 'SUPER KAMEHAMEHA', sub: 'SON GOKU' },
+            giorno: { tag: '✦ GOLDEN EXPERIENCE REQUIEM ✦', title: 'RETURN TO ZERO', sub: 'GIORNO GIOVANNA' },
+            naoya: { tag: '✦ 24 FPS PROJECTION SORCERY ✦', title: 'MACH 3 PROJECTION BARRAGE', sub: "NAOYA ZEN'IN" },
+            luffy: { tag: '✦ GEAR 5 SUN GOD NIKA ✦', title: 'GOMU GOMU NO BAJRANG GUN', sub: 'MONKEY D. LUFFY' },
+            gojo: { tag: '✦ INNATE DOMAIN EXPANSION ✦', title: 'UNLIMITED VOID', sub: 'SATORU GOJO' },
+            sukuna: { tag: '✦ INNATE DOMAIN EXPANSION ✦', title: 'MALEVOLENT SHRINE', sub: 'RYOMEN SUKUNA' },
+            saitama: { tag: '✦ SERIOUS SERIES SPECIAL MOVE ✦', title: 'SERIOUS PUNCH: DEATH', sub: 'SAITAMA' },
+            megumi: { tag: '✦ TEN SHADOWS SACRED TECHNIQUE ✦', title: 'EIGHT-HANDLED SWORD: MAHORAGA', sub: 'FUSHIGURO MEGUMI' },
+            mirai: { tag: '✦ SPIRIT WORLD BLOOD CATACLYSM ✦', title: 'BLOOD WEAPON: FUYUKAI DESU', sub: 'KURIYAMA MIRAI' }
+        };
+        const info = ultTitles[user.characterId] || {
+            tag: '✦ MAXIMUM OVERDRIVE FINISHER ✦',
+            title: 'OVERDRIVE ULTIMATE',
+            sub: user.name || 'FIGHTER'
+        };
+
+        this.activeUltimateCutIn = {
+            user: user,
+            charId: user.characterId,
+            tag: info.tag,
+            title: info.title,
+            sub: info.sub,
+            color: user.color || '#38bdf8',
+            timer: 55,
+            maxTimer: 55
+        };
+        this.triggerFlash(user.color || '#ffffff', 0.55);
+        this.triggerShake(12, 18);
+    }
+
+    drawUltimateCutIn(ctx) {
+        if (!this.activeUltimateCutIn) return;
+        const cut = this.activeUltimateCutIn;
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const p = 1 - (cut.timer / cut.maxTimer);
+
+        // Alpha envelope: fade in first 8 frames, sustain, fade out last 8 frames
+        let alpha = 1;
+        if (cut.timer > cut.maxTimer - 8) {
+            alpha = (cut.maxTimer - cut.timer) / 8;
+        } else if (cut.timer < 8) {
+            alpha = cut.timer / 8;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+        // 1. Cinematic Dark Backdrop
+        ctx.fillStyle = 'rgba(3, 7, 18, 0.72)';
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. Cinematic Black Letterbox Bars (Top & Bottom)
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, w, 46);
+        ctx.fillRect(0, h - 46, w, 46);
+
+        // Border neon glow lines on letterbox
+        ctx.strokeStyle = cut.color;
+        ctx.shadowColor = cut.color;
+        ctx.shadowBlur = 15;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 46);
+        ctx.lineTo(w, 46);
+        ctx.moveTo(0, h - 46);
+        ctx.lineTo(w, h - 46);
+        ctx.stroke();
+
+        // 3. Dynamic Angled Slash Banner across screen center
+        const bannerH = 175;
+        const bannerY = h * 0.42;
+        const slideOffset = (1 - Math.sin(Math.min(1, p * 4) * Math.PI * 0.5)) * -220;
+
+        ctx.save();
+        ctx.translate(slideOffset, 0);
+
+        // Banner Polygon
+        const polyTopY = bannerY - bannerH * 0.5;
+        const polyBotY = bannerY + bannerH * 0.5;
+
+        // Banner gradient
+        const bgGrad = ctx.createLinearGradient(0, polyTopY, w, polyBotY);
+        bgGrad.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
+        bgGrad.addColorStop(0.35, 'rgba(2, 6, 23, 0.98)');
+        bgGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.95)');
+        bgGrad.addColorStop(1, 'rgba(2, 6, 23, 0.98)');
+
+        ctx.fillStyle = bgGrad;
+        ctx.beginPath();
+        ctx.moveTo(-100, polyTopY - 12);
+        ctx.lineTo(w + 100, polyTopY + 12);
+        ctx.lineTo(w + 100, polyBotY + 12);
+        ctx.lineTo(-100, polyBotY - 12);
+        ctx.closePath();
+        ctx.fill();
+
+        // Glowing border stripes
+        ctx.strokeStyle = cut.color;
+        ctx.lineWidth = 4;
+        ctx.shadowColor = cut.color;
+        ctx.shadowBlur = 24;
+        ctx.beginPath();
+        ctx.moveTo(-100, polyTopY - 12);
+        ctx.lineTo(w + 100, polyTopY + 12);
+        ctx.moveTo(-100, polyBotY - 12);
+        ctx.lineTo(w + 100, polyBotY + 12);
+        ctx.stroke();
+
+        // Animated neon speed lines passing across banner
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        for (let i = 0; i < 6; i++) {
+            const lineX = ((p * 2500 + i * 280) % (w + 400)) - 200;
+            const lineY = polyTopY + (i / 5) * bannerH;
+            ctx.beginPath();
+            ctx.moveTo(lineX, lineY);
+            ctx.lineTo(lineX + 180, lineY + 6);
+            ctx.stroke();
+        }
+
+        // 4. Character Portrait Cut-In
+        const avatar = assets.getCharacterAvatar ? assets.getCharacterAvatar(cut.charId) : null;
+        const portX = 220;
+        const portY = bannerY;
+        const portR = 64;
+
+        ctx.save();
+        ctx.shadowColor = cut.color;
+        ctx.shadowBlur = 30;
+
+        // Portrait glowing backdrop shield
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.strokeStyle = cut.color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(portX, portY, portR + 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw Avatar inside circle
+        if (avatar && avatar.complete && avatar.naturalWidth > 0) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(portX, portY, portR, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(avatar, portX - portR, portY - portR, portR * 2, portR * 2);
+            ctx.restore();
+        }
+        ctx.restore();
+
+        // 5. Stylized Typography & Titles
+        const textX = 320;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+
+        // Tagline (Category / Domain)
+        ctx.font = 'bold 15px Rajdhani, monospace';
+        ctx.fillStyle = cut.color;
+        ctx.shadowColor = cut.color;
+        ctx.shadowBlur = 12;
+        ctx.fillText(cut.tag, textX, bannerY - 42);
+
+        // Main Ultimate Title
+        ctx.font = '900 36px Orbitron, Rajdhani, sans-serif';
+        // Outer dark glow
+        ctx.shadowColor = '#000000';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+        ctx.strokeStyle = cut.color;
+        ctx.lineWidth = 5;
+        ctx.strokeText(cut.title, textX, bannerY);
+        // Inner white/bright fill
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(cut.title, textX, bannerY);
+
+        // Subtitle / Fighter Name
+        ctx.font = 'bold 17px Rajdhani, sans-serif';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#000000';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillText(`◆ ${cut.sub} ◆`, textX, bannerY + 40);
+
+        ctx.restore();
+        ctx.restore();
     }
 }

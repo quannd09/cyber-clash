@@ -1,6 +1,6 @@
-import { sound } from './audio.js?v=75';
-import { fx } from './particles.js?v=75';
-import { physics } from './physics.js?v=75';
+import { sound } from './audio.js?v=76';
+import { fx } from './particles.js?v=76';
+import { physics } from './physics.js?v=76';
 
 export const WEAPONS = {
     YANAGI: {
@@ -610,8 +610,8 @@ export class CombatResolver {
             for (let j = i + 1; j < players.length; j++) {
                 const pA = players[i];
                 const pB = players[j];
-                if (!pA || !pB || pA.isDead || pB.isDead) continue;
-                if (pA.teamId === pB.teamId) continue; // Teammates cannot harm each other!
+                if (!pA || !pB || pA.isDead || pB.isDead || pA === pB) continue;
+                if (pA.teamId !== undefined && pB.teamId !== undefined && pA.teamId === pB.teamId) continue; // Teammates cannot harm each other!
 
                 // 1. Blade Clash
                 this.resolveBladeClash(pA, pB, shake);
@@ -863,7 +863,7 @@ export class CombatResolver {
             for (const defender of players) {
                 if (!defender || defender.isDead) continue;
                 // Friendly Fire OFF
-                if (attacker && defender.teamId === attacker.teamId) continue;
+                if (attacker && attacker !== defender && attacker.teamId !== undefined && defender.teamId !== undefined && defender.teamId === attacker.teamId) continue;
                 if (defender.index === proj.ownerIndex) continue;
 
                 // Capsule hitbox covering entire character body from head to toe
